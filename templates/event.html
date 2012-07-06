@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Events - {{event[0]}} {% endblock %}
+
+{% block content %}
+
+	<table id="events">
+		<tr>
+			<td>time_recieved</td>
+			<td>{{ event.received_time }}</td>
+		</tr>
+		<tr>
+			<td>time_logged</td>
+			<td>{{ event.reported_time }}</td>
+		</tr>
+		<tr>
+			<td>host</td>
+			<td>{{ event.host }}</td>
+		</tr>
+		<tr>
+			<td>facility</td>
+			<td>{{ event.facility }}</td>
+		</tr>
+		<tr>
+			<td>priority</td>
+			<td>{{ event.priority }}</td>
+		</tr>
+		<tr>
+			<td>level</td>
+			<td>{{ event.level }}</td>
+		</tr>
+		<tr>
+			<td>tag</td>
+			<td>{{ event.tag }}</td>
+		</tr>
+		<tr>
+			<td>program</td>
+			<td>{{ event.program }}</td>
+		</tr>
+		<tr>
+			<td>message</td>
+			<td>{{ event.message }}</td>
+		</tr>
+	</table>
+	
+{% endblock %}

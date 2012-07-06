@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Events{% if type %} &rarr; {{ type }} = {{ value }}{% endif %}{% endblock %}
+
+{% block content %}
+
+	<table id="events">
+        <thead>
+			<tr>
+				<th width="157">time_logged</th>
+				<th>host</th>
+				<th>facility</th>
+				<th>priority</th>
+				<th>tag</th>
+				<th>program</th>
+				<th>message</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for event in events.get_rows(page, pagesize) %}
+			<tr>
+				<td>{{ event.reported_time }}</td>
+				<td><a href="/events/filter/host/{{ event.host }}">{{ event.host }}</a></td>
+				<td class="color_{{ event.level }}"><a href="/events/filter/facility/{{ event.facility }}">{{ event.facility }}</a></td>
+				<td><a href="/events/filter/priority/{{ event.priority }}">{{ event.priority }}</a></td>
+				<td>{{ event.tag }}</td>
+				<td><a href="/events/filter/program/{{ event.program }}">{{ event.program }}</a></td>
+				<td><a href="/events/{{event.id}}">{{ event.message }}</a></td>
+			</tr>
+		{% endfor %}
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="7" id="pagecount">
+					
+					{% if page > 0 %}<a href="/events?page={{page - 1}}">&larr;</a>{% endif %}
+					{{ page + 1 }} / {{ events.get_count() }}
+					{% if page < events.get_count() / pagesize %}<a href="/events?page={{page + 1}}">&rarr;</a>{% endif %}
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+
+{% endblock %}

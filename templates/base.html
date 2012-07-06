@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>pyLogView &gt;&gt; {% block title %}{% endblock %}</title>
+		<link rel="stylesheet" type="text/css" href="/static/css/base.css" />
+		<link rel="stylesheet" type="text/css" href="/static/css/jquery.jqplot.css" />
+		
+		<!--[if lt IE 9]><script language="javascript" type="text/javascript" src="/static/js/excanvas.js"></script><![endif]-->
+		<script language="javascript" type="text/javascript" src="/static/js/jquery.min.js"></script>
+		<script language="javascript" type="text/javascript" src="/static/js/jquery.jqplot.min.js"></script>
+	</head>
+
+	<body>
+		<h1>{{ self.title() }}</h1>
+		<div id="menu">
+			{% include 'menu.html' %}
+		</div>
+		
+		<div id="main">
+			{% block content %}
+			{% endblock %}
+		</div>
+		
+		{% block scripts %}
+		{% endblock %}
+	</body>
+</html>

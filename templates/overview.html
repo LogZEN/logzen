@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Overview{% endblock %}
+
+{% block content %}    
+<div id="chartdiv" style="height:400px;width:300px; "></div>
+<script>
+$.jqplot('chartdiv',  [[[1,{{count_last_hour}}], [2, {{count_this_hour}}]]]);
+</script>
+
+count = {{count}}
+this_hour = {{count_this_hour}}
+last_hour = {{count_last_hour}}
+{% endblock %}

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% set maxpages = (events.get_count() / pagesize)|round(0, 'ceil')|int %}
+
 {% block title %}Events{% if type %} &rarr; {{ type }} = {{ value }}{% endif %}{% endblock %}
 
 {% block content %}
@@ -10,14 +12,14 @@
 				<th width="157">time_logged</th>
 				<th>host</th>
 				<th>facility</th>
-				<th>priority</th>
+				<th>severity</th>
 				<th>tag</th>
 				<th>program</th>
 				<th>message</th>
 			</tr>
 		</thead>
 		<tbody>
-		{% for event in events.get_rows(page, pagesize) %}
+		{% for event in events.get_rows(page * pagesize, pagesize) %}
 			<tr>
 				<td>{{ event.reported_time }}</td>
 				<td><a href="/events/filter/host/{{ event.host }}">{{ event.host }}</a></td>
@@ -32,10 +34,9 @@
 		<tfoot>
 			<tr>
 				<td colspan="7" id="pagecount">
-					
-					{% if page > 0 %}<a href="/events?page={{page - 1}}">&larr;</a>{% endif %}
-					{{ page + 1 }} / {{ events.get_count() }}
-					{% if page < events.get_count() / pagesize %}<a href="/events?page={{page + 1}}">&rarr;</a>{% endif %}
+					<span class="arrow">{% if page > 0 %}<a href="/events{% if type %}/filter/{{type}}/{{value}}{% endif %}?page={{page - 1}}">&larr;</a>{% endif %}</span>
+					[ {{ page + 1 }} / {{ maxpages }} ]
+					<span class="arrow">{% if page + 1 < maxpages %}<a href="/events{% if type %}/filter/{{type}}/{{value}}{% endif %}?page={{page + 1}}">&rarr;</a>{% endif %}</span>
 				</td>
 			</tr>
 		</tfoot>

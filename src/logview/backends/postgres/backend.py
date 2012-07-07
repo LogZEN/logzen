@@ -23,7 +23,7 @@ class PostgresResult:
               AND priority = COALESCE(%(priority)s, priority)
               AND level = COALESCE(%(level)s, level)
               AND program = COALESCE(%(program)s, program)
-            ORDER BY reported_time DESC
+            ORDER BY reported_time DESC;
         '''
 
         self.__cursor.execute(sql, collections.defaultdict(lambda: None, filters))

@@ -38,4 +38,6 @@ class Events:
         events = backend.get_events({type: value})
         return template.render(events = events,
                                page = int(page),
-                               pagesize = 50)
+                               pagesize = 50,
+                               type = type,
+                               value = value)

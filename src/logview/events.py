@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with pyLogView.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import socket
+
 import cherrypy
 
 from logview.backends import backend
@@ -80,5 +82,7 @@ class Events:
         template = templates.get_template('tooltip.ajax.html')
 
         event = backend.get_event(event_id)
+
+        event['ip'] = socket.gethostbyname(event['host'])
         return template.render(event = event)
 

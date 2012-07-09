@@ -154,3 +154,29 @@ table#events input[type="text"] {
 	width: 96%;
 	margin: 0px auto;
 }
+
+
+
+
+/*
+ * tooltip event layout
+ */
+#tooltip_event td {
+	vertical-align: top;
+	clear: both;
+}
+#tooltip_event td span#text {
+	display: none;
+}
+#tooltip_event td span#image {
+	background-image: url('/static/img/google.png');
+	width: 16px;
+	height: 16px;
+	display: block;
+	float: right;
+}
+#tooltip_event td span#image:hover {
+	background-image: url('/static/img/google_hover.png');
+	width: 16px;
+	height: 16px;
+}

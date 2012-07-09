@@ -1,4 +1,4 @@
-<table id="event">
+<table id="tooltip_event">
 	<tr>
 		<td>time_recieved</td>
 		<td>{{ event.received_time }}</td>
@@ -12,16 +12,16 @@
 		<td>{{ event.host }}</td>
 	</tr>
 	<tr>
+		<td>ip</td>
+		<td>{{ event.ip }}</td>
+	</tr>
+	<tr>
 		<td>facility</td>
 		<td>{{ event.facility }}</td>
 	</tr>
 	<tr>
 		<td>priority</td>
-		<td>{{ event.priority }}</td>
-	</tr>
-	<tr>
-		<td>level</td>
-		<td>{{ event.level }}</td>
+		<td>{{ event.severity }}</td>
 	</tr>
 	<tr>
 		<td>tag</td>
@@ -32,7 +32,13 @@
 		<td>{{ event.program }}</td>
 	</tr>
 	<tr>
-		<td>message</td>
-		<td>{{ event.message }}</td>
+		<td valign="middle">message</td>
+		<td>
+			{{ event.message }}
+			<a href="http://google.com/search?q={{ event.message }}" target="_blank"> &nbsp;
+				<span id=text>Google</span>
+				<span id="image"></span>
+			</a>
+		</td>
 	</tr>
 </table>

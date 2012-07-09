@@ -14,7 +14,6 @@
 				<th>host</th>
 				<th>facility</th>
 				<th>severity</th>
-				<th>tag</th>
 				<th>program</th>
 				<th width="40%">message</th>
 			</tr>
@@ -23,7 +22,6 @@
 				<th><input type="text" name="filter_host" id="filter_host" placeholder="filter" size="5" /></th>
 				<th><input type="text" name="filter_facility" id="filter_facility" placeholder="filter" size="5" /></th>
 				<th><input type="text" name="filter_severity" id="filter_severity" placeholder="filter" size="5" /></th>
-				<th><input type="text" name="filter_tag" id="filter_tag" placeholder="filter" size="5" /></th>
 				<th><input type="text" name="filter_program" id="filter_program" placeholder="filter" size="5" /></th>
 				<th><input type="text" name="filter_message" id="filter_message" placeholder="filter" size="5" /></th>
 			</tr>
@@ -44,7 +42,6 @@
             host = $form.find('input[name="filter_host"]').val(),
             facility = $form.find('input[name="filter_facility"]').val(),
             severity = $form.find('input[name="filter_severity"]').val(),
-            tag = $form.find('input[name="filter_tag"]').val(),
             program = $form.find('input[name="filter_program"]').val(),
             message = $form.find('input[name="filter_message"]').val(),
             url = $form.attr('action');

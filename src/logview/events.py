@@ -53,7 +53,6 @@ class Events:
                host = None,
                facility = None,
                severity = None,
-               tag = None,
                program = None,
                message = None):
         template = templates.get_template('eventlist.ajax.html')
@@ -65,8 +64,6 @@ class Events:
             filters['facility'] = '%' + facility + '%'
         if severity is not None:
             filters['severity'] = '%' + severity + '%'
-        if tag is not None:
-            filters['tag'] = '%' + tag + '%'
         if program is not None:
             filters['program'] = '%' + program + '%'
         if message is not None:

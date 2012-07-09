@@ -40,7 +40,6 @@ class PostgresResult:
             WHERE host LIKE COALESCE(%(host)s, host)
               AND facility LIKE COALESCE(%(facility)s, facility)
               AND severity LIKE COALESCE(%(severity)s, severity)
-              AND tag LIKE COALESCE(%(tag)s, tag)
               AND program LIKE COALESCE(%(program)s, program)
               AND message LIKE COALESCE(%(message)s, message)
             ORDER BY reported_time DESC;

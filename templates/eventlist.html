@@ -2,10 +2,11 @@
 
 {% set maxpages = (events.get_count() / pagesize)|round(0, 'ceil')|int %}
 
-{% block title %}Events{% if type %} &rarr; {{ type }} = {{ value }}{% endif %}{% endblock %}
+{% block title %}Events{% endblock %}
 
 {% block content %}
 
+	<form action="/events/filter" method="post" id="filterform">
 	<table id="events">
         <thead>
 			<tr>
@@ -15,31 +16,54 @@
 				<th>severity</th>
 				<th>tag</th>
 				<th>program</th>
-				<th>message</th>
+				<th width="40%">message</th>
+			</tr>
+			<tr>
+				<th><input type="text" name="filter_time" id="filter_time" placeholder="filter" size="5" /></th>
+				<th><input type="text" name="filter_host" id="filter_host" placeholder="filter" size="5" /></th>
+				<th><input type="text" name="filter_facility" id="filter_facility" placeholder="filter" size="5" /></th>
+				<th><input type="text" name="filter_severity" id="filter_severity" placeholder="filter" size="5" /></th>
+				<th><input type="text" name="filter_tag" id="filter_tag" placeholder="filter" size="5" /></th>
+				<th><input type="text" name="filter_program" id="filter_program" placeholder="filter" size="5" /></th>
+				<th><input type="text" name="filter_message" id="filter_message" placeholder="filter" size="5" /></th>
 			</tr>
 		</thead>
-		<tbody>
-		{% for event in events.get_rows(page * pagesize, pagesize) %}
-			<tr>
-				<td>{{ event.reported_time }}</td>
-				<td><a href="/events/filter/host/{{ event.host }}">{{ event.host }}</a></td>
-				<td class="color_{{ event.level }}"><a href="/events/filter/facility/{{ event.facility }}">{{ event.facility }}</a></td>
-				<td><a href="/events/filter/priority/{{ event.priority }}">{{ event.priority }}</a></td>
-				<td>{{ event.tag }}</td>
-				<td><a href="/events/filter/program/{{ event.program }}">{{ event.program }}</a></td>
-				<td><a href="/events/{{event.id}}">{{ event.message }}</a></td>
-			</tr>
-		{% endfor %}
+		
+		<tbody id="tbody">
+		{% include 'eventlist.ajax.html' %}
 		</tbody>
-		<tfoot>
-			<tr>
-				<td colspan="7" id="pagecount">
-					<span class="arrow">{% if page > 0 %}<a href="/events{% if type %}/filter/{{type}}/{{value}}{% endif %}?page={{page - 1}}">&larr;</a>{% endif %}</span>
-					[ {{ page + 1 }} / {{ maxpages }} ]
-					<span class="arrow">{% if page + 1 < maxpages %}<a href="/events{% if type %}/filter/{{type}}/{{value}}{% endif %}?page={{page + 1}}">&rarr;</a>{% endif %}</span>
-				</td>
-			</tr>
-		</tfoot>
+		
 	</table>
+	</form>
 
+	<script>
+	$('#filterform').submit(function (event) {
+        event.preventDefault();
+        
+        var $form = $(this),
+            host = $form.find('input[name="filter_host"]').val(),
+            facility = $form.find('input[name="filter_facility"]').val(),
+            severity = $form.find('input[name="filter_severity"]').val(),
+            tag = $form.find('input[name="filter_tag"]').val(),
+            program = $form.find('input[name="filter_program"]').val(),
+            message = $form.find('input[name="filter_message"]').val(),
+            url = $form.attr('action');
+
+        $.post(url, { host: host, 
+        			  facility : facility,
+        			  severity: severity,
+        			  tag: tag,
+        			  program: program,
+        			  message: message }, 
+          function(data) {
+              var body_content = $(data);
+              $('#tbody').empty().append(body_content);
+              $('html, body').animate({scrollTop:0}, 'fast');
+          });
+	});
+	
+	$('#filterform').bind('keyup', function() {
+	    $('#filterform').submit();
+	});
+	</script>
 {% endblock %}

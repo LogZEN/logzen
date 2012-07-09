@@ -30,14 +30,30 @@ class Events:
 
     @cherrypy.expose
     def filter(self,
-               type,
-               value,
-               page = 0):
-        template = templates.get_template('eventlist.html')
+               page = 0,
+               host = None,
+               facility = None,
+               severity = None,
+               tag = None,
+               program = None,
+               message = None):
+        template = templates.get_template('eventlist.ajax.html')
 
-        events = backend.get_events({type: value})
+        filters = {}
+        if host is not None:
+            filters['host'] = '%' + host + '%'
+        if facility is not None:
+            filters['facility'] = '%' + facility + '%'
+        if severity is not None:
+            filters['severity'] = '%' + severity + '%'
+        if tag is not None:
+            filters['tag'] = '%' + tag + '%'
+        if program is not None:
+            filters['program'] = '%' + program + '%'
+        if message is not None:
+            filters['message'] = '%' + message + '%'
+
+        events = backend.get_events(filters)
         return template.render(events = events,
                                page = int(page),
-                               pagesize = 50,
-                               type = type,
-                               value = value)
+                               pagesize = 50)

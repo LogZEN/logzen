@@ -12,10 +12,9 @@ if __name__ == '__main__':
     dispatcher.connect('overview', '/', Overview())
 
     dispatcher.connect('events', '/events', Events(), action = 'list')
+    dispatcher.connect('events', '/events/filter', Events(), action = 'filter')
     dispatcher.connect('events', '/events/:event_id', Events(), action = 'details')
-    dispatcher.connect('events', '/events/filter/:type/:value', Events(), action = 'filter')
 
-    # Create CherryPy server
     config = {
         '/': {
               'request.dispatch': dispatcher

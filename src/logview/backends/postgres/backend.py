@@ -18,11 +18,12 @@ class PostgresResult:
         sql = '''
             SELECT *
             FROM events
-            WHERE host = COALESCE(%(host)s, host)
-              AND facility = COALESCE(%(facility)s, facility)
-              AND priority = COALESCE(%(priority)s, priority)
-              AND level = COALESCE(%(level)s, level)
-              AND program = COALESCE(%(program)s, program)
+            WHERE host LIKE COALESCE(%(host)s, host)
+              AND facility LIKE COALESCE(%(facility)s, facility)
+              AND severity LIKE COALESCE(%(severity)s, severity)
+              AND tag LIKE COALESCE(%(tag)s, tag)
+              AND program LIKE COALESCE(%(program)s, program)
+              AND message LIKE COALESCE(%(message)s, message)
             ORDER BY reported_time DESC;
         '''
 

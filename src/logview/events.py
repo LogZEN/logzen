@@ -76,3 +76,12 @@ class Events:
         return template.render(events = events,
                                page = int(page),
                                pagesize = 50)
+
+    @cherrypy.expose
+    def tooltip(self,
+                event_id):
+        template = templates.get_template('tooltip.ajax.html')
+
+        event = backend.get_event(event_id)
+        return template.render(event = event)
+

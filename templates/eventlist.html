@@ -49,21 +49,66 @@
             message = $form.find('input[name="filter_message"]').val(),
             url = $form.attr('action');
 
-        $.post(url, { host: host, 
-        			  facility : facility,
-        			  severity: severity,
-        			  tag: tag,
-        			  program: program,
-        			  message: message }, 
-          function(data) {
-              var body_content = $(data);
-              $('#tbody').empty().append(body_content);
-              $('html, body').animate({scrollTop:0}, 'fast');
-          });
-	});
+			$.post(url, { host: host, 
+						  facility : facility,
+						  severity: severity,
+						  program: program,
+						  message: message }, 
+			function(data) {
+			    var body_content = $(data);
+			    $('#tbody').empty().append(body_content);
+			    $('html, body').animate({scrollTop:0}, 'fast');
+
+				$(".event").each(function() {
+					$(this).qtip({
+						content: {
+							text: 'Loading...',
+							ajax: {
+								url: '/events/tooltip',
+								type: 'GET',
+								data: { event_id: this.id },
+								success: function(data, status) {
+									this.set('content.text', data);
+								}
+							}
+						},
+						hide: {
+					        fixed: true,
+							delay: 200
+						},
+						style: {
+							classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
+						}
+					});
+				});
+			});
+		});
 	
-	$('#filterform').bind('keyup', function() {
-	    $('#filterform').submit();
-	});
+		$('#filterform').bind('keyup', function() {
+		    $('#filterform').submit();
+		});
+		
+		$(".event").each(function() {
+			$(this).qtip({
+				content: {
+					text: 'Loading...',
+					ajax: {
+						url: '/events/tooltip',
+						type: 'GET',
+						data: { event_id: this.id },
+						success: function(data, status) {
+							this.set('content.text', data);
+						}
+					}
+				},
+				hide: {
+			        fixed: true,
+					delay: 200
+				},
+				style: {
+					classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
+				}
+			});
+		});
 	</script>
 {% endblock %}

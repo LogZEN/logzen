@@ -32,6 +32,7 @@ if __name__ == '__main__':
 
     dispatcher.connect('events', '/events', Events(), action = 'list')
     dispatcher.connect('events', '/events/filter', Events(), action = 'filter')
+    dispatcher.connect('events', '/events/tooltip', Events(), action = 'tooltip')
     dispatcher.connect('events', '/events/:event_id', Events(), action = 'details')
 
     config = {

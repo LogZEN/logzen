@@ -18,6 +18,8 @@ along with pyLogView.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import socket
+import datetime
+import humanize
 
 import cherrypy
 
@@ -84,5 +86,6 @@ class Events:
         event = backend.get_event(event_id)
 
         event['ip'] = socket.gethostbyname(event['host'])
-        return template.render(event = event)
+        event['ago_time'] = humanize.naturaltime(datetime.datetime.now() - event['reported_time'])
 
+        return template.render(event = event)

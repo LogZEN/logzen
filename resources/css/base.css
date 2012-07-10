@@ -161,22 +161,45 @@ table#events input[type="text"] {
 /*
  * tooltip event layout
  */
-#tooltip_event td {
+#tooltip_event td,
+#tooltip_event th {
 	vertical-align: top;
 	clear: both;
 }
+#tooltip_event th {
+	padding-right: 15px;
+	white-space: nowrap;
+}
+
 #tooltip_event td span#text {
 	display: none;
 }
-#tooltip_event td span#image {
+#tooltip_event td span#google_image {
 	background-image: url('/static/img/google.png');
 	width: 16px;
 	height: 16px;
+	margin-left: 5px;
 	display: block;
 	float: right;
 }
-#tooltip_event td span#image:hover {
+#tooltip_event td span#google_image:hover {
 	background-image: url('/static/img/google_hover.png');
 	width: 16px;
 	height: 16px;
+}
+#tooltip_event td span#link_image {
+	background-image: url('/static/img/link_new.png');
+	width: 16px;
+	height: 16px;
+	margin-left: 5px;
+	display: block;
+	float: right;
+}
+#tooltip_event td span#link_image:hover {
+	background-image: url('/static/img/link_hover.png');
+	width: 16px;
+	height: 16px;
+}
+#tooltip_event td.spacing {
+	line-height: 2px;
 }

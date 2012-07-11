@@ -188,7 +188,7 @@ table#events input[type="text"] {
 	height: 16px;
 }
 #tooltip_event td span#link_image {
-	background-image: url('/static/img/link_new.png');
+	background-image: url('/static/img/link.png');
 	width: 16px;
 	height: 16px;
 	margin-left: 5px;

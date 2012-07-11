@@ -35,77 +35,69 @@
 	</form>
 
 	<script>
-	$('#filterform').submit(function (event) {
-        event.preventDefault();
-        
-        var $form = $(this),
-            host = $form.find('input[name="filter_host"]').val(),
-            facility = $form.find('input[name="filter_facility"]').val(),
-            severity = $form.find('input[name="filter_severity"]').val(),
-            program = $form.find('input[name="filter_program"]').val(),
-            message = $form.find('input[name="filter_message"]').val(),
-            url = $form.attr('action');
-
-			$.post(url, { host: host, 
-						  facility : facility,
-						  severity: severity,
-						  program: program,
-						  message: message }, 
-			function(data) {
-			    var body_content = $(data);
-			    $('#tbody').empty().append(body_content);
-			    $('html, body').animate({scrollTop:0}, 'fast');
-
-				$(".event").each(function() {
-					$(this).qtip({
-						content: {
-							text: 'Loading...',
-							ajax: {
-								url: '/events/tooltip',
-								type: 'GET',
-								data: { event_id: this.id },
-								success: function(data, status) {
-									this.set('content.text', data);
-								}
-							}
-						},
-						hide: {
-					        fixed: true,
-							delay: 200
-						},
-						style: {
-							classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
-						}
-					});
+		$('#filterform').submit(function (event) {
+	        event.preventDefault();
+	        
+	        var $form = $(this),
+	            host = $form.find('input[name="filter_host"]').val(),
+	            facility = $form.find('input[name="filter_facility"]').val(),
+	            severity = $form.find('input[name="filter_severity"]').val(),
+	            program = $form.find('input[name="filter_program"]').val(),
+	            message = $form.find('input[name="filter_message"]').val(),
+	            url = $form.attr('action');
+	
+			$.post(url, { 
+					host: host, 
+					facility : facility,
+					severity: severity,
+					program: program,
+					message: message 
+				}, 
+				function(data) {
+				    var body_content = $(data);
+				    $('#tbody').empty().append(body_content);
+				    $('html, body').animate({scrollTop:0}, 'fast');
+		
+					set_tooltips();
 				});
-			});
 		});
 	
 		$('#filterform').bind('keyup', function() {
 		    $('#filterform').submit();
 		});
 		
-		$(".event").each(function() {
-			$(this).qtip({
-				content: {
-					text: 'Loading...',
-					ajax: {
-						url: '/events/tooltip',
-						type: 'GET',
-						data: { event_id: this.id },
-						success: function(data, status) {
-							this.set('content.text', data);
+		set_tooltips();
+
+		/*
+		 * set the tooltip for each result row
+		 */
+		function set_tooltips() {
+			$(".event").each(function() {
+				$(this).qtip({
+					content: {
+						text: 'Loading...',
+						ajax: {
+							url: '/events/tooltip',
+							type: 'GET',
+							data: { event_id: this.id },
+							success: function(data, status) {
+								this.set('content.text', data);
+							}
 						}
+					},
+					position: {
+						my: 'top left',
+						at: 'bottom center'
+					},
+					hide: {
+				        fixed: true,
+						delay: 200
+					},
+					style: {
+						classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
 					}
-				},
-				hide: {
-			        fixed: true,
-					delay: 200
-				},
-				style: {
-					classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
-				}
+				});
 			});
-		});
+		}
 	</script>
 {% endblock %}

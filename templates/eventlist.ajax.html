@@ -3,11 +3,11 @@
 		
 		{% for event in events.get_rows(page * pagesize, pagesize) %}
 			<tr>
-				<td>{{ event.reported_time }}</td>
-				<td><a href="javascript:void(0)" onclick="$('#filter_host').val($(this).html()); $('#filterform').submit();" class="event" id="{{ event.id }}">{{ event.host }}</a></td>
-				<td class="color_{{ event.level }}"><a href="javascript:void(0)" onclick="$('#filter_facility').val($(this).html()); $('#filterform').submit();">{{ event.facility }}</a></td>
-				<td><a href="javascript:void(0)" onclick="$('#filter_severity').val($(this).html()); $('#filterform').submit();">{{ event.severity }}</a></td>
-				<td><a href="javascript:void(0)" onclick="$('#filter_program').val($(this).html()); $('#filterform').submit();">{{ event.program }}</a></td>
+				<td class="event" id="{{ event.id }}">{{ event.reported_time }}</td>
+				<td class="event" id="{{ event.id }}"><a href="javascript:void(0)" onclick="$('#filter_host').val($(this).html()); $('#filterform').submit();">{{ event.host }}</a></td>
+				<td class="event color_{{ event.level }}" id="{{ event.id }}"><a href="javascript:void(0)" onclick="$('#filter_facility').val($(this).html()); $('#filterform').submit();">{{ event.facility }}</a></td>
+				<td class="event" id="{{ event.id }}"><a href="javascript:void(0)" onclick="$('#filter_severity').val($(this).html()); $('#filterform').submit();">{{ event.severity }}</a></td>
+				<td class="event" id="{{ event.id }}"><a href="javascript:void(0)" onclick="$('#filter_program').val($(this).html()); $('#filterform').submit();">{{ event.program }}</a></td>
 				<td><a href="javascript:void(0)" onclick="$('#filter_message').val($(this).html()); $('#filterform').submit();">{{ event.message }}</a></td>
 			</tr>
 		{% endfor %}

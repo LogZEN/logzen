@@ -64,7 +64,7 @@
         			  program: program,
         			  message: message }, 
 			function(data) {
-        		$('#navi').empty().append($(data).filter('#navi'));
+        		$('#navi').empty().append($(data).filter('#navi').html());
 				$('#tbody_content').empty().append($(data).find('#tbody').html());
 				$('html, body').animate({scrollTop:0}, 'fast');
           });

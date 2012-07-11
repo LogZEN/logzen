@@ -13,7 +13,7 @@
 			{% else %}
 				No Results
 			{% endif %}
-			</span>
+			</span> &nbsp;
 			<a href="#" class="button"><input type="checkbox" name="autorefresh" /> Refresh</a>
 			<a class="button left" href="javascript:void(0);" {% if page > 0 %}onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page - 1}}'); $('#filterform').submit();"{%endif%}>Prev</a><a class="button right" {% if page + 1 < maxpages %}onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page + 1}}'); $('#filterform').submit();"{% endif %}>Next</a>
 		</div>

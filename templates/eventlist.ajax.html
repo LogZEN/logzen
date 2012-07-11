@@ -1,6 +1,27 @@
+<!DOCTYPE html>
+<html>
+<body>
+	
+	
+{% set maxpages = (events.get_count() / pagesize)|round(0, 'ceil')|int %}
+
+	<div id="navi">
+		<div class="buttons">
+			<span id="count">
+			{% if events.get_count() > 0 %}
+				{{page * pagesize + 1}} - {{page * pagesize + pagesize}} of {{ events.get_count() }}
+			{% else %}
+				No Results
+			{% endif %}
+			</span>
+			<a href="#" class="button"><input type="checkbox" name="autorefresh" /> Refresh</a>
+			<a class="button left" href="javascript:void(0);" {% if page > 0 %}onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page - 1}}'); $('#filterform').submit();"{%endif%}>Prev</a><a class="button right" {% if page + 1 < maxpages %}onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page + 1}}'); $('#filterform').submit();"{% endif %}>Next</a>
+		</div>
+	</div>
+	
+	<table>
+		<tbody id="tbody">
 	{% if events.get_count() > 0 %}
-		{% set maxpages = (events.get_count() / pagesize)|round(0, 'ceil')|int %}
-		
 		{% for event in events.get_rows(page * pagesize, pagesize) %}
 			<tr>
 				<td>{{ event.reported_time }}</td>
@@ -32,3 +53,7 @@
 				</td>
 			</tr>
 	{% endif %}
+		</tbody>
+	</table>
+</body>
+</html>

@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 
-{% set maxpages = (events.get_count() / pagesize)|round(0, 'ceil')|int %}
-
 {% block title %}Events{% endblock %}
 
 {% block content %}
 
+	<div id="navi">
+	</div>
+	
 	<form action="/events/filter" method="post" id="filterform">
 	<table id="events">
         <thead>
-			<tr>
+			<tr id="first">
 				<th width="157">time_logged</th>
 				<th>host</th>
 				<th>facility</th>
@@ -29,10 +30,17 @@
 			</tr>
 		</thead>
 		
-		<tbody id="tbody">
-		{% include 'eventlist.ajax.html' %}
+		<tbody id="tbody_content">
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
 		</tbody>
-		
 	</table>
 	</form>
 
@@ -55,15 +63,18 @@
         			  tag: tag,
         			  program: program,
         			  message: message }, 
-          function(data) {
-              var body_content = $(data);
-              $('#tbody').empty().append(body_content);
-              $('html, body').animate({scrollTop:0}, 'fast');
+			function(data) {
+        		$('#navi').empty().append($(data).filter('#navi'));
+				$('#tbody_content').empty().append($(data).find('#tbody').html());
+				$('html, body').animate({scrollTop:0}, 'fast');
           });
 	});
 	
 	$('#filterform').bind('keyup', function() {
 	    $('#filterform').submit();
 	});
+	
+	$('#filterform').submit();
+	
 	</script>
 {% endblock %}

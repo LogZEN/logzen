@@ -38,3 +38,7 @@ class Backend:
     @abstractmethod
     def get_logs(self):
         pass
+
+    @abstractmethod
+    def severity_count_by_host(self):
+        pass

@@ -3,12 +3,51 @@
 {% block title %}Overview{% endblock %}
 
 {% block content %}    
-<div id="chartdiv" style="height:400px;width:300px; "></div>
+<div id="chartdiv" style="height: 200px; width: 95%;"></div>
 <script>
-$.jqplot('chartdiv',  [[[1,{{count_last_hour}}], [2, {{count_this_hour}}]]]);
+
+data = [[
+        {% for next in d %}
+        	{% set l = loop %}
+        	[{{l.index}}, {{next.count}}],
+        	
+        	{% endfor %}
+        	]]
+tick = [
+         {% for next in d %}
+     	{% set l = loop %}
+     	[{{l.index}}, "{{next.time}}"],
+     	
+     	{% endfor %}
+     	]
+     	
+options = {
+		xaxis: { ticks: tick },
+		lines: {
+		      show: true,
+		      lineWidth: 0,
+		      fill: true,      
+		      fillColor:  "rgba(200, 255, 200, 0.8)" 
+		  },
+		  selection: { mode: "x" }
+}
+$.plot($("#chartdiv"), data, options);
+
+$("#chartdiv").bind("plotselected", function (event, ranges) {
+    // clamp the zooming to prevent eternal zoom
+    if (ranges.xaxis.to - ranges.xaxis.from < 0.00001)
+        ranges.xaxis.to = ranges.xaxis.from + 0.00001;
+    if (ranges.yaxis.to - ranges.yaxis.from < 0.00001)
+        ranges.yaxis.to = ranges.yaxis.from + 0.00001;
+    
+    // do the zooming
+    plot = $.plot($("#chartdiv"), data,
+                  $.extend(true, {}, options, {
+                      xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+                  }));
+    
+});
+
 </script>
 
-count = {{count}}
-this_hour = {{count_this_hour}}
-last_hour = {{count_last_hour}}
 {% endblock %}

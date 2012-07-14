@@ -32,6 +32,5 @@ class Overview:
     def __call__(self):
         template = templates.get_template('overview.html')
 
-        return template.render(count = 100,
-                               count_last_hour = 30,
-                               count_this_hour = 42)
+        d = backend.event_count_by_time()
+        return template.render(d = d)

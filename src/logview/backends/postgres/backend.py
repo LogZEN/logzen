@@ -95,6 +95,43 @@ class PostgresBackend:
 
         return result
 
+    def severity_count_by_host(self):
+        connection = self.__connection_pool.getconn()
+        cursor = connection.cursor()
+
+        cursor.execute('''
+            SELECT COUNT(*) AS count, severity, host
+            FROM events
+            WHERE TRUE
+            GROUP BY host, severity;
+        ''')
+
+        result = cursor.fetchall()
+
+        cursor.close()
+        self.__connection_pool.putconn(connection)
+
+        return result
+
+    def event_count_by_time(self):
+        connection = self.__connection_pool.getconn()
+        cursor = connection.cursor()
+
+        cursor.execute('''
+            SELECT date_trunc('hour', reported_time) AS time, COUNT(*) AS count
+            FROM events
+            WHERE TRUE
+            GROUP BY date_trunc('hour', reported_time);
+        ''')
+
+        result = cursor.fetchall()
+
+        cursor.close()
+        self.__connection_pool.putconn(connection)
+
+        return result
+
+
 
 Result.register(PostgresResult)
 Backend.register(PostgresBackend)

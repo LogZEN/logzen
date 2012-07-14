@@ -85,7 +85,11 @@ class Events:
 
         event = backend.get_event(event_id)
 
-        event['ip'] = socket.gethostbyname(event['host'])
+        try:
+            event['ip'] = socket.gethostbyname(event['host'])
+        except:
+            event['ip'] = 'Unknown'
+
         event['ago_time'] = humanize.naturaltime(datetime.datetime.now() - event['reported_time'])
 
         return template.render(event = event)

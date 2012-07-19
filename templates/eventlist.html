@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 
-{% set maxpages = (events.get_count() / pagesize)|round(0, 'ceil')|int %}
-
 {% block title %}Events{% endblock %}
 
 {% block content %}
 
+	<div id="navi">
+	</div>
+	
 	<form action="/events/filter" method="post" id="filterform">
 	<table id="events">
         <thead>
-			<tr>
+			<tr id="first">
 				<th width="157">time_logged</th>
 				<th>host</th>
 				<th>facility</th>
@@ -27,77 +28,51 @@
 			</tr>
 		</thead>
 		
-		<tbody id="tbody">
-		{% include 'eventlist.ajax.html' %}
+		<tbody id="tbody_content">
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
 		</tbody>
-		
 	</table>
 	</form>
 
 	<script>
-		$('#filterform').submit(function (event) {
-	        event.preventDefault();
-	        
-	        var $form = $(this),
-	            host = $form.find('input[name="filter_host"]').val(),
-	            facility = $form.find('input[name="filter_facility"]').val(),
-	            severity = $form.find('input[name="filter_severity"]').val(),
-	            program = $form.find('input[name="filter_program"]').val(),
-	            message = $form.find('input[name="filter_message"]').val(),
-	            url = $form.attr('action');
-	
-			$.post(url, { 
-					host: host, 
-					facility : facility,
-					severity: severity,
-					program: program,
-					message: message 
-				}, 
-				function(data) {
-				    var body_content = $(data);
-				    $('#tbody').empty().append(body_content);
-				    $('html, body').animate({scrollTop:0}, 'fast');
-		
-					set_tooltips();
-				});
-		});
-	
-		$('#filterform').bind('keyup', function() {
-		    $('#filterform').submit();
-		});
-		
-		set_tooltips();
+	$('#filterform').submit(function (event) {
+        event.preventDefault();
+        
+        var $form = $(this),
+            host = $form.find('input[name="filter_host"]').val(),
+            facility = $form.find('input[name="filter_facility"]').val(),
+            severity = $form.find('input[name="filter_severity"]').val(),
+            tag = $form.find('input[name="filter_tag"]').val(),
+            program = $form.find('input[name="filter_program"]').val(),
+            message = $form.find('input[name="filter_message"]').val(),
+            url = $form.attr('action');
 
-		/*
-		 * set the tooltip for each result row
-		 */
-		function set_tooltips() {
-			$(".event").each(function() {
-				$(this).qtip({
-					content: {
-						text: 'Loading...',
-						ajax: {
-							url: '/events/tooltip',
-							type: 'GET',
-							data: { event_id: this.id },
-							success: function(data, status) {
-								this.set('content.text', data);
-							}
-						}
-					},
-					position: {
-						my: 'top left',
-						at: 'bottom center'
-					},
-					hide: {
-				        fixed: true,
-						delay: 200
-					},
-					style: {
-						classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
-					}
-				});
-			});
-		}
+        $.post(url, { host: host, 
+        			  facility : facility,
+        			  severity: severity,
+        			  tag: tag,
+        			  program: program,
+        			  message: message }, 
+			function(data) {
+        		$('#navi').empty().append($(data).filter('#navi').html());
+				$('#tbody_content').empty().append($(data).find('#tbody').html());
+				$('html, body').animate({scrollTop:0}, 'fast');
+          });
+	});
+	
+	$('#filterform').bind('keyup', function() {
+	    $('#filterform').submit();
+	});
+	
+	$('#filterform').submit();
+	
 	</script>
 {% endblock %}

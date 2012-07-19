@@ -1,6 +1,33 @@
-	{% if events.get_count() > 0 %}
-		{% set maxpages = (events.get_count() / pagesize)|round(0, 'ceil')|int %}
-		
+<!DOCTYPE html>
+<html>
+<body>
+	
+{% set event_count = events.get_count() %}
+{% set maxpages = (event_count / pagesize)|round(0, 'ceil')|int %}
+{% set event_first = (page * pagesize + 1) %}
+{% if (page * pagesize + pagesize) > event_count %}
+	{% set event_last = event_count %}
+{% else %}
+	{% set event_last = page * pagesize + pagesize %}
+{% endif %}
+
+	<div id="navi">
+		<div class="buttons">
+			<span id="count">
+			{% if event_count > 0 %}
+				{{event_first}} - {{event_last}} of {% if event_count < 10000 %} {{event_count}} {% else %}quite a few{% endif %}
+			{% else %}
+				No Results
+			{% endif %}
+			</span> &nbsp;
+			<a href="#" class="button"><input type="checkbox" name="autorefresh" /> Refresh</a>
+			<a class="button left" href="javascript:void(0);" {% if page > 0 %}onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page - 1}}'); $('#filterform').submit();"{%endif%}>Prev</a><a class="button right" {% if page + 1 < maxpages %}onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page + 1}}'); $('#filterform').submit();"{% endif %}>Next</a>
+		</div>
+	</div>
+	
+	<table>
+		<tbody id="tbody">
+	{% if event_count > 0 %}
 		{% for event in events.get_rows(page * pagesize, pagesize) %}
 			<tr>
 				<td class="event" id="{{ event.id }}">{{ event.reported_time }}</td>
@@ -11,23 +38,14 @@
 				<td><a href="javascript:void(0)" onclick="$('#filter_message').val($(this).html()); $('#filterform').submit();">{{ event.message }}</a></td>
 			</tr>
 		{% endfor %}
-
-			<tr>
-				<td colspan="6" id="pagenav">
-					<span class="arrow">{% if page > 0 %}<a href="javascript:void(0);" onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page - 1}}'); $('#filterform').submit();">&larr;</a>{% endif %}</span>
-					[ {{ page + 1 }} / {{ maxpages }} ]
-					<span class="arrow">{% if page + 1 < maxpages %}<a href="javascript:void(0);" onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page + 1}}'); $('#filterform').submit();">&rarr;</a>{% endif %}</span>
-				</td>
-			</tr>
 		
 	{% else %}
 			<tr>
 				<td colspan="6" id="noresults">No events found.</td>
 			</tr>
 
-			<tr>
-				<td colspan="6" id="pagenav">
-					[0 / 0]
-				</td>
-			</tr>
 	{% endif %}
+		</tbody>
+	</table>
+</body>
+</html>

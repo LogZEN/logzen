@@ -61,7 +61,7 @@ class PostgresResult:
         return self.__cursor.fetchmany(size = count)
 
 
-class PostgresBackend:
+class PostgresBackend(Backend):
     def __init__(self):
         self.__connection_pool = psycopg2.pool.ThreadedConnectionPool(minconn = 1,
                                                                       maxconn = 20,
@@ -81,7 +81,7 @@ class PostgresBackend:
                               filters)
 
     def get_event(self,
-                 event_id):
+                  event_id):
         connection = self.__connection_pool.getconn()
         cursor = connection.cursor()
 

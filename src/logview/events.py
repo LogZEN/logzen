@@ -35,11 +35,7 @@ class Events:
     def list(self,
              page = 0):
         template = templates.get_template('eventlist.html')
-
-        events = backend.get_events()
-        return template.render(events = events,
-                               page = int(page),
-                               pagesize = 50)
+        return template.render()
 
     @cherrypy.expose
     def details(self,

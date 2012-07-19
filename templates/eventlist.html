@@ -65,6 +65,8 @@
         		$('#navi').empty().append($(data).filter('#navi').html());
 				$('#tbody_content').empty().append($(data).find('#tbody').html());
 				$('html, body').animate({scrollTop:0}, 'fast');
+
+				set_tooltips();
           });
 	});
 	
@@ -74,5 +76,36 @@
 	
 	$('#filterform').submit();
 	
+	/*
+	 * set the tooltip for each result row
+	 */
+	function set_tooltips() {
+		$(".event").each(function() {
+			$(this).qtip({
+				content: {
+					text: 'Loading...',
+					ajax: {
+						url: '/events/tooltip',
+						type: 'GET',
+						data: { event_id: this.id },
+						success: function(data, status) {
+							this.set('content.text', data);
+						}
+					}
+				},
+				position: {
+					my: 'top left',
+					at: 'bottom center'
+				},
+				hide: {
+			        fixed: true,
+					delay: 200
+				},
+				style: {
+					classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
+				}
+			});
+		});
+	}
 	</script>
 {% endblock %}

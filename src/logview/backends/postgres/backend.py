@@ -113,17 +113,24 @@ class PostgresBackend:
 
         return result
 
-    def event_count_by_time(self):
+    def event_count_by_time(self,
+                            start_time,
+                            end_time):
         connection = self.__connection_pool.getconn()
         cursor = connection.cursor()
 
-        cursor.execute('''
+        sql = ('''
             SELECT date_trunc('hour', reported_time) AS time, COUNT(*) AS count
             FROM events
-            WHERE TRUE
-            GROUP BY date_trunc('hour', reported_time);
+            WHERE reported_time > COALESCE(%(start_time)s, reported_time)
+              AND reported_time < COALESCE(%(end_time)s, reported_time)
+            GROUP BY date_trunc('hour', reported_time)
+            ORDER BY time;
         ''')
 
+        cursor.execute(sql, collections.defaultdict(lambda: None,
+                                                    {'start_time': start_time,
+                                                     'end_time': end_time}))
         result = cursor.fetchall()
 
         cursor.close()

@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pyLogView.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import datetime
 import cherrypy
 
 from logview.backends import backend
@@ -29,8 +30,15 @@ class Overview:
         pass
 
     @cherrypy.expose
-    def __call__(self):
+    def index(self):
         template = templates.get_template('overview.html')
+        return template.render()
 
-        d = backend.event_count_by_time()
+    @cherrypy.expose
+    def get_data(self,
+              start = '1970-01-01 00:00:00',
+              end = datetime.datetime.now()):
+        template = templates.get_template('overview.ajax.html')
+
+        d = backend.event_count_by_time(start, end)
         return template.render(d = d)

@@ -36,7 +36,13 @@ class Backend:
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def get_logs(self):
+    def get_events(self,
+                   filters = {}):
+        pass
+
+    @abstractmethod
+    def get_event(self,
+                  event_id):
         pass
 
     @abstractmethod

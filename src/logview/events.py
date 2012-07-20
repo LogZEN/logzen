@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with pyLogView.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import socket
+import datetime
+import humanize
+
 import cherrypy
 
 from logview.backends import backend
@@ -31,11 +35,7 @@ class Events:
     def list(self,
              page = 0):
         template = templates.get_template('eventlist.html')
-
-        events = backend.get_events()
-        return template.render(events = events,
-                               page = int(page),
-                               pagesize = 50)
+        return template.render()
 
     @cherrypy.expose
     def details(self,
@@ -53,7 +53,6 @@ class Events:
                host = None,
                facility = None,
                severity = None,
-               tag = None,
                program = None,
                message = None):
         template = templates.get_template('eventlist.ajax.html')
@@ -65,8 +64,6 @@ class Events:
             filters['facility'] = '%' + facility + '%'
         if severity is not None:
             filters['severity'] = '%' + severity + '%'
-        if tag is not None:
-            filters['tag'] = '%' + tag + '%'
         if program is not None:
             filters['program'] = '%' + program + '%'
         if message is not None:
@@ -76,3 +73,19 @@ class Events:
         return template.render(events = events,
                                page = int(page),
                                pagesize = 50)
+
+    @cherrypy.expose
+    def tooltip(self,
+                event_id):
+        template = templates.get_template('tooltip.ajax.html')
+
+        event = backend.get_event(event_id)
+
+        try:
+            event['ip'] = socket.gethostbyname(event['host'])
+        except:
+            event['ip'] = 'Unknown'
+
+        event['ago_time'] = humanize.naturaltime(datetime.datetime.now() - event['reported_time'])
+
+        return template.render(event = event)

@@ -283,3 +283,16 @@ table#events input[type="text"] {
 #tooltip_event td.spacing {
 	line-height: 2px;
 }
+
+/*
+ *	flot tooltips
+ */
+#flotTip {
+	background:					#555;
+	color:						#eee;
+	padding: 					3px;
+	
+	border:						1px solid #000;
+	border-radius: 				6px;
+	
+}

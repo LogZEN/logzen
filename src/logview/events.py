@@ -94,3 +94,53 @@ class Events:
         event['ago_time'] = humanize.naturaltime(datetime.datetime.now() - event['reported_time'])
 
         return template.render(event = event)
+
+    @cherrypy.expose
+    def get_event_count(self,
+                 host = None,
+                 facility = None,
+                 severity = None,
+                 program = None,
+                 message = None,
+                 start_time = None,
+                 end_time = None):
+
+        filters = {}
+        if host is not None:
+            filters['host'] = '%' + host + '%'
+        if facility is not None:
+            filters['facility'] = '%' + facility + '%'
+        if severity is not None:
+            filters['severity'] = '%' + severity + '%'
+        if program is not None:
+            filters['program'] = '%' + program + '%'
+        if message is not None:
+            filters['message'] = '%' + message + '%'
+
+        if start_time is None:
+            filters['start_time'], filters['end_time'] = backend.event_timestamp_range()
+        else:
+            filters['start_time'] = datetime.datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')
+            filters['end_time'] = datetime.datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S')
+
+        interval = filters['end_time'] - filters['start_time']
+
+        steps = 'millisecond'
+        if interval.seconds > 60:
+            steps = 'second'
+        if interval.seconds > 60:
+            steps = 'minute'
+        if interval.seconds / 60 > 60:
+            steps = 'hour'
+        if interval.seconds / 3600 > 24:
+            steps = 'day'
+        if interval.days > 30:
+            steps = 'month'
+        if interval.days / 30 > 12:
+            steps = 'year'
+
+        eventcount = backend.event_count_by_time(filters,
+                                                 steps)
+
+        template = templates.get_template('overview.ajax.html')
+        return template.render(eventcount = eventcount)

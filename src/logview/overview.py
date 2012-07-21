@@ -34,32 +34,4 @@ class Overview:
         template = templates.get_template('overview.html')
         return template.render()
 
-    @cherrypy.expose
-    def get_data(self,
-                 host = None,
-                 facility = None,
-                 severity = None,
-                 program = None,
-                 message = None,
-                 start_time = '1970-01-01 00:00:00',
-                 end_time = datetime.datetime.now()):
 
-        filters = {}
-        if host is not None:
-            filters['host'] = '%' + host + '%'
-        if facility is not None:
-            filters['facility'] = '%' + facility + '%'
-        if severity is not None:
-            filters['severity'] = '%' + severity + '%'
-        if program is not None:
-            filters['program'] = '%' + program + '%'
-        if message is not None:
-            filters['message'] = '%' + message + '%'
-
-        filters['start_time'] = start_time
-        filters['end_time'] = end_time
-
-        eventcount = backend.event_count_by_time(filters)
-
-        template = templates.get_template('overview.ajax.html')
-        return template.render(eventcount = eventcount)

@@ -8,6 +8,31 @@ body {
   font-size:              10pt;
 }
 
+#noscript {
+	position: 				absolute;
+	top: 					35%;
+	left:					50%;
+	width: 					400px;
+	
+	margin-left:			-200px;
+	padding:				20px;
+	
+	background:				#f9f9f9;
+		
+	border-color: 			#333;
+	border-radius: 			8px;
+	
+	box-shadow: 			0 0 15px rgba(0, 0, 0, 0.40);
+	
+	text-align:				center;
+}
+#noscript h1 {
+	margin:					0px;
+	
+	color:					#a22;
+	font-size:				16pt;
+}
+
 /*
  *	main menu
  */

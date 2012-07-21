@@ -21,7 +21,7 @@
 			{% endif %}
 			</span> &nbsp;
 			<a href="#" class="button"><input type="checkbox" name="autorefresh" /> Refresh</a>
-			<a class="button left" href="javascript:void(0);" {% if page > 0 %}onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page - 1}}'); $('#filterform').submit();"{%endif%}>Prev</a><a class="button right" {% if page + 1 < maxpages %}onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page + 1}}'); $('#filterform').submit();"{% endif %}>Next</a>
+			<a class="button left" href="javascript:void(0);" {% if page > 0 %}onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page - 1}}'); updateAction();"{%endif%}>Prev</a><a class="button right" {% if page + 1 < maxpages %}onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page + 1}}'); updateAction();"{% endif %}>Next</a>
 		</div>
 	</div>
 	
@@ -31,11 +31,11 @@
 		{% for event in events.get_rows(page * pagesize, pagesize) %}
 			<tr>
 				<td class="event" id="{{ event.id }}">{{ event.reported_time }}</td>
-				<td class="event" id="{{ event.id }}"><a href="javascript:void(0)" onclick="$('#filter_host').val($(this).html()); $('#filterform').submit();">{{ event.host }}</a></td>
-				<td class="event color_{{ event.level }}" id="{{ event.id }}"><a href="javascript:void(0)" onclick="$('#filter_facility').val($(this).html()); $('#filterform').submit();">{{ event.facility }}</a></td>
-				<td class="event" id="{{ event.id }}"><a href="javascript:void(0)" onclick="$('#filter_severity').val($(this).html()); $('#filterform').submit();">{{ event.severity }}</a></td>
-				<td class="event" id="{{ event.id }}"><a href="javascript:void(0)" onclick="$('#filter_program').val($(this).html()); $('#filterform').submit();">{{ event.program }}</a></td>
-				<td><a href="javascript:void(0)" onclick="$('#filter_message').val($(this).html()); $('#filterform').submit();">{{ event.message }}</a></td>
+				<td class="event" id="{{ event.id }}"><a href="javascript:void(0)" onclick="$('#filter_host').val($(this).html()); updateAction();">{{ event.host }}</a></td>
+				<td class="event color_{{ event.level }}" id="{{ event.id }}"><a href="javascript:void(0)" onclick="$('#filter_facility').val($(this).html()); updateAction();">{{ event.facility }}</a></td>
+				<td class="event" id="{{ event.id }}"><a href="javascript:void(0)" onclick="$('#filter_severity').val($(this).html()); updateAction();">{{ event.severity }}</a></td>
+				<td class="event" id="{{ event.id }}"><a href="javascript:void(0)" onclick="$('#filter_program').val($(this).html()); updateAction();">{{ event.program }}</a></td>
+				<td><a href="javascript:void(0)" onclick="$('#filter_message').val($(this).html()); updateAction();">{{ event.message }}</a></td>
 			</tr>
 		{% endfor %}
 		

@@ -42,6 +42,8 @@ class PostgresResult:
               AND severity LIKE COALESCE(%(severity)s, severity)
               AND program LIKE COALESCE(%(program)s, program)
               AND message LIKE COALESCE(%(message)s, message)
+              AND reported_time >= COALESCE(%(start_time)s, reported_time)
+              AND reported_time <= COALESCE(%(end_time)s, reported_time)
             ORDER BY reported_time DESC;
         '''
 
@@ -113,23 +115,25 @@ class PostgresBackend(Backend):
         return result
 
     def event_count_by_time(self,
-                            start_time,
-                            end_time):
+                            filters):
         connection = self.__connection_pool.getconn()
         cursor = connection.cursor()
 
         sql = ('''
             SELECT date_trunc('hour', reported_time) AS time, COUNT(*) AS count
             FROM events
-            WHERE reported_time > COALESCE(%(start_time)s, reported_time)
+            WHERE host LIKE COALESCE(%(host)s, host)
+              AND facility LIKE COALESCE(%(facility)s, facility)
+              AND severity LIKE COALESCE(%(severity)s, severity)
+              AND program LIKE COALESCE(%(program)s, program)
+              AND message LIKE COALESCE(%(message)s, message)
+              AND reported_time > COALESCE(%(start_time)s, reported_time)
               AND reported_time < COALESCE(%(end_time)s, reported_time)
             GROUP BY date_trunc('hour', reported_time)
             ORDER BY time;
         ''')
 
-        cursor.execute(sql, collections.defaultdict(lambda: None,
-                                                    {'start_time': start_time,
-                                                     'end_time': end_time}))
+        cursor.execute(sql, collections.defaultdict(lambda: None, filters))
         result = cursor.fetchall()
 
         cursor.close()

@@ -1,7 +1,7 @@
 {
 
 "data" : {
-	{% for next in d %}
+	{% for next in eventcount %}
 		"{{next.time}}": "{{next.count}}"{% if not loop.last %},{% endif %}
 		
 	{% endfor %}

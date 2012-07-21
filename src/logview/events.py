@@ -54,7 +54,9 @@ class Events:
                facility = None,
                severity = None,
                program = None,
-               message = None):
+               message = None,
+               start_time = '1970-01-01 00:00:00',
+               end_time = datetime.datetime.now()):
         template = templates.get_template('eventlist.ajax.html')
 
         filters = {}
@@ -68,6 +70,9 @@ class Events:
             filters['program'] = '%' + program + '%'
         if message is not None:
             filters['message'] = '%' + message + '%'
+
+        filters['start_time'] = start_time
+        filters['end_time'] = end_time
 
         events = backend.get_events(filters)
         return template.render(events = events,

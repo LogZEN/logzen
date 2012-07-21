@@ -7,6 +7,8 @@
 	<div id="navi">
 	</div>
 	
+	<div id="chartdiv" style="height: 150px; width: 90%; margin: 0px auto"></div>
+	
 	<form action="/events/filter" method="post" id="filterform">
 	<table id="events">
         <thead>
@@ -42,70 +44,131 @@
 	</table>
 	</form>
 
-	<script>
-	$('#filterform').submit(function (event) {
-        event.preventDefault();
-        
-        var $form = $(this),
-            host = $form.find('input[name="filter_host"]').val(),
-            facility = $form.find('input[name="filter_facility"]').val(),
-            severity = $form.find('input[name="filter_severity"]').val(),
-            tag = $form.find('input[name="filter_tag"]').val(),
-            program = $form.find('input[name="filter_program"]').val(),
-            message = $form.find('input[name="filter_message"]').val(),
-            url = $form.attr('action');
-
-        $.post(url, { host: host, 
-        			  facility : facility,
-        			  severity: severity,
-        			  tag: tag,
-        			  program: program,
-        			  message: message }, 
-			function(data) {
-        		$('#navi').empty().append($(data).filter('#navi').html());
-				$('#tbody_content').empty().append($(data).find('#tbody').html());
-				$('html, body').animate({scrollTop:0}, 'fast');
-
-				set_tooltips();
-          });
-	});
+	<script type="text/javascript">//<![CDATA[
+	var timerange = [];
 	
-	$('#filterform').bind('keyup', function() {
-	    $('#filterform').submit();
-	});
-	
-	$('#filterform').submit();
+	 /*
+	  * set the tooltip for each result row
+	  */
+	 function loadTooltips() {
+	 	$(".event").each(function() {
+	 		$(this).qtip({
+	 			content: {
+	 				text: 'Loading...',
+	 				ajax: {
+	 					url: '/events/tooltip',
+	 					type: 'GET',
+	 					data: { event_id: this.id },
+	 					success: function(data, status) {
+	 						this.set('content.text', data);
+	 					}
+	 				}
+	 			},
+	 			position: {
+	 				my: 'top left',
+	 				at: 'bottom center'
+	 			},
+	 			hide: {
+	 		        fixed: true,
+	 				delay: 200
+	 			},
+	 			style: {
+	 				classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
+	 			}
+	 		});
+	 	});
+	 }	 
+	/*
+	 *	load event list
+	 */
+	function loadEvents(params) {
+	    $.post($('#filterform').attr('action'), 
+	    		params,
+				function(data) {
+		    		$('#navi').empty().append($(data).filter('#navi').html());
+					$('#tbody_content').empty().append($(data).find('#tbody').html());
+					$('html, body').animate({scrollTop:0}, 'fast');
+
+					loadTooltips();
+				}
+		);
+	}
 	
 	/*
-	 * set the tooltip for each result row
+	 *	load graph
 	 */
-	function set_tooltips() {
-		$(".event").each(function() {
-			$(this).qtip({
-				content: {
-					text: 'Loading...',
-					ajax: {
-						url: '/events/tooltip',
-						type: 'GET',
-						data: { event_id: this.id },
-						success: function(data, status) {
-							this.set('content.text', data);
-						}
-					}
+	function loadGraph (params) {
+	    $.ajax({
+	        url: "/overview/range",
+	        method: 'POST',
+	        data: params,
+	        dataType: 'json', 
+	        success: onDataReceived
+	    });
+	    function onDataReceived(series) {
+	    	data = []
+	    	tick = []
+	    	i = 0
+	    	for (s in series.data) {
+	    		data.push([i, parseInt(series.data[s])])
+	    		tick.push([i, s])
+	    		i++;
+	    	}
+	    	$.plot($('#chartdiv'), [data], options = {
+	    		xaxis: {
+	    			ticks: tick,
 				},
-				position: {
-					my: 'top left',
-					at: 'bottom center'
-				},
-				hide: {
-			        fixed: true,
-					delay: 200
-				},
-				style: {
-					classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
-				}
-			});
-		});
+	    		bars: {
+	    		      show: true,
+	    		      lineWidth: 1,
+	    		      fill: true,
+	    		      fillColor: { colors: ["#729fcf", "#3465af"] }
+	    		  },
+                  grid: { hoverable: true, autoHighlight: true },
+	    		  colors: ["#204a87"],
+	    		  selection: { mode: "x" }
+	    	});
+	    }
 	}
-	</script>
+
+	/*
+	 *	update the 
+	 */
+	function updateAction(event, ranges) {
+		var $form = $('#filterform');
+        var params = {};
+        
+        params['host'] = $form.find('input[name="filter_host"]').val();
+        params['facility'] = $form.find('input[name="filter_facility"]').val();
+        params['severity'] = $form.find('input[name="filter_severity"]').val();
+        params['tag'] = $form.find('input[name="filter_tag"]').val();
+        params['program'] = $form.find('input[name="filter_program"]').val();
+        params['message'] = $form.find('input[name="filter_message"]').val();
+		
+        if(ranges) {
+        	timerange['start_time'] = tick[Math.floor(ranges.xaxis.from)][1];
+        	timerange['end_time'] = tick[Math.ceil(ranges.xaxis.to)][1];
+        }
+		params['start_time'] = timerange['start_time'];
+		params['end_time'] = timerange['end_time'];
+        
+		loadEvents(params);
+		loadGraph(params);
+	}
+
+	/*
+	 *	add actions
+	 */
+	
+	$('#filterform').bind('keyup', function() {
+		updateAction();
+	});
+	
+	$("#chartdiv").bind("plotselected", updateAction);
+	/*
+	 *	fire the initial event
+	 */
+	 updateAction();
+	
+	//]]></script>
 {% endblock %}

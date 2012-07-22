@@ -126,19 +126,21 @@ class Events:
         interval = filters['end_time'] - filters['start_time']
 
         steps = 'millisecond'
-        if interval.seconds > 60:
+        print interval.total_seconds()
+        if interval.total_seconds() > 1:
             steps = 'second'
-        if interval.seconds > 60:
+        if interval.total_seconds() > 60:
             steps = 'minute'
-        if interval.seconds / 60 > 60:
+        if interval.total_seconds() > 3600:        # 60 * 60
             steps = 'hour'
-        if interval.seconds / 3600 > 24:
+        if interval.total_seconds() > 86400:       # 60 * 60 * 24
             steps = 'day'
-        if interval.days > 30:
+        if interval.total_seconds() > 2592000:     # 60 * 60 * 24 * 30
             steps = 'month'
-        if interval.days / 30 > 12:
+        if interval.total_seconds() > 31536000:    # 60 * 60 * 24 * 365
             steps = 'year'
 
+        print steps
         eventcount = backend.event_count_by_time(filters,
                                                  steps)
 

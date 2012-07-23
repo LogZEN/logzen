@@ -125,24 +125,29 @@ class Events:
 
         interval = filters['end_time'] - filters['start_time']
 
-        steps = 'millisecond'
-        print interval.total_seconds()
-        if interval.total_seconds() > 1:
-            steps = 'second'
-        if interval.total_seconds() > 60:
+        steps = 'second'
+        level = 5
+        if interval.total_seconds() > 120:
             steps = 'minute'
-        if interval.total_seconds() > 3600:        # 60 * 60
+            level = 4
+        if interval.total_seconds() > 7200:        # 60 * 60 * 2
             steps = 'hour'
-        if interval.total_seconds() > 86400:       # 60 * 60 * 24
+            level = 3
+        if interval.total_seconds() > 345600:      # 60 * 60 * 24 * 4
             steps = 'day'
-        if interval.total_seconds() > 2592000:     # 60 * 60 * 24 * 30
+            level = 2
+        if interval.total_seconds() > 7776000:     # 60 * 60 * 24 * 90
             steps = 'month'
+            level = 1
         if interval.total_seconds() > 31536000:    # 60 * 60 * 24 * 365
             steps = 'year'
+            level = 0
 
         print steps
         eventcount = backend.event_count_by_time(filters,
                                                  steps)
 
         template = templates.get_template('overview.ajax.html')
-        return template.render(eventcount = eventcount)
+        return template.render(eventcount = eventcount,
+                               zoomlevel = level,
+                               maxtime = filters['end_time'])

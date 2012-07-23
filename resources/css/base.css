@@ -294,5 +294,21 @@ table#events input[type="text"] {
 	
 	border:						1px solid #000;
 	border-radius: 				6px;
-	
+}
+
+/*
+ *	chart
+ */
+#chartdiv #zoombutton {
+    position: 					absolute;
+    top:						5px;
+    right:						3px;
+    padding: 					2px;
+    z-index:					99;
+    
+    background-color: 			#eee;
+    color:	 					#999;
+    
+    cursor: 					default;
+    font-size: 					smaller;
 }

@@ -45,7 +45,13 @@
 	</form>
 
 	<script type="text/javascript">//<![CDATA[
+	var zoomlevel = null;
+	var plot = null;
 	var timerange = [];
+	var prevrange = new Array(1);
+	for (var i = 0; i < 6; i++) {
+		prevrange[i] = new Array(2);
+	}
 	
 	 /*
 	  * set the tooltip for each result row
@@ -90,6 +96,15 @@
 					$('html, body').animate({scrollTop:0}, 'fast');
 
 					loadTooltips();
+
+				    $('#zoomoutbutton').click(function (e) {
+				        e.preventDefault();
+				        if (zoomlevel > 0) {
+				        	timerange['start_time'] = prevrange[zoomlevel - 1]['start_time']
+				        	timerange['end_time'] = prevrange[zoomlevel - 1]['end_time']
+				        }
+				        updateAction();
+				    });
 				}
 		);
 	}
@@ -106,6 +121,7 @@
 	        success: onDataReceived
 	    });
 	    function onDataReceived(series) {
+	    	zoomlevel = series.metadata['zoomlevel']
 	    	data = []
 	    	tick = []
 	    	i = 0
@@ -154,6 +170,9 @@
         params['message'] = $form.find('input[name="filter_message"]').val();
 		
         if(ranges) {
+        	console.log(zoomlevel)
+        	prevrange[zoomlevel]['start_time'] = timerange['start_time']
+        	prevrange[zoomlevel]['end_time'] = timerange['end_time']
         	timerange['start_time'] = tick[Math.floor(ranges.xaxis.from)][1];
         	timerange['end_time'] = tick[Math.ceil(ranges.xaxis.to)][1];
         }

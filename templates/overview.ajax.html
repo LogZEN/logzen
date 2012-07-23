@@ -1,10 +1,12 @@
 {
-
-"data" : {
-	{% for next in eventcount %}
-		"{{next.time}}": "{{next.count}}"{% if not loop.last %},{% endif %}
-		
-	{% endfor %}
-}
-
+	"metadata": {
+		"zoomlevel": "{{zoomlevel}}",
+		"maxtime": "{{maxtime}}"
+	},
+	"data" : {
+		{% for next in eventcount %}
+			"{{next.time}}": "{{next.count}}"{% if not loop.last %},{% endif %}
+			
+		{% endfor %}
+	}
 }

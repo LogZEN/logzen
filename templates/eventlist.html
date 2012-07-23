@@ -126,13 +126,16 @@
 	    	tick = []
 	    	i = 0
 	    	for (s in series.data) {
+	    		console.log(i, parseInt(series.data[s]), s)
 	    		data.push([i, parseInt(series.data[s])])
 	    		tick.push([i, s])
 	    		i++;
 	    	}
-	    	$.plot($('#chartdiv'), [data], options = {
+	    	tick.push([i, series.metadata['maxtime']])
+	    	
+	    	plot = $.plot($('#chartdiv'), [data], options = {
 	    		xaxis: {
-	    			ticks: tick,
+	    			ticks: false,
 				},
 	    		bars: {
 	    		      show: true,

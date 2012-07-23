@@ -137,18 +137,24 @@
 	    	zoomlevel = series.metadata['zoomlevel']
 	    	data = []
 	    	tick = []
+	    	tickrange = []
 	    	i = 0
 	    	for (s in series.data) {
-	    		console.log(i, parseInt(series.data[s]), s)
-	    		data.push([i, parseInt(series.data[s])])
-	    		tick.push([i, s])
+	    		console.log(i, parseInt(series.data[s]), s);
+	    		data.push([i, parseInt(series.data[s])]);
+	    		tick.push([i, s]);
 	    		i++;
 	    	}
 	    	tick.push([i, series.metadata['maxtime']])
 	    	
+	    	console.log(tick.length)
+    		tickrange.push(tick[0]);
+	    	tickrange.push(tick[Math.round((tick.length - 1) / 2)])
+	    	tickrange.push(tick[tick.length - 1])
+	    	
 	    	plot = $.plot($('#chartdiv'), [data], options = {
 	    		xaxis: {
-	    			ticks: false,
+	    			ticks: tickrange,
 				},
 	    		bars: {
 	    		      show: true,

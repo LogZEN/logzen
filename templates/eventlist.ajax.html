@@ -15,14 +15,14 @@
 		<div class="buttons">
 			<span id="count">
 			{% if event_count > 0 %}
-				{{event_first}} - {{event_last}} of {% if event_count < 10000 %} {{event_count}} {% else %}quite a few{% endif %}
+				{{event_first}} - {{event_last}} of {% if event_count < 10000 %} {{event_count}} {% else %}<span class="q_tip" title="{{event_count}} events">quite a few</span>{% endif %}
 			{% else %}
 				No Results
 			{% endif %}
 			</span> &nbsp;
 			<a href="#" class="button"><input type="checkbox" name="autorefresh" /> Refresh</a>
-			<a href="javascript:void(0);" class="button" id="zoomoutbutton">Zoom Out</a>
-			<a class="button left" href="javascript:void(0);" {% if page > 0 %}onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page - 1}}'); updateAction();"{%endif%}>Prev</a><a class="button right" {% if page + 1 < maxpages %}onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page + 1}}'); updateAction();"{% endif %}>Next</a>
+			<a href="javascript:void(0);" class="button q_tip" id="zoomoutbutton" title="Zoom out to a wider timerange">Zoom Out</a>
+			<a class="button left q_tip" title="Newer" href="javascript:void(0);" {% if page > 0 %}onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page - 1}}'); updateAction();"{%endif%}>Prev</a><a class="button right q_tip" title="Older" {% if page + 1 < maxpages %}onclick="$('#filterform').get(0).setAttribute('action', '/events/filter?page={{page + 1}}'); updateAction();"{% endif %}>Next</a>
 		</div>
 	</div>
 	

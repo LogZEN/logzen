@@ -7,6 +7,7 @@
 	<div id="navi">
 	</div>
 	
+	<div id="loading"></div>
 	<div id="chartdiv" style="height: 150px; width: 90%; margin: 0px auto"></div>
 	
 	<form action="/events/filter" method="post" id="filterform">
@@ -121,6 +122,11 @@
 				}
 		);
 	}
+	$("#loading").bind("ajaxStart", function(){
+		  $(this).show();
+		}).bind("ajaxComplete", function(){
+		  $(this).hide();
+	 });
 	
 	/*
 	 *	load graph

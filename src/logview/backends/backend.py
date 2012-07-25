@@ -44,3 +44,7 @@ class Backend:
     def get_event(self,
                   event_id):
         pass
+
+    @abstractmethod
+    def severity_count_by_host(self):
+        pass

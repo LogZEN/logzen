@@ -54,7 +54,9 @@ class Events:
                facility = None,
                severity = None,
                program = None,
-               message = None):
+               message = None,
+               start_time = '1970-01-01 00:00:00',
+               end_time = datetime.datetime.now()):
         template = templates.get_template('eventlist.ajax.html')
 
         filters = {}
@@ -68,6 +70,9 @@ class Events:
             filters['program'] = '%' + program + '%'
         if message is not None:
             filters['message'] = '%' + message + '%'
+
+        filters['start_time'] = start_time
+        filters['end_time'] = end_time
 
         events = backend.get_events(filters)
         return template.render(events = events,
@@ -89,3 +94,60 @@ class Events:
         event['ago_time'] = humanize.naturaltime(datetime.datetime.now() - event['reported_time'])
 
         return template.render(event = event)
+
+    @cherrypy.expose
+    def get_event_count(self,
+                 host = None,
+                 facility = None,
+                 severity = None,
+                 program = None,
+                 message = None,
+                 start_time = None,
+                 end_time = None):
+
+        filters = {}
+        if host is not None:
+            filters['host'] = '%' + host + '%'
+        if facility is not None:
+            filters['facility'] = '%' + facility + '%'
+        if severity is not None:
+            filters['severity'] = '%' + severity + '%'
+        if program is not None:
+            filters['program'] = '%' + program + '%'
+        if message is not None:
+            filters['message'] = '%' + message + '%'
+
+        if start_time is None:
+            filters['start_time'], filters['end_time'] = backend.event_timestamp_range()
+        else:
+            filters['start_time'] = datetime.datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')
+            filters['end_time'] = datetime.datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S')
+
+        interval = filters['end_time'] - filters['start_time']
+
+        steps = 'second'
+        level = 5
+        if interval.total_seconds() > 120:
+            steps = 'minute'
+            level = 4
+        if interval.total_seconds() > 7200:        # 60 * 60 * 2
+            steps = 'hour'
+            level = 3
+        if interval.total_seconds() > 345600:      # 60 * 60 * 24 * 4
+            steps = 'day'
+            level = 2
+        if interval.total_seconds() > 7776000:     # 60 * 60 * 24 * 90
+            steps = 'month'
+            level = 1
+        if interval.total_seconds() > 31536000:    # 60 * 60 * 24 * 365
+            steps = 'year'
+            level = 0
+
+        print steps
+        eventcount = backend.event_count_by_time(filters,
+                                                 steps)
+
+        template = templates.get_template('overview.ajax.html')
+        return template.render(eventcount = eventcount,
+                               zoomlevel = level,
+                               maxtime = filters['end_time'])

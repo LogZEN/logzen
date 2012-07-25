@@ -42,6 +42,8 @@ class PostgresResult:
               AND severity LIKE COALESCE(%(severity)s, severity)
               AND program LIKE COALESCE(%(program)s, program)
               AND message LIKE COALESCE(%(message)s, message)
+              AND reported_time >= COALESCE(%(start_time)s, reported_time)
+              AND reported_time <= COALESCE(%(end_time)s, reported_time)
             ORDER BY reported_time DESC;
         '''
 
@@ -93,6 +95,81 @@ class PostgresBackend(Backend):
         self.__connection_pool.putconn(connection)
 
         return result
+
+    def severity_count_by_host(self):
+        connection = self.__connection_pool.getconn()
+        cursor = connection.cursor()
+
+        cursor.execute('''
+            SELECT COUNT(*) AS count, severity, host
+            FROM events
+            WHERE TRUE
+            GROUP BY host, severity;
+        ''')
+
+        result = cursor.fetchall()
+
+        cursor.close()
+        self.__connection_pool.putconn(connection)
+
+        return result
+
+    def event_count_by_time(self,
+                            filters,
+                            steps):
+        connection = self.__connection_pool.getconn()
+        cursor = connection.cursor()
+
+        sql = ('''
+            SELECT
+                series.timestamp AS time,
+                COUNT(event.timestamp) AS count
+            FROM generate_series(date_trunc(%(steps)s, %(start_time)s),
+                                 date_trunc(%(steps)s, %(end_time)s),
+                                 ('1 ' || %(steps)s)::interval) AS series(timestamp)
+            LEFT OUTER JOIN (
+                SELECT
+                    date_trunc(%(steps)s, reported_time) AS timestamp
+                FROM events
+                WHERE host LIKE COALESCE(%(host)s, host)
+                  AND facility LIKE COALESCE(%(facility)s, facility)
+                  AND severity LIKE COALESCE(%(severity)s, severity)
+                  AND program LIKE COALESCE(%(program)s, program)
+                  AND message LIKE COALESCE(%(message)s, message)
+                  AND reported_time >= %(start_time)s
+                  AND reported_time <= %(end_time)s) AS event
+              ON (series.timestamp = event.timestamp)
+            GROUP BY series.timestamp
+            ORDER BY series.timestamp;
+        ''')
+
+        parameters = collections.defaultdict(lambda: None, filters)
+        parameters['steps'] = steps
+
+        cursor.execute(sql, parameters)
+        result = cursor.fetchall()
+
+        cursor.close()
+        self.__connection_pool.putconn(connection)
+
+        return result
+
+    def event_timestamp_range(self):
+        connection = self.__connection_pool.getconn()
+        cursor = connection.cursor()
+
+        sql = ('''
+            SELECT min(reported_time) AS min, max(reported_time) AS max
+            FROM events;
+        ''')
+
+        cursor.execute(sql)
+        result = cursor.fetchone()
+
+        cursor.close()
+        self.__connection_pool.putconn(connection)
+
+        return result['min'], result['max']
 
 
 Result.register(PostgresResult)

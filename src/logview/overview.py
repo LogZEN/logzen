@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pyLogView.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import datetime
 import cherrypy
 
 from logview.backends import backend
@@ -29,9 +30,8 @@ class Overview:
         pass
 
     @cherrypy.expose
-    def __call__(self):
+    def index(self):
         template = templates.get_template('overview.html')
+        return template.render()
 
-        return template.render(count = 100,
-                               count_last_hour = 30,
-                               count_this_hour = 42)
+

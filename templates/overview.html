@@ -3,12 +3,53 @@
 {% block title %}Overview{% endblock %}
 
 {% block content %}    
-<div id="chartdiv" style="height:400px;width:300px; "></div>
+<div id="chartdiv" style="height: 200px; width: 95%;"></div>
 <script>
-$.jqplot('chartdiv',  [[[1,{{count_last_hour}}], [2, {{count_this_hour}}]]]);
+
+function plotData (event, ranges) {
+    $.ajax({
+        url: "/overview/range",
+        method: 'POST',
+        data: function() {
+        	if (ranges) {
+        		return {
+        			start: tick[Math.floor(ranges.xaxis.from)][1], 
+                	end: tick[Math.ceil(ranges.xaxis.to)][1]
+        		}	
+        	}
+        }(),
+        dataType: 'json', 
+        success: onDataReceived
+    });
+    function onDataReceived(series) {
+    	data = []
+    	tick = []
+    	i = 0
+    	for (s in series.data) {
+    		data.push([i, parseInt(series.data[s])])
+    		tick.push([i, s])
+    		i++;
+    	}
+    	$.plot($('#chartdiv'), [data], options = {
+    		xaxis: {
+    			ticks: tick,
+			},
+    		lines: {
+    		      show: true,
+    		      lineWidth: 1,
+    		      fill: true,
+    		      fillColor: { colors: ["#729fcf", "#3465af"] }
+    		  },
+    		  colors: ["#204a87"],
+    		  selection: { mode: "x" }
+    	});
+    }
+}
+
+$("#chartdiv").bind("plotselected", plotData);
+
+plotData();
+
 </script>
 
-count = {{count}}
-this_hour = {{count_this_hour}}
-last_hour = {{count_last_hour}}
 {% endblock %}

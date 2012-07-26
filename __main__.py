@@ -30,9 +30,8 @@ if __name__ == '__main__':
     dispatcher = cherrypy.dispatch.RoutesDispatcher()
     dispatcher.connect('overview', '/', Overview(), action = 'index')
 
-    dispatcher.connect('events', '/events', Events(), action = 'list')
-    dispatcher.connect('events', '/events/filter', Events(), action = 'filter')
-    dispatcher.connect('events', '/events/get_count', Overview(), action = 'get_event_count')
+    dispatcher.connect('events', '/events', Events())
+    dispatcher.connect('events', '/events/update', Events(), action = 'update')
     dispatcher.connect('events', '/events/tooltip', Events(), action = 'tooltip')
     dispatcher.connect('events', '/event/:event_id', Events(), action = 'details')
 

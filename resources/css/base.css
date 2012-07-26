@@ -140,20 +140,74 @@ table#events td#noresults {
   	line-height: 50px;
   	text-align: center;
 }
-table#events td#pagenav {
-	text-align: center;
-	padding: 20px 1px 5px 1px;
-	border-bottom: 0px;	
-}
 
-table#events td#pagenav span.arrow {
-	font-size: 1.5em;
-}
-
+/*
+ *	filter input elements
+ */
 table#events input[type="text"] {
-	width: 96%;
-	margin: 0px auto;
+	margin-bottom: 2px;
 }
+
+th#column_time {
+	width:							160px;
+	overflow:						hidden;
+}
+th#column_host {
+	width:							140px;
+	overflow:						hidden;
+}
+th#column_facility,
+th#column_severity {
+	width:							110px;
+	overflow:						hidden;
+}
+th#column_program {
+	width:							120px;
+	overflow:						hidden;
+}
+
+input#filter_time {
+	width:							136px;
+	padding-right: 					5px;
+}
+input#filter_host {
+	width:							116px;
+	padding-right: 					5px;
+}
+input#filter_facility,
+input#filter_severity {
+	width:							86px;
+	padding-right: 					5px;
+}
+input#filter_program {
+	width:							96px;
+	padding-right: 					5px;
+}
+input#filter_message {
+	padding-right: 					5px;
+}
+
+.divclearable {
+	background: #fff;
+	border: 1px solid #888;
+	display: inline-block;
+	vertical-align: middle;
+	padding-right: 					5px;
+}
+
+a.clearlink {
+	background: url("/static/img/close-button.png") no-repeat scroll 0 0 transparent;
+	cursor: pointer;
+	display: inline-block;
+	height: 16px;
+	width: 12px;
+	z-index: 2000;
+	border: 0px solid;
+}
+a.clearlink:hover {
+	background: url("/static/img/close-button.png") no-repeat scroll -24px 0 transparent;
+}
+
 
 /*
  * buttons

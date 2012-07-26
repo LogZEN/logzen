@@ -46,5 +46,15 @@ class Backend:
         pass
 
     @abstractmethod
-    def severity_count_by_host(self):
+    def event_peaks_today(self):
+        pass
+
+    @abstractmethod
+    def event_count_by_host(self):
+        pass
+
+    @abstractmethod
+    def event_count_by_time(self,
+                            filters,
+                            steps):
         pass

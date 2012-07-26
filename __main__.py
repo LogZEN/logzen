@@ -28,7 +28,7 @@ from logview.events import Events
 if __name__ == '__main__':
 
     dispatcher = cherrypy.dispatch.RoutesDispatcher()
-    dispatcher.connect('overview', '/', Overview(), action = 'index')
+    dispatcher.connect('overview', '/', Overview())
 
     dispatcher.connect('events', '/events', Events(), action = 'list')
     dispatcher.connect('events', '/events/filter', Events(), action = 'filter')

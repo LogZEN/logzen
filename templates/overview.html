@@ -2,54 +2,82 @@
 
 {% block title %}Overview{% endblock %}
 
-{% block content %}    
-<div id="chartdiv" style="height: 200px; width: 95%;"></div>
+{% block content %}
+
+<div class="left_graphs">
+	<div class="left">
+		<h2>Events by Host</h2>
+		<div id="events_by_host" style="height: 200px; width: 100%;"></div>
+	</div>
+	<div class="right">
+		<h2>TOP 5 Host</h2>
+		<div id="top_hosts" style="height: 200px; width: 100%;"></div>
+	</div>
+</div>
+
+
 <script>
 
-function plotData (event, ranges) {
-    $.ajax({
-        url: "/overview/range",
-        method: 'POST',
-        data: function() {
-        	if (ranges) {
-        		return {
-        			start: tick[Math.floor(ranges.xaxis.from)][1], 
-                	end: tick[Math.ceil(ranges.xaxis.to)][1]
-        		}	
-        	}
-        }(),
-        dataType: 'json', 
-        success: onDataReceived
-    });
-    function onDataReceived(series) {
-    	data = []
-    	tick = []
-    	i = 0
-    	for (s in series.data) {
-    		data.push([i, parseInt(series.data[s])])
-    		tick.push([i, s])
-    		i++;
-    	}
-    	$.plot($('#chartdiv'), [data], options = {
-    		xaxis: {
-    			ticks: tick,
-			},
-    		lines: {
-    		      show: true,
-    		      lineWidth: 1,
-    		      fill: true,
-    		      fillColor: { colors: ["#729fcf", "#3465af"] }
-    		  },
-    		  colors: ["#204a87"],
-    		  selection: { mode: "x" }
-    	});
+data = [
+	{% for c in count %}
+		{label: "{{c.host}}", data: {{c.count}}}{% if loop.last != true %},{% endif %}
+	{% endfor %}
+]
+
+$.plot($('#events_by_host'),
+		[
+			{% for c in events_by_host %}
+				{label: "{{c.host}}", data: {{c.count}}}{% if loop.last != true %},{% endif %}
+			{% endfor %}
+		], {
+	series: {
+	    pie: {
+	        show: true,
+            combine: {
+                color: '#999',
+                threshold: 0.1
+            }
+	    }
+	},
+    legend: {
+        show: false
     }
-}
-
-$("#chartdiv").bind("plotselected", plotData);
-
-plotData();
-
+});
+$.plot($('#top_hosts'),
+		[[
+			{% for c in top_hosts %}
+				[{{loop.index}}, {{c.count}}]{% if loop.last != true %},{% endif %}
+			{% endfor %}
+		]], {
+	xaxis: {
+		ticks: [
+				{% for c in top_hosts %}
+					[{{loop.index}}, "{{c.host}}"]{% if loop.last != true %},{% endif %}
+				{% endfor %}
+				],
+	},
+	bars: {
+	      show: true,
+	      lineWidth: 1,
+          align: "center",
+          barWidth: 0.6,
+	      fill: true,
+	      fillColor: { colors: ["#729fcf", "#3465af"] }
+	},
+    legend: {
+        show: false
+    },
+	grid: { 
+		hoverable: true, 
+		autoHighlight: true 
+	},
+	tooltip: true,
+	tooltipOpts: {
+		content: "%y",
+		defaultTheme:  false
+	},
+	colors: ["#204a87"],
+});
 </script>
 
 {% endblock %}

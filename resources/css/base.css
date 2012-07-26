@@ -354,3 +354,46 @@ table#events input[type="text"] {
     cursor: 					default;
     font-size: 					smaller;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ *	overview
+ */
+.left_graphs {
+	width:						50%;
+	height:						50%;
+	float:						left;
+	
+	background:					#fafafa;
+	padding: 					3px;
+
+	border:						1px solid #999;
+	border-radius: 				6px;
+}
+.left_graphs .left {
+	width: 						50%;
+	float: 						left;
+}
+.left_graphs .right {
+	width: 						50%;
+	float: 						right;
+}
+.left_graphs h2 {
+	padding: 					1px 0px 10px 0px;
+	margin: 					0px;
+	
+	font-size: 					11pt;
+}

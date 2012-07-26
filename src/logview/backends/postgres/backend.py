@@ -96,15 +96,33 @@ class PostgresBackend(Backend):
 
         return result
 
-    def severity_count_by_host(self):
+    def event_peaks_today(self):
         connection = self.__connection_pool.getconn()
         cursor = connection.cursor()
 
         cursor.execute('''
-            SELECT COUNT(*) AS count, severity, host
+            SELECT host, COUNT(*) AS count
             FROM events
-            WHERE TRUE
-            GROUP BY host, severity;
+            GROUP BY host
+            ORDER BY count DESC
+            LIMIT 5;
+        ''')
+
+        result = cursor.fetchall()
+
+        cursor.close()
+        self.__connection_pool.putconn(connection)
+
+        return result
+
+    def event_count_by_host(self):
+        connection = self.__connection_pool.getconn()
+        cursor = connection.cursor()
+
+        cursor.execute('''
+            SELECT host, COUNT(*) AS count
+            FROM events
+            GROUP BY host;
         ''')
 
         result = cursor.fetchall()

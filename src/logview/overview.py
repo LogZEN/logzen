@@ -30,8 +30,12 @@ class Overview:
         pass
 
     @cherrypy.expose
-    def index(self):
+    def __call__(self):
+        events_by_host = backend.event_count_by_host()
+        top_hosts = backend.event_peaks_today()
+
         template = templates.get_template('overview.html')
-        return template.render()
+        return template.render(events_by_host = events_by_host,
+                               top_hosts = top_hosts)
 
 

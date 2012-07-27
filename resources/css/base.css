@@ -377,10 +377,10 @@ table#events input[type="text"] {
 	height:						50%;
 	float:						left;
 	
-	background:					#fafafa;
-	padding: 					3px;
+	background:					#fcfcfc;
+	padding: 					6px;
 
-	border:						1px solid #999;
+	border:						1px solid #ccc;
 	border-radius: 				6px;
 }
 .left_graphs .left {

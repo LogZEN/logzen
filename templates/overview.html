@@ -17,30 +17,40 @@
 
 
 <script>
-
-data = [
-	{% for c in count %}
-		{label: "{{c.host}}", data: {{c.count}}}{% if loop.last != true %},{% endif %}
-	{% endfor %}
-]
+var piecolors = ['#a40000','#204a87', '#4e9a06', '#ce5c00']
 
 $.plot($('#events_by_host'),
 		[
 			{% for c in events_by_host %}
-				{label: "{{c.host}}", data: {{c.count}}}{% if loop.last != true %},{% endif %}
+				{label: "{{c.host}}", data: {{c.count}}, color: piecolors[{{loop.index}}]}{% if loop.last != true %},{% endif %}
 			{% endfor %}
 		], {
 	series: {
 	    pie: {
 	        show: true,
+            radius: 1,
             combine: {
-                color: '#999',
+                color: '#2e3436',
                 threshold: 0.1
-            }
+            },
+            stroke: {
+            	color: '#ccc'
+            },
+			label: {
+			    show: true,
+			    radius: 3/4,
+			    formatter: function(label, series) {
+                    return '<div style="font-size:8pt;text-align:center;padding:2px;color:white;">'+label+'<br/>'+Math.round(series.percent)+'%</div>'
+			    },
+			    background: { opacity: 0.6 }
+			}
 	    }
 	},
     legend: {
         show: false
+    },
+    grid: {
+        hoverable: true
     }
 });
 $.plot($('#top_hosts'),

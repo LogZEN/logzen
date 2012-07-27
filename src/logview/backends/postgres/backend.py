@@ -199,11 +199,15 @@ class PostgresBackend(Backend):
         sql = '''
             SELECT reported_time, host, severity, message
             FROM events
+            WHERE severity = 'err'
+               OR severity = 'crit'
+               OR severity = 'alert'
+               OR severity = 'emerge'
             ORDER BY reported_time DESC
-            LIMIT 20;
+            LIMIT 15;
         '''
 
-        cursor.execute(sql, {"severity": "error"})
+        cursor.execute(sql)
         result = cursor.fetchall()
 
         cursor.close()

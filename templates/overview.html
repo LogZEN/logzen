@@ -186,17 +186,30 @@
 				if (d.length > 0) {
 					for (var i = 0; i < d.length; i++) {
 						var object = d[i];
-						var shortMessage = $.trim(object['message']).substring(0, 50) + " ...";
+						var shortMessage = $.trim(object['message']).substring(0, 50)
+						if (object['message'].length > 50) shortMessage += " ...";
 						rows += '<tr>';
 						rows += '<td class="event" id="' + object['id'] + '">' + object['reported_time'] + '</td>';
 						rows += '<td class="event color_' + object['severity'] + '" id="' + object['id'] + '">' + object['host'] + '</td>';
-						rows += '<td class="event" id="' + object['id'] + '" style="overflow:hidden">' + shortMessage + '</td>';
+						rows += '<td class="event q_tip" id="' + object['id'] + '" title="' + object['message'] + '">' + shortMessage + '</td>';
 						rows += '</tr>';
 					}
 				} else {
 					rows = '<tr><td colspan="6" id="noresults">No events found.</td></tr>'
 				}
 				$('tbody').empty().append(rows);
+				$('.q_tip').qtip({
+					content: {
+						attr: 'title'
+					},
+					position: {
+		 				my: 'top center',
+		 				at: 'bottom center'
+		 			},
+		 			style: {
+		 				classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
+		 			}
+				});
 			}
 		});
 	}

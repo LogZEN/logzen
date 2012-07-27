@@ -215,6 +215,34 @@ class PostgresBackend(Backend):
 
         return result
 
+    def get_count_events(self):
+        connection = self.__connection_pool.getconn()
+        cursor = connection.cursor()
+
+        cursor.execute('''
+            SELECT severity, COUNT(*) as count
+            FROM events
+            GROUP BY severity;
+        ''');
+        result = cursor.fetchall()
+
+        cursor.close()
+        self.__connection_pool.putconn(connection)
+
+        return result
+
+
+    def get_count_hosts(self):
+        connection = self.__connection_pool.getconn()
+        cursor = connection.cursor()
+
+        cursor.execute('SELECT COUNT(*) FROM events GROUP BY host;')
+        result = cursor.rowcount
+
+        cursor.close()
+        self.__connection_pool.putconn(connection)
+
+        return result
 
 Result.register(PostgresResult)
 Backend.register(PostgresBackend)

@@ -65,3 +65,20 @@ class Overview:
             eventmap.append(event)
 
         return eventmap
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_statistics(self):
+        data = {}
+        eventmap = {}
+        events = backend.get_count_events()
+        if events > 0:
+            sum = 0
+            for event in events:
+                sum += event['count']
+                eventmap[event['severity']] = humanize.intcomma(event['count'])
+            eventmap['sum'] = humanize.intcomma(sum)
+
+        data['count_hosts'] = backend.get_count_hosts()
+        data['count_events'] = eventmap
+        return data

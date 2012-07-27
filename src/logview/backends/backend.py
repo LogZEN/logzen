@@ -63,3 +63,11 @@ class Backend:
     @abstractmethod
     def new_events(self):
         pass
+
+    @abstractmethod
+    def get_count_events(self):
+        pass
+
+    @abstractmethod
+    def get_count_hosts(self):
+        pass

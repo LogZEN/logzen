@@ -479,3 +479,9 @@ ul#top_hosts_menu li a {
 ul#top_hosts_menu li a:hover {
 	color:						#fff;
 }
+
+table#stats_count th.count,
+table#stats_count td.count {
+	text-align: 				right;
+	padding-left: 				20px;
+}

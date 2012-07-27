@@ -17,9 +17,18 @@
 	</div>
 	<div class="dashboard_right" style="height: 250px;">
 		<div class="left">
-			Events:
-			Hosts:
-			
+			<table id="stats_count">
+				<tr><th>Number of Events</th><th id="count_events_sum" class="count"></th></tr>
+				<tr><td>&nbsp; Emergency</td><td id="count_events_emergency" class="count"></td></tr>
+				<tr><td>&nbsp; Critical</td><td id="count_events_critical" class="count"></td></tr>
+				<tr><td>&nbsp; Error</td><td id="count_events_error" class="count"></td></tr>
+				<tr><td>&nbsp; Warning</td><td id="count_events_warning" class="count"></td></tr>
+				<tr><td>&nbsp; Notice</td><td id="count_events_notice" class="count"></td></tr>
+				<tr><td>&nbsp; Informational</td><td id="count_events_informational" class="count"></td></tr>
+				<tr><td>&nbsp; Debug</td><td id="count_events_debug" class="count"></td></tr>
+				<tr><td>&nbsp;</td></tr>
+				<tr><th>Number of Hosts</th><th id="count_hosts" class="count"></th></tr>
+			</table>
 		</div>
 	</div>
 	
@@ -47,8 +56,6 @@
 	</div>
 	<div class="dashboard_right" style="height: 350px;">
 		<div class="left">
-			Events:
-			Hosts:
 			
 		</div>
 	</div>
@@ -197,7 +204,7 @@
 				} else {
 					rows = '<tr><td colspan="6" id="noresults">No events found.</td></tr>'
 				}
-				$('tbody').empty().append(rows);
+				$('#tbody_content').empty().append(rows);
 				$('.q_tip').qtip({
 					content: {
 						attr: 'title'
@@ -215,10 +222,39 @@
 	}
 	
 	
+	function statistics() {
+		$.ajax({
+			url: "/overview/statistics",
+			dataType: 'json',
+			beforeSend: function(){
+				$("#loading").show();
+			},
+			success: function(d) {
+				$('#count_events_sum').empty().append(d.count_events['sum']);
+				$('#count_events_emergency').empty().append(d.count_events['alert']);
+				$('#count_events_critical').empty().append(d.count_events['crit']);
+				$('#count_events_error').empty().append(d.count_events['err']);
+				$('#count_events_warning').empty().append(d.count_events['warning']);
+				$('#count_events_notice').empty().append(d.count_events['notice']);
+				$('#count_events_informational').empty().append(d.count_events['info']);
+				$('#count_events_debug').empty().append(d.count_events['debug']);
+				
+				$('#count_hosts').empty().append(d['count_hosts']);
+			}
+		});
+	}
+	
+	function updateAction() {
+		new_events();
+		statistics();
+	}
+	
 	events_by_host();
 	top_hosts(1);
 	new_events();
+	statistics();
 	
+	setInterval(updateAction, 5000); 
 </script>
 
 {% endblock %}

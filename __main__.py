@@ -29,6 +29,9 @@ if __name__ == '__main__':
 
     dispatcher = cherrypy.dispatch.RoutesDispatcher()
     dispatcher.connect('overview', '/', Overview())
+    dispatcher.connect('overview', '/overview/events_by_host', Overview(), action = "get_events_by_host")
+    dispatcher.connect('overview', '/overview/top_hosts', Overview(), action = "get_top_hosts")
+    dispatcher.connect('overview', '/overview/new_events', Overview(), action = "get_new_events")
 
     dispatcher.connect('events', '/events', Events(), action = 'list')
     dispatcher.connect('events', '/events/filter', Events(), action = 'filter')

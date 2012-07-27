@@ -46,7 +46,8 @@ class Backend:
         pass
 
     @abstractmethod
-    def event_peaks_today(self):
+    def event_peaks(self,
+                    timerange):
         pass
 
     @abstractmethod
@@ -57,4 +58,8 @@ class Backend:
     def event_count_by_time(self,
                             filters,
                             steps):
+        pass
+
+    @abstractmethod
+    def new_events(self):
         pass

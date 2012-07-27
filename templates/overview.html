@@ -4,90 +4,208 @@
 
 {% block content %}
 
-<div class="left_graphs">
-	<div class="left">
-		<h2>Events by Host</h2>
-		<div id="events_by_host" style="height: 200px; width: 100%;"></div>
+<div id="dashboard">
+	<div class="dashboard_left" style="height: 250px;">
+		<div class="left">
+			<h2>Events by Host</h2>
+			<div id="events_by_host" style="height: 220px; width: 100%;"></div>
+		</div>
+		<div class="right">
+			<h2>TOP 5 Host <span id="top_hosts_selector">(last 24 hours)</span></h2>
+			<div id="top_hosts" style="height: 220px; width: 100%;"></div>
+		</div>
 	</div>
-	<div class="right">
-		<h2>TOP 5 Host</h2>
-		<div id="top_hosts" style="height: 200px; width: 100%;"></div>
+	<div class="dashboard_right" style="height: 250px;">
+		<div class="left">
+			Events:
+			Hosts:
+			
+		</div>
+	</div>
+	
+	<div class="dashboard_left" style="height: 350px;overflow:hidden;">
+		<div class="full">
+			<h2>Newest events <span id="new_events_selector">(alert and above)</span></h2>
+			<table id="events" style="font-size: 8pt;">
+		        <thead>
+					<tr id="first">
+						<th width="110">Time</th>
+						<th width="90">Host</th>
+						<th>Message</th>
+					</tr>
+				</thead>
+				<tbody id="tbody_content">
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="dashboard_right" style="height: 350px;">
+		<div class="left">
+			Events:
+			Hosts:
+			
+		</div>
 	</div>
 </div>
 
-
 <script>
-var piecolors = ['#a40000','#204a87', '#4e9a06', '#ce5c00']
+	var piecolors = ['#a40000','#204a87', '#4e9a06', '#ce5c00']
+	
+	function events_by_host() {
+	    $.ajax({
+	        url: "/overview/events_by_host",
+	        dataType: 'json', 
+	        success: function(d) {
+	        	data = []
+		    	for (var i = 0; i < d.length; i++) {
+		    		data[i] = { label: d[i]['host'], data: d[i]['count'], color: piecolors[i] }
+		    	}
+		    	$.plot($('#events_by_host'), data, {
+		    		series: {
+		    		    pie: {
+		    		        show: true,
+		    	            radius: 0.95,
+		    	            combine: {
+		    	                color: '#2e3436',
+		    	                threshold: 0.1
+		    	            },
+		    	            stroke: {
+		    	            	color: '#ccc'
+		    	            },
+		    				label: {
+		    				    show: true,
+		    				    radius: 3/4,
+		    				    formatter: function(label, series) {
+		    	                    return '<div style="font-size:8pt;text-align:center;padding:2px;color:white;">'+label+'<br/>'+Math.round(series.percent)+'%</div>'
+		    				    }
+		    				}
+		    		    }
+		    		},
+		    	    legend: {
+		    	        show: false
+		    	    },
+		    	    grid: {
+		    	        hoverable: true
+		    	    }
+		    	});
+		    }
+	    });
+	}
+	
+	
+	function top_hosts(timerange) {
+	    $.ajax({
+	        url: "/overview/top_hosts",
+	        method: 'POST',
+	        data: timerange,
+	        dataType: 'json', 
+	        success: function(d) {
+		    	data = []
+		    	tick = []
+		    	for (var i = 0; i < d.data.length; i++) {
+		    		data.push([i, parseInt(d.data[i]['count'])]);
+		    		tick.push([i, d.data[i]['host']]);
+		    	}
+		    	$('#top_hosts_selector').empty().append(function() {
+		    		if (d.metadata['timerange'] == 1) {
+		    			text = '(last 24 hours)';
+		    		} else {
+		    			text = '(last ' + d.metadata['timerange'] + ' days)';
+		    		}
+		    		return text;
+		    	});
+				$.plot($('#top_hosts'), [data], {
+					xaxis: {
+						ticks: tick
+					},
+					bars: {
+					      show: true,
+					      lineWidth: 1,
+				          align: "center",
+				          barWidth: 0.6,
+					      fill: true,
+					      fillColor: { colors: ["#729fcf", "#3465af"] }
+					},
+				    legend: {
+				        show: false
+				    },
+					grid: { 
+						hoverable: true, 
+						autoHighlight: true 
+					},
+					tooltip: true,
+					tooltipOpts: {
+						content: "%y",
+						defaultTheme:  false
+					},
+					colors: ["#204a87"],
+				});
+		    }
+	    });
+	}
 
-$.plot($('#events_by_host'),
-		[
-			{% for c in events_by_host %}
-				{label: "{{c.host}}", data: {{c.count}}, color: piecolors[{{loop.index}}]}{% if loop.last != true %},{% endif %}
-			{% endfor %}
-		], {
-	series: {
-	    pie: {
-	        show: true,
-            radius: 1,
-            combine: {
-                color: '#2e3436',
-                threshold: 0.1
-            },
-            stroke: {
-            	color: '#ccc'
-            },
-			label: {
-			    show: true,
-			    radius: 3/4,
-			    formatter: function(label, series) {
-                    return '<div style="font-size:8pt;text-align:center;padding:2px;color:white;">'+label+'<br/>'+Math.round(series.percent)+'%</div>'
-			    },
-			    background: { opacity: 0.6 }
+	$('#top_hosts_selector').mouseover(function() {
+		$(this).qtip({
+			content: {
+ 				text: '<ul id="top_hosts_menu"> \
+					<li><a href="javascript:void(0);" onclick="top_hosts(\'timerange=1\');">show last day</a></li> \
+					<li><a href="javascript:void(0);" onclick="top_hosts(\'timerange=7\');">show last week</a></li> \
+					<li><a href="javascript:void(0);" onclick="top_hosts(\'timerange=30\');">show last month</a></li> \
+					<li><a href="javascript:void(0);" onclick="top_hosts(\'timerange=364\');">show last year</a></li> \
+					</ul>',
+ 			},
+ 			position: {
+ 				my: 'top center',
+ 				at: 'bottom center'
+ 			},
+ 			hide: {
+ 		        fixed: true,
+ 				delay: 200
+ 			},
+ 			style: {
+ 				classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
+ 			}
+ 		});
+	});
+	
+	function new_events() {
+		$.ajax({
+			url: "/overview/new_events",
+			dataType: 'json',
+			beforeSend: function(){
+				$("#loading").show();
+			},
+			success: function(d) {
+				var rows = ""
+				if (d.length > 0) {
+					for (var i = 0; i < d.length; i++) {
+						var object = d[i];
+						var shortMessage = $.trim(object['message']).substring(0, 50) + " ...";
+						rows += '<tr>';
+						rows += '<td class="event" id="' + object['id'] + '">' + object['reported_time'] + '</td>';
+						rows += '<td class="event color_' + object['severity'] + '" id="' + object['id'] + '">' + object['host'] + '</td>';
+						rows += '<td class="event" id="' + object['id'] + '" style="overflow:hidden">' + shortMessage + '</td>';
+						rows += '</tr>';
+					}
+				} else {
+					rows = '<tr><td colspan="6" id="noresults">No events found.</td></tr>'
+				}
+				$('tbody').empty().append(rows);
 			}
-	    }
-	},
-    legend: {
-        show: false
-    },
-    grid: {
-        hoverable: true
-    }
-});
-$.plot($('#top_hosts'),
-		[[
-			{% for c in top_hosts %}
-				[{{loop.index}}, {{c.count}}]{% if loop.last != true %},{% endif %}
-			{% endfor %}
-		]], {
-	xaxis: {
-		ticks: [
-				{% for c in top_hosts %}
-					[{{loop.index}}, "{{c.host}}"]{% if loop.last != true %},{% endif %}
-				{% endfor %}
-				],
-	},
-	bars: {
-	      show: true,
-	      lineWidth: 1,
-          align: "center",
-          barWidth: 0.6,
-	      fill: true,
-	      fillColor: { colors: ["#729fcf", "#3465af"] }
-	},
-    legend: {
-        show: false
-    },
-	grid: { 
-		hoverable: true, 
-		autoHighlight: true 
-	},
-	tooltip: true,
-	tooltipOpts: {
-		content: "%y",
-		defaultTheme:  false
-	},
-	colors: ["#204a87"],
-});
+		});
+	}
+	
+	
+	events_by_host();
+	top_hosts(1);
+	new_events();
+	
 </script>
 
 {% endblock %}

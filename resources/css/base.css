@@ -78,7 +78,7 @@ div#main {
 
 
 table#events {
-  border:                 1px #000000 solid;
+  border:                 1px #ddd solid;
   width:                  100%;
   border-collapse:        collapse;
   
@@ -86,7 +86,7 @@ table#events {
 }
 
 table#events tr#first th {
-  border-top:             1px #000000 solid;
+  border-top:             1px #ddd solid;
 }
 table#events th {
   background-color:       #F6F6F6;
@@ -372,28 +372,56 @@ table#events input[type="text"] {
 /*
  *	overview
  */
-.left_graphs {
-	width:						50%;
-	height:						50%;
-	float:						left;
+.dashboard_left,
+.dashboard_right {
+	width:						47%;
+	margin-bottom: 				20px;
 	
 	background:					#fcfcfc;
-	padding: 					6px;
+	padding: 					20px 10px;
 
 	border:						1px solid #ccc;
 	border-radius: 				6px;
 }
-.left_graphs .left {
-	width: 						50%;
+.dashboard_left {
+	float:						left;
+}
+.dashboard_right {
+	float:						right;
+}
+
+.dashboard_left .left {
+	width: 						49%;
 	float: 						left;
 }
-.left_graphs .right {
-	width: 						50%;
+.dashboard_left .right {
+	width: 						49%;
 	float: 						right;
 }
-.left_graphs h2 {
+.dashboard_left h2 {
 	padding: 					1px 0px 10px 0px;
 	margin: 					0px;
 	
 	font-size: 					11pt;
+}
+
+span#top_hosts_selector,
+span#new_events_selector {
+	font-size:					7pt;
+	font-weight:				normal;
+}
+ul#top_hosts_menu {
+	list-style-type: 			none;
+	padding:					0px;
+	margin:						0px;
+}
+ul#top_hosts_menu li {
+	padding:					2px;
+}
+ul#top_hosts_menu li a {
+	color:						#eee;
+	text-decoration:			none;
+}
+ul#top_hosts_menu li a:hover {
+	color:						#fff;
 }

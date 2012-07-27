@@ -96,17 +96,19 @@ class PostgresBackend(Backend):
 
         return result
 
-    def event_peaks_today(self):
+    def event_peaks(self,
+                    time):
         connection = self.__connection_pool.getconn()
         cursor = connection.cursor()
 
         cursor.execute('''
             SELECT host, COUNT(*) AS count
             FROM events
+            WHERE reported_time > %(time)s
             GROUP BY host
             ORDER BY count DESC
             LIMIT 5;
-        ''')
+        ''', {"time": time})
 
         result = cursor.fetchall()
 
@@ -122,7 +124,8 @@ class PostgresBackend(Backend):
         cursor.execute('''
             SELECT host, COUNT(*) AS count
             FROM events
-            GROUP BY host;
+            GROUP BY host
+            ORDER BY count DESC;
         ''')
 
         result = cursor.fetchall()
@@ -188,6 +191,25 @@ class PostgresBackend(Backend):
         self.__connection_pool.putconn(connection)
 
         return result['min'], result['max']
+
+    def new_events(self):
+        connection = self.__connection_pool.getconn()
+        cursor = connection.cursor()
+
+        sql = '''
+            SELECT reported_time, host, severity, message
+            FROM events
+            ORDER BY reported_time DESC
+            LIMIT 20;
+        '''
+
+        cursor.execute(sql, {"severity": "error"})
+        result = cursor.fetchall()
+
+        cursor.close()
+        self.__connection_pool.putconn(connection)
+
+        return result
 
 
 Result.register(PostgresResult)

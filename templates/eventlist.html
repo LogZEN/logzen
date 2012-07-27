@@ -5,29 +5,36 @@
 {% block content %}
 
 	<div id="navi">
+		<div class="buttons">
+			<span id="eventcount"></span> &nbsp;
+			<a href="#" class="button"><input type="checkbox" name="autorefresh" /> Refresh</a>
+			<a href="javascript:void(0);" class="button q_tip" id="zoomoutbutton" title="Zoom out to a wider timerange">Zoom Out</a>
+			<a class="button left q_tip" title="Newer" href="javascript:void(0);" id="prevbutton">Prev</a><a class="button right q_tip" title="Older" href="javascript:void(0);" id="nextbutton">Next</a>
+		</div>
 	</div>
-	
+		
 	<div id="loading"></div>
-	<div id="chartdiv" style="height: 150px; width: 90%; margin: 0px auto"></div>
+	<div id="chartdiv" style="height: 120px; width: 90%; margin: 0px auto;"></div>
 	
-	<form action="/events/filter" method="post" id="filterform">
+	<form action="/events/update" method="post" id="filterform">
 	<table id="events">
         <thead>
 			<tr id="first">
-				<th width="157">time_logged</th>
+				<th>time_logged <a href="javascript:void(0);" onclick="toggleEventlistColumn(1); toggleEventlistColumn(2);"><img src="/static/img/arrow_left.png" /></a></th>
+				<th style="display:none;"><a href="javascript:void(0);" onclick="toggleEventlistColumn(1); toggleEventlistColumn(2);"><img src="/static/img/arrow_right.png" /></a></th>
 				<th>host</th>
 				<th>facility</th>
 				<th>severity</th>
 				<th>program</th>
-				<th width="40%">message</th>
+				<th>message</th>
 			</tr>
 			<tr>
-				<th><input type="text" name="filter_time" id="filter_time" placeholder="filter" size="5" /></th>
-				<th><input type="text" name="filter_host" id="filter_host" placeholder="filter" size="5" /></th>
-				<th><input type="text" name="filter_facility" id="filter_facility" placeholder="filter" size="5" /></th>
-				<th><input type="text" name="filter_severity" id="filter_severity" placeholder="filter" size="5" /></th>
-				<th><input type="text" name="filter_program" id="filter_program" placeholder="filter" size="5" /></th>
-				<th><input type="text" name="filter_message" id="filter_message" placeholder="filter" size="5" /></th>
+				<th id="column_time"><input type="text" name="filter_time" id="filter_time" class="filter" placeholder="filter" size="5" /></th>
+				<th id="column_host"><input type="text" name="filter_host" id="filter_host" class="filter" placeholder="filter" size="5" /></th>
+				<th id="column_facility"><input type="text" name="filter_facility" id="filter_facility" class="filter" placeholder="filter" size="5" /></th>
+				<th id="column_severity"><input type="text" name="filter_severity" id="filter_severity" class="filter" placeholder="filter" size="5" /></th>
+				<th id="column_program"><input type="text" name="filter_program" id="filter_program" class="filter" placeholder="filter" size="5" /></th>
+				<th id="column_message"><input type="text" name="filter_message" id="filter_message" class="filter" placeholder="filter" size="5" /></th>
 			</tr>
 		</thead>
 		
@@ -53,6 +60,42 @@
 	for (var i = 0; i < 6; i++) {
 		prevrange[i] = new Array(2);
 	}
+	
+	/*
+	 * remove a table column
+	 */
+	function toggleEventlistColumn(id) {
+		$('td:nth-child(' + id + '),th:nth-child(' + id + ')').fadeToggle();
+	}	 
+	
+	/*
+	 * formular clear buttons
+	 */
+ 	$(".filter").each(function() {
+		$(this).css({'border-width': '0px', 'outline': 'none'})
+			.wrap('<div id="sq" class="divclearable"></div>')
+			.parent()
+			.attr('class', $(this).attr('class') + ' divclearable')
+			.append('<a class="clearlink" href="javascript:"></a>');
+
+		$('.clearlink')
+			.attr('title', 'Clear this textbox')
+			.qtip({
+				content: {
+					text: 'Clear this textbox'
+				},
+				position: {
+	 				my: 'top center',
+	 				at: 'bottom center'
+	 			},
+	 			style: {
+	 				classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
+	 			}
+			})
+			.click(function() {
+				$(this).prev().val('');
+			})
+	});
 	
 	 /*
 	  * set the tooltip for each result row
@@ -98,47 +141,11 @@
  			}
 		});
 	 }
-	/*
-	 *	load event list
-	 */
-	function loadEvents(params) {
-	    $.post($('#filterform').attr('action'), 
-	    		params,
-				function(data) {
-		    		$('#navi').empty().append($(data).filter('#navi').html());
-					$('#tbody_content').empty().append($(data).find('#tbody').html());
-					$('html, body').animate({scrollTop:0}, 'fast');
 
-					loadTooltips();
-
-				    $('#zoomoutbutton').click(function (e) {
-				        e.preventDefault();
-				        if (zoomlevel > 0) {
-				        	timerange['start_time'] = prevrange[zoomlevel - 1]['start_time']
-				        	timerange['end_time'] = prevrange[zoomlevel - 1]['end_time']
-				        }
-				        updateAction();
-				    });
-				}
-		);
-	}
-	$("#loading").bind("ajaxStart", function(){
-		  $(this).show();
-		}).bind("ajaxComplete", function(){
-		  $(this).hide();
-	 });
-	
 	/*
 	 *	load graph
 	 */
-	function loadGraph (params) {
-	    $.ajax({
-	        url: "/events/get_count",
-	        method: 'POST',
-	        data: params,
-	        dataType: 'json', 
-	        success: onDataReceived
-	    });
+	function updateGraph () {
 	    function onDataReceived(series) {
 	    	zoomlevel = series.metadata['zoomlevel']
 	    	data = []
@@ -206,9 +213,123 @@
         }
 		params['start_time'] = timerange['start_time'];
 		params['end_time'] = timerange['end_time'];
-        
-		loadEvents(params);
-		loadGraph(params);
+
+	    $.ajax({
+	        url: $('#filterform').attr('action'),
+	        method: 'POST',
+	        data: params,
+	        dataType: 'json', 
+	        success: handleResult,
+	        beforeSend: function(){
+	        	$("#loading").show();
+	       },
+	    });
+
+		function handleResult(s) {
+        	$("#loading").hide();
+        	
+			// update navi
+			if (s.metadata['event_count'] < 10000) {
+				var event_count_label = s.metadata['event_count']
+			} else {
+				var event_count_label = '<span class="q_tip" title="' + 
+					s.metadata['event_count'] + ' events">quite a few</span>'
+			}
+			$('#eventcount').empty().append(s.metadata['event_first'] + " - " + 
+					s.metadata['event_last'] + " of " + event_count_label)
+			
+			$('#prevbutton').click(function() {
+				if(s.metadata['page'] > 0) {
+					var action = '/events/update?page=' + (s.metadata['page'] - 1)
+					$('#filterform').get(0).setAttribute('action', action);
+					updateAction();
+				}
+			});
+			$('#nextbutton').click(function() {
+				if(s.metadata['page'] + 1 < s.metadata['maxpages']) {
+					var action = '/events/update?page=' + (s.metadata['page'] + 1)
+					$('#filterform').get(0).setAttribute('action', action);
+					updateAction();
+				}
+			});
+			
+
+			// update events
+			var rows = ""
+			if (s.events.length > 0) {
+				for (var i = 0; i < s.events.length; i++) {
+					var object = s.events[i];
+					rows += '<tr>';
+					rows += '<td class="event" id="' + object['id'] + '">' + object['reported_time'] + '</td>';
+					rows += '<td class="event" id="' + object['id'] + '"><a href="javascript:void(0)" onclick="$(\'#filter_host\').val($(this).html()); updateAction();">' + object['host'] + '</a></td>';
+					rows += '<td class="event color_' + object['level'] + '" id="' + object['id'] + '"><a href="javascript:void(0)" onclick="$(\'#filter_facility\').val($(this).html()); updateAction();">' + object['facility'] + '</a></td>';
+					rows += '<td class="event" id="' + object['id'] + '"><a href="javascript:void(0)" onclick="$(\'#filter_severity\').val($(this).html()); updateAction();">' + object['severity'] + '</a></td>';
+					rows += '<td class="event" id="' + object['id'] + '"><a href="javascript:void(0)" onclick="$(\'#filter_program\').val($(this).html()); updateAction();">' + object['program'] + '</a></td>';
+					rows += '<td class="event" id="' + object['id'] + '"><a href="javascript:void(0)" onclick="$(\'#filter_message\').val($(this).html()); updateAction();">' + object['message'] + '</a></td>';
+					rows += '</tr>';
+				}
+			} else {
+				rows = '<tr><td colspan="6" id="noresults">No events found.</td></tr>'
+			}
+			$('tbody').empty().append(rows);
+			$('html, body').animate({scrollTop:0}, 'fast');
+
+			// tooltips
+			loadTooltips();
+
+			// graph
+	    	zoomlevel = s.metadata['zoom']
+	    	data = []
+	    	tick = []
+	    	tickrange = []
+	    	
+	    	if (s.eventcount.length > 0) {
+				for (var i = 0; i < s.eventcount.length; i++) {
+					var object = s.eventcount[i];
+	    			data.push([i, parseInt(object['count'])]);
+	    			tick.push([i, object['time']]);
+				}
+	    	}
+	    	tick.push([i, s.metadata['maxtime']])
+	    	
+    		tickrange.push(tick[0]);
+	    	tickrange.push(tick[Math.round((tick.length - 1) / 2)])
+	    	tickrange.push(tick[tick.length - 1])
+	    	
+	    	plot = $.plot($('#chartdiv'), [data], options = {
+	    		xaxis: {
+	    			ticks: tickrange,
+				},
+	    		bars: {
+	    		      show: true,
+	    		      lineWidth: 1,
+	    		      fill: true,
+	    		      fillColor: { colors: ["#729fcf", "#3465af"] }
+				},
+				grid: { 
+					hoverable: true, 
+					autoHighlight: true 
+				},
+				tooltip: true,
+				tooltipOpts: {
+					content: "%y",
+					defaultTheme:  false
+				},
+				colors: ["#204a87"],
+				selection: { mode: "x" }
+			});
+	    	
+	    	// update zoomout button
+		    $('#zoomoutbutton').click(function (e) {
+		        e.preventDefault();
+		        if (zoomlevel > 0) {
+		        	timerange['start_time'] = prevrange[zoomlevel - 1]['start_time']
+		        	timerange['end_time'] = prevrange[zoomlevel - 1]['end_time']
+		        }
+		        updateAction();
+		    });
+		}
+	    
 	}
 
 	/*
@@ -220,10 +341,22 @@
 	});
 	
 	$("#chartdiv").bind("plotselected", updateAction);
+	
 	/*
 	 *	fire the initial event
 	 */
-	 updateAction(); 
+	 $.plot($('#chartdiv'), [[[0,0], [0,0]]], {
+		bars: {
+		      show: true,
+		      lineWidth: 1,
+		      fill: true,
+		      fillColor: { colors: ["#729fcf", "#3465af"] }
+		},
+		colors: ["#204a87"],
+		selection: { mode: "x" }
+	});
+	 
+	updateAction(); 
 	    
 	//]]></script>
 {% endblock %}

@@ -20,22 +20,24 @@ along with pyLogView.  If not, see <http://www.gnu.org/licenses/>.
 import socket
 import datetime
 import humanize
+import math
 
 import cherrypy
 
 from logview.backends import backend
-
 from logview import templates
+
 
 class Events:
     def __init__(self):
         pass
 
+
     @cherrypy.expose
-    def list(self,
+    def __call__(self,
              page = 0):
-        template = templates.get_template('eventlist.html')
-        return template.render()
+        return templates.get_template('eventlist.html').render()
+
 
     @cherrypy.expose
     def details(self,
@@ -45,66 +47,19 @@ class Events:
         event = backend.get_event(event_id)
         return template.render(event = event)
 
-        pass
 
     @cherrypy.expose
-    def filter(self,
+    @cherrypy.tools.json_out()
+    def update(self,
                page = 0,
+               pagesize = 50,
                host = None,
                facility = None,
                severity = None,
                program = None,
                message = None,
-               start_time = '1970-01-01 00:00:00',
-               end_time = datetime.datetime.now()):
-        template = templates.get_template('eventlist.ajax.html')
-
-        filters = {}
-        if host is not None:
-            filters['host'] = '%' + host + '%'
-        if facility is not None:
-            filters['facility'] = '%' + facility + '%'
-        if severity is not None:
-            filters['severity'] = '%' + severity + '%'
-        if program is not None:
-            filters['program'] = '%' + program + '%'
-        if message is not None:
-            filters['message'] = '%' + message + '%'
-
-        filters['start_time'] = start_time
-        filters['end_time'] = end_time
-
-        events = backend.get_events(filters)
-        return template.render(events = events,
-                               page = int(page),
-                               pagesize = 50)
-
-    @cherrypy.expose
-    def tooltip(self,
-                event_id):
-        template = templates.get_template('tooltip.ajax.html')
-
-        event = backend.get_event(event_id)
-
-        try:
-            event['ip'] = socket.gethostbyname(event['host'])
-        except:
-            event['ip'] = 'Unknown'
-
-        event['ago_time'] = humanize.naturaltime(datetime.datetime.now() - event['reported_time'])
-
-        return template.render(event = event)
-
-    @cherrypy.expose
-    def get_event_count(self,
-                 host = None,
-                 facility = None,
-                 severity = None,
-                 program = None,
-                 message = None,
-                 start_time = None,
-                 end_time = None):
-
+               start_time = None,
+               end_time = None):
         filters = {}
         if host is not None:
             filters['host'] = '%' + host + '%'
@@ -124,7 +79,6 @@ class Events:
             filters['end_time'] = datetime.datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S')
 
         interval = filters['end_time'] - filters['start_time']
-
         steps = 'second'
         level = 5
         if interval.total_seconds() > 120:
@@ -143,11 +97,55 @@ class Events:
             steps = 'year'
             level = 0
 
-        print steps
-        eventcount = backend.event_count_by_time(filters,
-                                                 steps)
 
-        template = templates.get_template('overview.ajax.html')
-        return template.render(eventcount = eventcount,
-                               zoomlevel = level,
-                               maxtime = filters['end_time'])
+        # message count by timeperiod
+        countmap = []
+        eventcount = backend.event_count_by_time(filters, steps)
+        for c in eventcount:
+            countmap.append({"time": str(c['time']), "count": c['count']})
+
+        # event data
+        eventmap = []
+        events = backend.get_events(filters)
+        numevents = events.get_count()
+        if numevents > 0:
+            for event in events.get_rows(int(page) * pagesize, pagesize):
+                event['reported_time'] = str(event['reported_time'])
+                event['received_time'] = str(event['received_time'])
+                event['id'] = str(event['id'])
+                eventmap.append(event)
+
+        # define some metadata
+        metadata = {}
+        metadata['page'] = int(page)
+        metadata['maxpages'] = math.ceil(numevents / pagesize)
+        metadata['event_count'] = numevents
+        metadata['event_first'] = str(int(page) * pagesize + 1)
+        if (int(page) * pagesize + pagesize) > numevents:
+            metadata['event_last'] = numevents
+        else:
+            metadata['event_last'] = int(page) * pagesize + pagesize
+
+        metadata['zoom'] = level
+        metadata['maxtime'] = str(filters['end_time'])
+
+        return {"metadata": metadata,
+                "eventcount": countmap,
+                "events": eventmap}
+
+
+    @cherrypy.expose
+    def tooltip(self,
+                event_id):
+        template = templates.get_template('tooltip.ajax.html')
+
+        event = backend.get_event(event_id)
+
+        try:
+            event['ip'] = socket.gethostbyname(event['host'])
+        except:
+            event['ip'] = 'Unknown'
+
+        event['ago_time'] = humanize.naturaltime(datetime.datetime.now() - event['reported_time'])
+
+        return template.render(event = event)

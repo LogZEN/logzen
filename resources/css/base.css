@@ -1,6 +1,9 @@
 /*
  *	main content area
  */
+body {
+	background:				#f6f6f6;
+}
 div#main {
 	margin-top:             50px;
 }
@@ -292,12 +295,16 @@ span#eventcount {
 }
 
 .dashwidget {
-	background:					#eee;
+	background:					#fff;
 	
-	border:						1px solid #aaa;
+	border:						1px solid #ccc;
 	border-radius: 				6px;
-	
+}
+.dashpadded {
 	padding:					10px;
+}
+.row-fluid-padded {
+	padding-bottom:				20px;
 }
 
 table#stats_count th.count,

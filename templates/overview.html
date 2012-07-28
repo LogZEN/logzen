@@ -5,13 +5,13 @@
 {% block content %}
 
 <div id="dashboard">
-	<div class="row-fluid">
+	<div class="row-fluid row-fluid-padded">
 	   	<div class="span6 dashwidget">
-	    	<div class="span6">
+	    	<div class="span6 dashpadded">
 				<h2>Events by Host</h2>
 				<div id="events_by_host" style="height: 220px; width: 100%;"></div>
 		    </div>
-		    <div class="span6">
+		    <div class="span6 dashpadded">
 	  			<div class="clearfix">
 	  				<h2 class="inline">TOP 5 Host</h2>
 	  				<div class="btn-group inline pull-right" style="padding-top: 8px;">
@@ -30,7 +30,7 @@
 				<div id="top_hosts" style="height: 220px; width: 100%;"></div>
 		    </div>
 	   	</div>
-	    <div class="span6 dashwidget">
+	    <div class="span6 dashwidget dashpadded">
 			<table id="stats_count">
 				<tr><th>Number of Events</th><th id="count_events_sum" class="count"></th></tr>
 				<tr><td>&nbsp; Emergency</td><td id="count_events_emergency" class="count"></td></tr>
@@ -46,9 +46,9 @@
 	    </div>
 	</div>
 	   
-	<div class="row-fluid">
-		<div class="span6">
-			<h2>Latest events </h2>
+	<div class="row-fluid row-fluid-padded">
+		<div class="span6 dashwidget">
+			<h2 class="dashpadded">Latest events </h2>
 			<table id="events" style="font-size: 8pt;">
 			       <thead>
 					<tr id="first">

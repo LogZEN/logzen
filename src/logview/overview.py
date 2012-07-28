@@ -57,9 +57,10 @@ class Overview:
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def get_new_events(self):
+    def get_new_events(self,
+                       filter = 7):
         eventmap = []
-        events = backend.new_events()
+        events = backend.new_events(filter = int(filter))
         for event in events:
             event['reported_time'] = humanize.naturaltime(datetime.datetime.now() - event['reported_time'])
             eventmap.append(event)

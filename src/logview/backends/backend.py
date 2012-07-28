@@ -61,7 +61,8 @@ class Backend:
         pass
 
     @abstractmethod
-    def new_events(self):
+    def new_events(self,
+                   filter):
         pass
 
     @abstractmethod

@@ -192,13 +192,30 @@ class PostgresBackend(Backend):
 
         return result['min'], result['max']
 
-    def new_events(self):
+    def new_events(self,
+                   filter):
         connection = self.__connection_pool.getconn()
         cursor = connection.cursor()
+
+        where = ""
+        if filter != 7:
+            if filter >= 1:
+                where += "WHERE severity = 'alert'"
+            if filter >= 2:
+                where += " OR severity = 'crit'"
+            if filter >= 3:
+                where += " OR severity = 'err'"
+            if filter >= 4:
+                where += " OR severity = 'warning'"
+            if filter >= 5:
+                where += " OR severity = 'notice'"
+            if filter >= 6:
+                where += " OR severity = 'info'"
 
         sql = '''
             SELECT reported_time, host, severity, message
             FROM events
+        ''' + where + '''
             ORDER BY reported_time DESC
             LIMIT 15;
         '''

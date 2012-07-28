@@ -16,14 +16,14 @@
 	  				<h2 class="inline">TOP 5 Host</h2>
 	  				<div class="btn-group inline pull-right" style="padding-top: 8px;">
 					    <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
-					    <span id="top_hosts_selector">Action</span>
-					    <span class="caret"></span>
+					    	<span id="top_hosts_selector">last 24 hours</span>
+					    	<span class="caret"></span>
 					    </a>
 					    <ul class="dropdown-menu">
 							<li><a href="javascript:void(0);" onclick="top_hosts('timerange=1');">show last day</a></li>
 							<li><a href="javascript:void(0);" onclick="top_hosts('timerange=7');">show last week</a></li>
 							<li><a href="javascript:void(0);" onclick="top_hosts('timerange=30');">show last month</a></li>
-							<li><a href="javascript:void(0);" onclick="top_hosts('timerange=364');">show last year</a>
+							<li><a href="javascript:void(0);" onclick="top_hosts('timerange=364');">show last year</a></li>
 					    </ul>
 				    </div>
 				</div>
@@ -48,9 +48,26 @@
 	   
 	<div class="row-fluid row-fluid-padded">
 		<div class="span6 dashwidget">
-			<h2 class="dashpadded">Latest events </h2>
+  			<div class="clearfix dashpadded">
+				<h2 class="inline">Latest events </h2>
+  				<div class="btn-group inline pull-right" style="padding-top: 8px;">
+				    <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+				   		<span id="new_events_selector">severity: all</span>
+				    	<span class="caret"></span>
+				    </a>
+				    <ul class="dropdown-menu">
+						<li><a href="javascript:void(0);" onclick="new_events_filter = 1; new_events();">Alert and above</a></li>
+						<li><a href="javascript:void(0);" onclick="new_events_filter = 2; new_events();">Critical and above</a></li>
+						<li><a href="javascript:void(0);" onclick="new_events_filter = 3; new_events();">Error and above</a></li>
+						<li><a href="javascript:void(0);" onclick="new_events_filter = 4; new_events();">Warning and above</a></li>
+						<li><a href="javascript:void(0);" onclick="new_events_filter = 5; new_events();">Notice and above</a></li>
+						<li><a href="javascript:void(0);" onclick="new_events_filter = 6; new_events();">Informational and above</a></li>
+						<li><a href="javascript:void(0);" onclick="new_events_filter = 7; new_events();">All severities</a></li>
+				    </ul>
+			    </div>
+			</div>
 			<table id="events" style="font-size: 8pt;">
-			       <thead>
+			    <thead>
 					<tr id="first">
 						<th width="110">Time</th>
 						<th width="90">Host</th>
@@ -73,7 +90,8 @@
 </div>
 
 <script>
-	var piecolors = ['#a40000','#204a87', '#4e9a06', '#ce5c00']
+	var piecolors = ['#a40000','#204a87', '#4e9a06', '#ce5c00'];
+	var new_events_filter = 7;
 	
 	function events_by_host() {
 	    $.ajax({
@@ -179,11 +197,32 @@
 	function new_events() {
 		$.ajax({
 			url: "/overview/new_events",
+			method: 'POST',
+	        data: {'filter': new_events_filter},
 			dataType: 'json',
 			beforeSend: function(){
 				$("#loading").show();
 			},
 			success: function(d) {
+		    	$('#new_events_selector').empty().append(function() {
+		    		if (new_events_filter == 7) {
+		    			text = 'severity: all';
+		    		} else if (new_events_filter == 6) {
+		    			text = 'severity: info and above';
+		    		} else if (new_events_filter == 5) {
+		    			text = 'severity: notice and above';
+		    		} else if (new_events_filter == 4) {
+		    			text = 'severity: warning and above';
+		    		} else if (new_events_filter == 3) {
+		    			text = 'severity: error and above';
+		    		} else if (new_events_filter == 2) {
+		    			text = 'severity: critical and above';
+		    		} else if (new_events_filter == 1) {
+		    			text = 'severity: alert and above';
+		    		}
+		    		return text;
+		    	});
+		    	
 				var rows = ""
 				if (d.length > 0) {
 					for (var i = 0; i < d.length; i++) {

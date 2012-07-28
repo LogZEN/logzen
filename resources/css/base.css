@@ -42,6 +42,13 @@ h2.inline {
 }
 
 
+/*
+ *	navigation - clock
+ */
+#clock li {
+	display:inline;
+}
+
 
 /*
  *	svents table

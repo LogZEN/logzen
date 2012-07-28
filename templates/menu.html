@@ -1,5 +1,14 @@
-<div id="menu">
-	<span>pyLogView</span>
-	<a href="/">Overview</a>
-	<a href="/events">Events</a>
+<div id="menu"  class="navbar navbar-fixed-top"> 
+	<div class="navbar-inner">
+		<div class="container">
+			<a class="brand" href="#">pyLogView</a>
+			<ul class="nav pull-right">
+				<li{% if pagename == "overview" %} class="active"{% endif %}><a href="/">Overview</a></li>
+				<li{% if pagename == "events" %} class="active"{% endif %}><a href="/events">Events</a></li>
+				<li class="divider-vertical"></li>
+				<li{% if pagename == "settings" %} class="active"{% endif %}><a href="#">Settings</a></li>
+				<li{% if pagename == "help" %} class="active"{% endif %}><a href="#">Help</a></li>
+			</ul>
+		</div>
+	</div>
 </div>

@@ -5,18 +5,32 @@
 {% block content %}
 
 <div id="dashboard">
-	<div class="dashboard_left" style="height: 250px;">
-		<div class="left">
-			<h2>Events by Host</h2>
-			<div id="events_by_host" style="height: 220px; width: 100%;"></div>
-		</div>
-		<div class="right">
-			<h2>TOP 5 Host <span id="top_hosts_selector">(last 24 hours)</span></h2>
-			<div id="top_hosts" style="height: 220px; width: 100%;"></div>
-		</div>
-	</div>
-	<div class="dashboard_right" style="height: 250px;">
-		<div class="left">
+	<div class="row-fluid">
+	   	<div class="span6 dashwidget">
+	    	<div class="span6">
+				<h2>Events by Host</h2>
+				<div id="events_by_host" style="height: 220px; width: 100%;"></div>
+		    </div>
+		    <div class="span6">
+	  			<div class="clearfix">
+	  				<h2 class="inline">TOP 5 Host</h2>
+	  				<div class="btn-group inline pull-right" style="padding-top: 8px;">
+					    <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+					    <span id="top_hosts_selector">Action</span>
+					    <span class="caret"></span>
+					    </a>
+					    <ul class="dropdown-menu">
+							<li><a href="javascript:void(0);" onclick="top_hosts('timerange=1');">show last day</a></li>
+							<li><a href="javascript:void(0);" onclick="top_hosts('timerange=7');">show last week</a></li>
+							<li><a href="javascript:void(0);" onclick="top_hosts('timerange=30');">show last month</a></li>
+							<li><a href="javascript:void(0);" onclick="top_hosts('timerange=364');">show last year</a>
+					    </ul>
+				    </div>
+				</div>
+				<div id="top_hosts" style="height: 220px; width: 100%;"></div>
+		    </div>
+	   	</div>
+	    <div class="span6 dashwidget">
 			<table id="stats_count">
 				<tr><th>Number of Events</th><th id="count_events_sum" class="count"></th></tr>
 				<tr><td>&nbsp; Emergency</td><td id="count_events_emergency" class="count"></td></tr>
@@ -29,14 +43,14 @@
 				<tr><td>&nbsp;</td></tr>
 				<tr><th>Number of Hosts</th><th id="count_hosts" class="count"></th></tr>
 			</table>
-		</div>
+	    </div>
 	</div>
-	
-	<div class="dashboard_left" style="height: 350px;overflow:hidden;">
-		<div class="full">
+	   
+	<div class="row-fluid">
+		<div class="span6">
 			<h2>Latest events </h2>
 			<table id="events" style="font-size: 8pt;">
-		        <thead>
+			       <thead>
 					<tr id="first">
 						<th width="110">Time</th>
 						<th width="90">Host</th>
@@ -53,10 +67,7 @@
 				</tbody>
 			</table>
 		</div>
-	</div>
-	<div class="dashboard_right" style="height: 350px;">
-		<div class="left">
-			
+		<div class="span6">
 		</div>
 	</div>
 </div>
@@ -121,9 +132,9 @@
 		    	}
 		    	$('#top_hosts_selector').empty().append(function() {
 		    		if (d.metadata['timerange'] == 1) {
-		    			text = '(last 24 hours)';
+		    			text = 'last 24 hours';
 		    		} else {
-		    			text = '(last ' + d.metadata['timerange'] + ' days)';
+		    			text = 'last ' + d.metadata['timerange'] + ' days';
 		    		}
 		    		return text;
 		    	});
@@ -157,30 +168,6 @@
 		    }
 	    });
 	}
-
-	$('#top_hosts_selector').mouseover(function() {
-		$(this).qtip({
-			content: {
- 				text: '<ul id="top_hosts_menu"> \
-					<li><a href="javascript:void(0);" onclick="top_hosts(\'timerange=1\');">show last day</a></li> \
-					<li><a href="javascript:void(0);" onclick="top_hosts(\'timerange=7\');">show last week</a></li> \
-					<li><a href="javascript:void(0);" onclick="top_hosts(\'timerange=30\');">show last month</a></li> \
-					<li><a href="javascript:void(0);" onclick="top_hosts(\'timerange=364\');">show last year</a></li> \
-					</ul>',
- 			},
- 			position: {
- 				my: 'top center',
- 				at: 'bottom center'
- 			},
- 			hide: {
- 		        fixed: true,
- 				delay: 200
- 			},
- 			style: {
- 				classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
- 			}
- 		});
-	});
 	
 	function new_events() {
 		$.ajax({

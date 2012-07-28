@@ -33,7 +33,7 @@ class Overview:
     @cherrypy.expose
     def __call__(self):
         template = templates.get_template('overview.html')
-        return template.render()
+        return template.render(pagename = "overview")
 
 
     @cherrypy.expose

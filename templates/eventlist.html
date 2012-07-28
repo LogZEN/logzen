@@ -4,24 +4,34 @@
 
 {% block content %}
 
-	<div id="navi">
-		<div class="buttons">
+<div id="loading"></div>
+
+<div class="row-fluid">
+   	<div class="span12">
+   		<div id="navi" class="btn-toolbar">
 			<span id="eventcount"></span> &nbsp;
-			<a href="#" class="button"><input type="checkbox" name="autorefresh" /> Refresh</a>
-			<a href="javascript:void(0);" class="button q_tip" id="zoomoutbutton" title="Zoom out to a wider timerange">Zoom Out</a>
-			<a class="button left q_tip" title="Newer" href="javascript:void(0);" id="prevbutton">Prev</a><a class="button right q_tip" title="Older" href="javascript:void(0);" id="nextbutton">Next</a>
+			<div class="btn-group">
+				<a href="javascript:void(0);" class="btn q_tip" id="zoomoutbutton" title="Zoom out to a wider timerange">Zoom Out</a>
+			</div>
+			<div class="btn-group">
+				<a class="btn left q_tip" title="Newer" href="javascript:void(0);" id="prevbutton">Prev</a><a class="btn right q_tip" title="Older" href="javascript:void(0);" id="nextbutton">Next</a>
+			</div>
 		</div>
-	</div>
-		
-	<div id="loading"></div>
-	<div id="chartdiv" style="height: 120px; width: 90%; margin: 0px auto;"></div>
-	
-	<form action="/events/update" method="post" id="filterform">
-	<table id="events">
+   	</div>
+</div>
+
+<div class="row-fluid">
+   	<div class="span12">
+		<div id="chartdiv" style="height: 120px; width: 100%; margin: 0px auto;"></div>
+   	</div>
+</div>
+
+<div class="row-fluid">
+	<form action="/events/update" method="post" id="filterform" class="form-inline">
+	<table id="events" class="table-condensed">
         <thead>
 			<tr id="first">
-				<th>time_logged <a href="javascript:void(0);" onclick="toggleEventlistColumn(1); toggleEventlistColumn(2);"><img src="/static/img/arrow_left.png" /></a></th>
-				<th style="display:none;"><a href="javascript:void(0);" onclick="toggleEventlistColumn(1); toggleEventlistColumn(2);"><img src="/static/img/arrow_right.png" /></a></th>
+				<th>time_logged</th>
 				<th>host</th>
 				<th>facility</th>
 				<th>severity</th>
@@ -51,8 +61,9 @@
 		</tbody>
 	</table>
 	</form>
+</div>
 
-	<script type="text/javascript">//<![CDATA[
+<script type="text/javascript">//<![CDATA[
 	var zoomlevel = null;
 	var plot = null;
 	var timerange = [];
@@ -72,12 +83,6 @@
 	 * formular clear buttons
 	 */
  	$(".filter").each(function() {
-		$(this).css({'border-width': '0px', 'outline': 'none'})
-			.wrap('<div id="sq" class="divclearable"></div>')
-			.parent()
-			.attr('class', $(this).attr('class') + ' divclearable')
-			.append('<a class="clearlink" href="javascript:"></a>');
-
 		$('.clearlink')
 			.attr('title', 'Clear this textbox')
 			.qtip({
@@ -358,5 +363,6 @@
 	 
 	updateAction(); 
 	    
-	//]]></script>
+//]]></script>
+	
 {% endblock %}

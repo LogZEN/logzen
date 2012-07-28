@@ -156,6 +156,7 @@
 				    },
 					grid: { 
 						hoverable: true, 
+                        clickable: true,
 						autoHighlight: true 
 					},
 					tooltip: true,
@@ -165,6 +166,12 @@
 					},
 					colors: ["#204a87"],
 				}).resize();
+				
+				$("#top_hosts").bind("plotclick", function (event, pos, item) {
+					if (item) {
+						$(location).attr('href', '/events?host=' + tick[item.dataIndex][1]);
+					}
+				});
 		    }
 	    });
 	}

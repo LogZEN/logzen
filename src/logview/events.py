@@ -35,9 +35,10 @@ class Events:
 
     @cherrypy.expose
     def __call__(self,
-             page = 0):
+                 host = None):
         template = templates.get_template('eventlist.html')
-        return template.render(pagename = "events")
+        return template.render(pagename = "events",
+                               host = host)
 
 
     @cherrypy.expose

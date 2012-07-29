@@ -249,7 +249,7 @@
 						var shortMessage = $.trim(object['message']).substring(0, 50)
 						if (object['message'].length > 50) shortMessage += " ...";
 						rows += '<tr>';
-						rows += '<td><span class="badge color_' + object['severity'] + '" id="' + object['id'] + '"></span></td>'
+						rows += '<td style="text-align: center"><span class="badge q_tip color_' + object['severity'] + '" id="' + object['id'] + '" title="Severity: ' + object['severity'] + '"></span></td>'
 						rows += '<td class="event" id="' + object['id'] + '">' + object['reported_time'] + '</td>';
 						rows += '<td class="event" id="' + object['id'] + '">' + object['host'] + '</td>';
 						rows += '<td class="event q_tip" id="' + object['id'] + '" title="' + object['message'] + '">' + shortMessage + '</td>';

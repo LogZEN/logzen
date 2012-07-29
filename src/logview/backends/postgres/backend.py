@@ -236,8 +236,9 @@ class PostgresBackend(Backend):
         sql = '''
             SELECT severity, COUNT(*) as count
             FROM events
-            WHERE host = COALESCE(%(host)s)
-            GROUP BY severity;
+            WHERE host LIKE COALESCE(%(host)s, host)
+            GROUP BY severity
+            ORDER BY count DESC;
         '''
         cursor.execute(sql, collections.defaultdict(lambda: None, {'host': host}))
         result = cursor.fetchall()

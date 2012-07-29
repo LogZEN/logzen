@@ -288,19 +288,21 @@
 			},
 			success: function(d) {
 				var rows = "";
-				rows += '<li><a href="javascript:void(0);" onclick="severity_by_host(null)">All severities</a></li>';
+				rows += '<li><a href="javascript:void(0);" onclick="severity_by_host(null)">All hosts</a></li>';
 				rows += '<li class="divider"></li>';
 				for (var i = 0; i < d.hosts.length; i++) {
 					rows += '<li><a href="javascript:void(0);" onclick="severity_by_host(\'' + d.hosts[i]['host'] + '\');">' + d.hosts[i]['host'] + '</a></li>';
 				}
 				$('#severity_by_host_menu').empty().append(rows);
-				$('#severity_by_host_selector').empty().append('Host: ' + host);
+				h = ((host == "") ? "all" : host)
+				$('#severity_by_host_selector').empty().append('Host: ' + h);
 				
 	        	var data = [];
 	        	var i = 0;
 		    	for (s in d.count_severity) {
+		    		console.log(d.count_severity[s])
 		    		if (s != "sum") {
-		    			data[i] = { label: s, data: parseInt(d.count_severity[s]), color: piecolors[i] }
+		    			data[i] = { label: s, data: d.count_severity[s], color: piecolors[i] }
 		    			i++;
 		    		}
 		    	}

@@ -69,17 +69,21 @@ class Overview:
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def get_statistics(self):
+    def get_severity_by_host(self,
+                             host = None):
+        if host == "":
+            host = None
+
         data = {}
         eventmap = {}
-        events = backend.get_count_events()
+        events = backend.get_severity_count(host)
         if events > 0:
             sum = 0
             for event in events:
                 sum += event['count']
-                eventmap[event['severity']] = humanize.intcomma(event['count'])
-            eventmap['sum'] = humanize.intcomma(sum)
+                eventmap[event['severity']] = event['count']
+            eventmap['sum'] = sum
 
-        data['count_hosts'] = backend.get_count_hosts()
-        data['count_events'] = eventmap
+        data['count_severity'] = eventmap
+        data['hosts'] = backend.get_hosts()
         return data

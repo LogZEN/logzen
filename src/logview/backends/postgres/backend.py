@@ -228,15 +228,18 @@ class PostgresBackend(Backend):
 
         return result
 
-    def get_count_events(self):
+    def get_severity_count(self,
+                           host):
         connection = self.__connection_pool.getconn()
         cursor = connection.cursor()
 
-        cursor.execute('''
+        sql = '''
             SELECT severity, COUNT(*) as count
             FROM events
+            WHERE host = COALESCE(%(host)s)
             GROUP BY severity;
-        ''');
+        '''
+        cursor.execute(sql, collections.defaultdict(lambda: None, {'host': host}))
         result = cursor.fetchall()
 
         cursor.close()
@@ -245,12 +248,12 @@ class PostgresBackend(Backend):
         return result
 
 
-    def get_count_hosts(self):
+    def get_hosts(self):
         connection = self.__connection_pool.getconn()
         cursor = connection.cursor()
 
-        cursor.execute('SELECT COUNT(*) FROM events GROUP BY host;')
-        result = cursor.rowcount
+        cursor.execute('SELECT host FROM events GROUP BY host;')
+        result = cursor.fetchall()
 
         cursor.close()
         self.__connection_pool.putconn(connection)

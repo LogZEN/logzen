@@ -66,9 +66,10 @@ class Backend:
         pass
 
     @abstractmethod
-    def get_count_events(self):
+    def get_severity_count(self,
+                           host):
         pass
 
     @abstractmethod
-    def get_count_hosts(self):
+    def get_hosts(self):
         pass

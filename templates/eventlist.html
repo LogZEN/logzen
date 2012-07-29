@@ -65,6 +65,8 @@
 
 <script type="text/javascript">//<![CDATA[
 	var zoomlevel = null;
+	var page = 0;
+	var maxpages = 1;
 	var plot = null;
 	var timerange = [];
 	var prevrange = new Array(1);
@@ -233,6 +235,10 @@
 		function handleResult(s) {
         	$("#loading").hide();
         	
+        	// set current page
+        	page = s.metadata['page'];
+        	maxpages = s.metadata['maxpages'];
+        	
 			// update eventcount
 			if (s.metadata['event_count'] < 10000) {
 				var event_count_label = s.metadata['event_count']
@@ -242,19 +248,18 @@
 			}
 			$('#eventcount').empty().append(s.metadata['event_first'] + " - " + 
 					s.metadata['event_last'] + " of " + event_count_label)
-			
-			// update prev button action
-			if(s.metadata['page'] > 0) {
-				var action = '/events/update?page=' + (s.metadata['page'] - 1)
-				$('#filterform').get(0).setAttribute('action', action);
-			}
-			
-			// update next button action
-			if(s.metadata['page'] + 1 < s.metadata['maxpages']) {
-				var action = '/events/update?page=' + (s.metadata['page'] + 1)
-				$('#filterform').get(0).setAttribute('action', action);
+
+			if (page > 0) {
+				$('#prevbutton').removeAttr("disabled");
+			} else {
+				$('#prevbutton').attr("disabled", "disabled");
 			}
 
+        	if (page + 1 < maxpages) {
+				$('#nextbutton').removeAttr("disabled");
+			} else {
+				$('#nextbutton').attr("disabled", "disabled");
+			}
 			// update events
 			var rows = ""
 			if (s.events.length > 0) {
@@ -339,13 +344,21 @@
         }
         updateAction();
     });
-
+    
 	$('#prevbutton').click(function() {
-		updateAction();
+		if(page > 0) {
+			var action = '/events/update?page=' + (page - 1)
+			$('#filterform').get(0).setAttribute('action', action);
+			updateAction();
+		}
 	});
 	
 	$('#nextbutton').click(function() {
-		updateAction();
+		if(page + 1 < maxpages) {
+			var action = '/events/update?page=' + (page + 1)
+			$('#filterform').get(0).setAttribute('action', action);
+			updateAction();
+		}
 	});
 	
 	$("#chartdiv").bind("plotselected", updateAction);

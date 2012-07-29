@@ -233,7 +233,7 @@
 		function handleResult(s) {
         	$("#loading").hide();
         	
-			// update navi
+			// update eventcount
 			if (s.metadata['event_count'] < 10000) {
 				var event_count_label = s.metadata['event_count']
 			} else {
@@ -243,21 +243,17 @@
 			$('#eventcount').empty().append(s.metadata['event_first'] + " - " + 
 					s.metadata['event_last'] + " of " + event_count_label)
 			
-			$('#prevbutton').click(function() {
-				if(s.metadata['page'] > 0) {
-					var action = '/events/update?page=' + (s.metadata['page'] - 1)
-					$('#filterform').get(0).setAttribute('action', action);
-					updateAction();
-				}
-			});
-			$('#nextbutton').click(function() {
-				if(s.metadata['page'] + 1 < s.metadata['maxpages']) {
-					var action = '/events/update?page=' + (s.metadata['page'] + 1)
-					$('#filterform').get(0).setAttribute('action', action);
-					updateAction();
-				}
-			});
+			// update prev button action
+			if(s.metadata['page'] > 0) {
+				var action = '/events/update?page=' + (s.metadata['page'] - 1)
+				$('#filterform').get(0).setAttribute('action', action);
+			}
 			
+			// update next button action
+			if(s.metadata['page'] + 1 < s.metadata['maxpages']) {
+				var action = '/events/update?page=' + (s.metadata['page'] + 1)
+				$('#filterform').get(0).setAttribute('action', action);
+			}
 
 			// update events
 			var rows = ""
@@ -279,10 +275,10 @@
 			$('tbody').empty().append(rows);
 			$('html, body').animate({scrollTop:0}, 'fast');
 
-			// tooltips
+			// update tooltips
 			loadTooltips();
 
-			// graph
+			// update graph
 	    	zoomlevel = s.metadata['zoom']
 	    	data = []
 	    	tick = []
@@ -323,25 +319,32 @@
 				colors: ["#204a87"],
 				selection: { mode: "x" }
 			});
-	    	
-	    	// update zoomout button
-		    $('#zoomoutbutton').click(function (e) {
-		        e.preventDefault();
-		        if (zoomlevel > 0) {
-		        	timerange['start_time'] = prevrange[zoomlevel - 1]['start_time']
-		        	timerange['end_time'] = prevrange[zoomlevel - 1]['end_time']
-		        }
-		        updateAction();
-		    });
 		}
-	    
 	}
+	// update buttons
+
 
 	/*
 	 *	add actions
 	 */
-	
 	$('#filterform').bind('keyup', function() {
+		updateAction();
+	});
+	
+    $('#zoomoutbutton').click(function (e) {
+        e.preventDefault();
+    	if (zoomlevel > 0) {
+        	timerange['start_time'] = prevrange[zoomlevel - 1]['start_time']
+        	timerange['end_time'] = prevrange[zoomlevel - 1]['end_time']
+        }
+        updateAction();
+    });
+
+	$('#prevbutton').click(function() {
+		updateAction();
+	});
+	
+	$('#nextbutton').click(function() {
 		updateAction();
 	});
 	

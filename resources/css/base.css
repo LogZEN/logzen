@@ -80,29 +80,29 @@ table#events td {
   padding: 1px 8px;
 }
 
-table#events td.color_debug {
-	background: #ddd;
+.color_debug {
+	background: #d3d7cf;
 }
-table#events td.color_info {
-	background: #cfc;
+.color_info {
+	background: #3465a4;
 }
-table#events td.color_notice {
-	background: #9f9;
+.color_notice {
+	background: #4e9a06;
 }
-table#events td.color_warning {
-	background: #ff9;
+.color_warning {
+	background: #edd400;
 }
-table#events td.color_err {
-	background: #fcc;
+.color_err {
+	background: #f57900;
 }
-table#events td.color_crit {
-	background: #f99;
+.color_crit {
+	background: #ef2929;
 }
-table#events td.color_emerge {
-	background: #f66;
+.color_emerge {
+	background: #cc0000;
 }
-table#events td.color_alert {
-	background: #f33;
+.color_alert {
+	background: #a40000;
 }
 
 table#events td a {

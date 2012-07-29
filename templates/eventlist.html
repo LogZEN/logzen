@@ -230,6 +230,7 @@
 			} else {
 				$('#nextbutton').attr("disabled", "disabled");
 			}
+        	
 			// update events
 			var rows = ""
 			if (s.events.length > 0) {
@@ -255,6 +256,13 @@
 
 			// update graph
 	    	zoomlevel = s.metadata['zoom']
+			console.log(zoomlevel)
+        	if (zoomlevel > 1) {
+				$('#zoomoutbutton').removeAttr("disabled");
+			} else {
+				$('#zoomoutbutton').attr("disabled", "disabled");
+			}
+			
 	    	data = []
 	    	tick = []
 	    	tickrange = []
@@ -296,8 +304,6 @@
 			});
 		}
 	}
-	// update buttons
-
 
 	/*
 	 *	add actions

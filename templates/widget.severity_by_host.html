@@ -11,17 +11,15 @@
 </div>
 <div class="row-fluid">
     <div class="span6 dashpadded">
-		<table id="stats_count">
-			<tr><th>Number of Events</th><th id="count_events_sum" class="count"></th></tr>
-			<tr><td>&nbsp; Emergency</td><td id="count_events_emergency" class="count"></td></tr>
-			<tr><td>&nbsp; Critical</td><td id="count_events_critical" class="count"></td></tr>
-			<tr><td>&nbsp; Error</td><td id="count_events_error" class="count"></td></tr>
-			<tr><td>&nbsp; Warning</td><td id="count_events_warning" class="count"></td></tr>
-			<tr><td>&nbsp; Notice</td><td id="count_events_notice" class="count"></td></tr>
-			<tr><td>&nbsp; Informational</td><td id="count_events_informational" class="count"></td></tr>
-			<tr><td>&nbsp; Debug</td><td id="count_events_debug" class="count"></td></tr>
-			<tr><td>&nbsp;</td></tr>
-			<tr><th>Number of Hosts</th><th id="count_hosts" class="count"></th></tr>
+		<table id="severity_by_host_table">
+			<tr><th>Number of Events</th><th id="severity_by_host_sum" class="count"></th></tr>
+			<tr><td>&nbsp; Emergency</td><td id="severity_by_host_emergency" class="count"></td></tr>
+			<tr><td>&nbsp; Critical</td><td id="severity_by_host_critical" class="count"></td></tr>
+			<tr><td>&nbsp; Error</td><td id="severity_by_host_error" class="count"></td></tr>
+			<tr><td>&nbsp; Warning</td><td id="severity_by_host_warning" class="count"></td></tr>
+			<tr><td>&nbsp; Notice</td><td id="severity_by_host_notice" class="count"></td></tr>
+			<tr><td>&nbsp; Informational</td><td id="severity_by_host_informational" class="count"></td></tr>
+			<tr><td>&nbsp; Debug</td><td id="severity_by_host_debug" class="count"></td></tr>
 		</table>
 	</div>
     <div class="span6 dashpadded">
@@ -80,22 +78,19 @@
 		    				}
 		    		    }
 		    		},
-		    	    legend: {
-		    	        show: false
-		    	    },
 		    	    grid: {
 		    	        hoverable: true
 		    	    }
 		    	}).resize();
 	        	
-				$('#count_events_sum').empty().append(d.count_severity['sum']);
-				$('#count_events_emergency').empty().append(d.count_severity['alert']);
-				$('#count_events_critical').empty().append(d.count_severity['crit']);
-				$('#count_events_error').empty().append(d.count_severity['err']);
-				$('#count_events_warning').empty().append(d.count_severity['warning']);
-				$('#count_events_notice').empty().append(d.count_severity['notice']);
-				$('#count_events_informational').empty().append(d.count_severity['info']);
-				$('#count_events_debug').empty().append(d.count_severity['debug']);
+				$('#severity_by_host_sum').empty().append(d.count_severity['sum']);
+				$('#severity_by_host_emergency').empty().append(d.count_severity['alert']);
+				$('#severity_by_host_critical').empty().append(d.count_severity['crit']);
+				$('#severity_by_host_error').empty().append(d.count_severity['err']);
+				$('#severity_by_host_warning').empty().append(d.count_severity['warning']);
+				$('#severity_by_host_notice').empty().append(d.count_severity['notice']);
+				$('#severity_by_host_informational').empty().append(d.count_severity['info']);
+				$('#severity_by_host_debug').empty().append(d.count_severity['debug']);
 			}
 		});
 	}

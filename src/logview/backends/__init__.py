@@ -17,10 +17,21 @@ You should have received a copy of the GNU General Public License
 along with pyLogView.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from logview.config import Config
+
 from logview.backends.postgres.backend import PostgresBackend
 
 
 def __init_backend():
-    return PostgresBackend()
+    backend = Config().logview['backend.type']
+
+    if backend == 'postgres':
+        return PostgresBackend()
+
+    elif backend == 'elasticsearch':
+        raise NotImplementedError
+
+    else:
+        raise NotImplementedError
 
 backend = __init_backend()

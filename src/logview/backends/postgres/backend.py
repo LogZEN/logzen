@@ -22,6 +22,7 @@ import collections
 import psycopg2.pool
 import psycopg2.extras
 
+from logview.config import Config
 from logview.backends.backend import Backend, Result
 
 
@@ -65,13 +66,13 @@ class PostgresResult:
 
 class PostgresBackend(Backend):
     def __init__(self):
-        self.__connection_pool = psycopg2.pool.ThreadedConnectionPool(minconn = 1,
-                                                                      maxconn = 20,
-                                                                      host = '127.0.0.1',
-                                                                      port = 5432,
-                                                                      database = 'syslog',
-                                                                      user = 'syslog',
-                                                                      password = 'd2u33fG9aC',
+        self.__connection_pool = psycopg2.pool.ThreadedConnectionPool(minconn = int(Config().logview['backend.minconn']),
+                                                                      maxconn = int(Config().logview['backend.maxconn']),
+                                                                      host = Config().logview['backend.server'],
+                                                                      port = int(Config().logview['backend.port']),
+                                                                      database = Config().logview['backend.database'],
+                                                                      user = Config().logview['backend.username'],
+                                                                      password = Config().logview['backend.password'],
                                                                       connection_factory = psycopg2.extras.RealDictConnection)
 
     def __del__(self):

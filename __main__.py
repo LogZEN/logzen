@@ -21,12 +21,12 @@ import cherrypy
 
 import os
 
+from logview.config import Config
 from logview.overview import Overview
 from logview.events import Events
 
 
 if __name__ == '__main__':
-
     dispatcher = cherrypy.dispatch.RoutesDispatcher()
     dispatcher.connect('overview', '/', Overview())
     dispatcher.connect('overview', '/overview/events_by_host', Overview(), action = "get_events_by_host")
@@ -50,7 +50,7 @@ if __name__ == '__main__':
             'tools.staticdir.dir' : 'resources',
         }
     }
-    cherrypy.config.update('config/main.conf')
+    cherrypy.config.update('config/cherrypy.conf')
     cherrypy.tree.mount(root = None, config = config)
 
     cherrypy.engine.start()

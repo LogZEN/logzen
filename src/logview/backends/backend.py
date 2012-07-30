@@ -71,5 +71,10 @@ class Backend:
         pass
 
     @abstractmethod
+    def get_program_count(self,
+                           host):
+        pass
+
+    @abstractmethod
     def get_hosts(self):
         pass

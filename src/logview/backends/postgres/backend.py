@@ -249,6 +249,25 @@ class PostgresBackend(Backend):
 
         return result
 
+    def get_program_count(self,
+                           host):
+        connection = self.__connection_pool.getconn()
+        cursor = connection.cursor()
+
+        sql = '''
+            SELECT program, COUNT(*) as count
+            FROM events
+            WHERE host LIKE COALESCE(%(host)s, host)
+            GROUP BY program
+            ORDER BY count DESC;
+        '''
+        cursor.execute(sql, collections.defaultdict(lambda: None, {'host': host}))
+        result = cursor.fetchall()
+
+        cursor.close()
+        self.__connection_pool.putconn(connection)
+
+        return result
 
     def get_hosts(self):
         connection = self.__connection_pool.getconn()

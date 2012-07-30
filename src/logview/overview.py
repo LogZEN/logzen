@@ -87,3 +87,25 @@ class Overview:
         data['count_severity'] = eventmap
         data['hosts'] = backend.get_hosts()
         return data
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_program_by_host(self,
+                            host):
+        if host == "":
+            host = None
+
+        data = {}
+        eventmap = {}
+        events = backend.get_program_count(host)
+        if events > 0:
+            sum = 0
+            for event in events:
+                sum += event['count']
+                eventmap[event['program']] = event['count']
+            eventmap['sum'] = sum
+
+        data['count_program'] = eventmap
+        data['hosts'] = backend.get_hosts()
+        return data
+

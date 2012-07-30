@@ -314,8 +314,8 @@ span#eventcount {
 	padding-bottom:				20px;
 }
 
-table#stats_count th.count,
-table#stats_count td.count {
+table th.count,
+table td.count {
 	text-align: 				right;
 	padding-left: 				20px;
 }

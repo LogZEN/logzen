@@ -46,6 +46,17 @@ class Backend:
         pass
 
     @abstractmethod
+    def get_similar_events(self,
+                           event_id):
+        pass
+
+    @abstractmethod
+    def get_similar_events_history(self,
+                                   filters,
+                                   steps):
+        pass
+
+    @abstractmethod
     def event_peaks(self,
                     timerange):
         pass

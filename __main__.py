@@ -38,7 +38,11 @@ if __name__ == '__main__':
     dispatcher.connect('events', '/events', Events())
     dispatcher.connect('events', '/events/update', Events(), action = 'update')
     dispatcher.connect('events', '/events/tooltip', Events(), action = 'tooltip')
-    dispatcher.connect('events', '/event/:event_id', Events(), action = 'details')
+
+    dispatcher.connect('event', '/event/event_details', Events(), action = 'get_event_details')
+    dispatcher.connect('event', '/event/similar_events', Events(), action = 'get_similar_events')
+    dispatcher.connect('event', '/event/similar_events_history', Events(), action = 'get_similar_events_history')
+    dispatcher.connect('event', '/event/:event_id', Events(), action = 'details')
 
     config = {
         '/': {

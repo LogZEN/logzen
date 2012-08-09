@@ -97,6 +97,65 @@ class PostgresBackend(Backend):
 
         return result
 
+    def get_similar_events(self,
+                           message,
+                           starttime):
+        connection = self.__connection_pool.getconn()
+        cursor = connection.cursor()
+
+        sql = '''
+            SELECT host, COUNT(*) AS count
+            FROM events 
+            WHERE message LIKE %(message)s
+              AND reported_time > %(time)s
+            GROUP BY host
+            ORDER BY count DESC
+        '''
+        cursor.execute(sql, {'message': message, 'time': starttime})
+        result = cursor.fetchall()
+
+        cursor.close()
+        self.__connection_pool.putconn(connection)
+
+        return result
+
+
+    def get_similar_events_history(self,
+                                   filters,
+                                   steps):
+        connection = self.__connection_pool.getconn()
+        cursor = connection.cursor()
+
+        sql = '''
+            SELECT
+                series.timestamp AS time,
+                COUNT(event.timestamp) AS count
+            FROM generate_series(date_trunc(%(steps)s, %(start_time)s),
+                                 date_trunc(%(steps)s, %(end_time)s),
+                                 ('1 ' || %(steps)s)::interval) AS series(timestamp)
+            LEFT OUTER JOIN (
+                SELECT
+                    date_trunc(%(steps)s, reported_time) AS timestamp
+                FROM events
+                WHERE host LIKE COALESCE(%(host)s, host) 
+                  AND message LIKE COALESCE(%(message)s, message)) AS event
+              ON (series.timestamp = event.timestamp)
+            GROUP BY series.timestamp
+            ORDER BY series.timestamp;
+        '''
+
+        parameters = collections.defaultdict(lambda: None, filters)
+        parameters['steps'] = steps
+
+        cursor.execute(sql, parameters)
+        result = cursor.fetchall()
+
+        cursor.close()
+        self.__connection_pool.putconn(connection)
+
+        return result
+
+
     def event_peaks(self,
                     time):
         connection = self.__connection_pool.getconn()

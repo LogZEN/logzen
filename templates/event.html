@@ -1,46 +1,310 @@
 {% extends "base.html" %}
 
-{% block title %}Events - {{event[0]}} {% endblock %}
+{% block title %}Event {{event_id}} {% endblock %}
 
 {% block content %}
 
-	<table id="events">
-		<tr>
-			<td>time_recieved</td>
-			<td>{{ event.received_time }}</td>
-		</tr>
-		<tr>
-			<td>time_logged</td>
-			<td>{{ event.reported_time }}</td>
-		</tr>
-		<tr>
-			<td>host</td>
-			<td>{{ event.host }}</td>
-		</tr>
-		<tr>
-			<td>facility</td>
-			<td>{{ event.facility }}</td>
-		</tr>
-		<tr>
-			<td>priority</td>
-			<td>{{ event.priority }}</td>
-		</tr>
-		<tr>
-			<td>level</td>
-			<td>{{ event.level }}</td>
-		</tr>
-		<tr>
-			<td>tag</td>
-			<td>{{ event.tag }}</td>
-		</tr>
-		<tr>
-			<td>program</td>
-			<td>{{ event.program }}</td>
-		</tr>
-		<tr>
-			<td>message</td>
-			<td>{{ event.message }}</td>
-		</tr>
-	</table>
+<div id="loading"></div>
+
+<div class="row-fluid">
+	<div class="span12">
+		<div class="page-header">
+			<h1 class="inline">Details for Event {{event_id}}</h1>
+   			<div id="navi" class="btn-toolbar inline pull-right" style="margin-top: -10px;">
+				<div class="btn-group">
+					<a class="btn left q_tip" title="Previous Event" href="javascript:void(0);" id="prevbutton">Prev</a>
+					<a class="btn right q_tip" title="Next Event" href="javascript:void(0);" id="nextbutton">Next</a>
+				</div>
+				<div class="btn-group">
+					<a class="btn btn-primary left q_tip" title="Go back to eventlist" href="javascript:void(0);" id="prevbutton">Back</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row-fluid" id="not_found_alert" style="display:none;">
+	<div class="span12">
+		<div class="alert alert-block">
+			<a class="close" data-dismiss="alert" href="#">×</a>
+			The requested event (id = {{event_id}}) was not found
+		</div>
+	</div>
+</div>
+
+<div class="row-fluid">
+	<div class="span8">
+		<table class="well table table-striped">
+			<tr>
+				<td width="120">Time logged</td>
+				<td id="reported_time"></td>
+			</tr>
+			<tr>
+				<td>Time received</td>
+				<td id="received_time"></td>
+			</tr>
+			<tr>
+				<td>Host</td>
+				<td id="host"></td>
+			</tr>
+			<tr>
+				<td>Address</td>
+				<td id="ip"></td>
+			</tr>
+			<tr>
+				<td>Facility</td>
+				<td id="facility"></td>
+			</tr>
+			<tr>
+				<td>Severity</td>
+				<td id="severity"></td>
+			</tr>
+			<tr>
+				<td>Level</td>
+				<td id="level"></td>
+			</tr>
+			<tr>
+				<td>Tag</td>
+				<td id="tag"></td>
+			</tr>
+			<tr>
+				<td>Program</td>
+				<td id="program"></td>
+			</tr>
+			<tr>
+				<td>Message</td>
+				<td id="message"></td>
+			</tr>
+		</table>
+	</div>
 	
+	<div class="span4">
+		<div class="clearfix">
+			<h4 class="inline">Similar events <small>(all hosts)</small></h4>
+			<div class="btn-group inline pull-right" style="padding-bottom: 2px;">
+				<a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+				  	<span id="similar_events_all_selector">last 24 hours</span>
+				  	<span class="caret"></span>
+				</a>
+				<ul class="dropdown-menu">
+					<li><a href="javascript:void(0);" onclick="timerange_all=1; similar_events();">show last day</a></li>
+					<li><a href="javascript:void(0);" onclick="timerange_all=7; similar_events();">show last week</a></li>
+					<li><a href="javascript:void(0);" onclick="timerange_all=30; similar_events();">show last month</a></li>
+					<li><a href="javascript:void(0);" onclick="timerange_all=365; similar_events();">show last year</a></li>
+				</ul>
+			</div>
+		</div>
+		<div id="similar_events_all_graph" style="height: 120px; width: 100%;"></div>
+		<br />
+		
+		<div class="clearfix">
+			<h4 class="inline">Similar events <small id="ins_host"></small></h4>
+			<div class="btn-group inline pull-right" style="padding-bottom: 2px;">
+				<a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+				  	<span id="similar_events_host_selector">one week</span>
+				  	<span class="caret"></span>
+				</a>
+				<ul class="dropdown-menu">
+					<li><a href="javascript:void(0);" onclick="timerange_host=7; similar_events_history();">one week</a></li>
+					<li><a href="javascript:void(0);" onclick="timerange_host=30; similar_events_history();">one month</a></li>
+					<li><a href="javascript:void(0);" onclick="timerange_host=365; similar_events_history();">one year</a></li>
+				</ul>
+			</div>
+		</div>
+		<div id="similar_events_host_graph" style="height: 120px; width: 100%;"></div>
+	</div>
+</div>
+
+
+<script type="text/javascript">//<![CDATA[
+var event_id = 0;
+var host = "";
+var msg = "";
+var timerange_all = 1;
+var timerange_host = 7;
+
+function get_event(id) {
+	$.ajax({
+		url: "/event/event_details",
+		method: 'POST',
+        data: {'event_id': id},
+		dataType: 'json',
+		beforeSend: function(){
+			$("#loading").show();
+		},
+		success: function(d) {
+        	$("#loading").hide();
+        	
+			if (d['existend'] == 1) {
+				event_id = d['id'];
+				host = d['host'];
+				msg = d['message'];
+				
+				$('#reported_time').empty().append(d['reported_time'] + "&nbsp; (" + d['ago_time'] + ")");
+				$('#received_time').empty().append(d['received_time']);
+				$('#host').empty().append(d['host']);
+				$('#ins_host').empty().append('(host: ' + d['host'] + ')');
+				$('#ip').empty().append(d['ip']);
+				$('#facility').empty().append(d['facility']);
+				$('#severity').empty().append(d['severity']);
+				$('#level').empty().append(d['level']);
+				$('#tag').empty().append(d['tag']);
+				$('#program').empty().append(d['program']);
+				$('#message').empty().append(d['message']);
+				
+				similar_events();
+				similar_events_history();
+				
+			} else {
+				$('#not_found_alert').show();
+			}
+		}
+	});
+}
+
+function similar_events() {
+    $.ajax({
+        url: "/event/similar_events",
+        method: 'POST',
+        data: {'timerange': timerange_all, 'message': msg},
+        dataType: 'json', 
+        success: function(d) {
+		   	data = []
+		   	tick = []
+			for (var i = 0; i < d.data.length; i++) {
+				data.push([i, parseInt(d.data[i]['count'])]);
+				tick.push([i, d.data[i]['host']]);
+			}
+	    	$('#similar_events_all_selector').empty().append(function() {
+	    		if (d.metadata['timerange'] == 1) {
+	    			text = 'last 24 hours';
+	    		} else {
+	    			text = 'last ' + d.metadata['timerange'] + ' days';
+	    		}
+	    		return text;
+	    	});
+			$.plot($('#similar_events_all_graph'), [data], {
+				xaxis: {
+					ticks: tick,
+					rotateTicks: 50
+				},
+				bars: {
+				      show: true,
+				      lineWidth: 1,
+			          align: "center",
+			          barWidth: 0.6,
+				      fill: true,
+				      fillColor: { colors: ["#729fcf", "#3465af"] }
+				},
+			    legend: {
+			        show: false
+			    },
+				grid: { 
+					hoverable: true, 
+		                  clickable: true,
+					autoHighlight: true 
+				},
+				tooltip: true,
+				tooltipOpts: {
+					content: "%y",
+					defaultTheme:  false
+				},
+				colors: ["#204a87"],
+			}).resize();
+			$("#similar_events_all_graph").bind("plotclick", function (event, pos, item) {
+				if (item) {
+					link = '/events';
+					link += '?host=' + tick[item.dataIndex][1];
+					link += '&message=' + msg;
+					link += '&start_time=' + timerange;
+					$(location).attr('href', encodeURI(link));
+				}
+			});
+	    }
+    });
+}
+
+
+function similar_events_history() {
+    $.ajax({
+        url: "/event/similar_events_history",
+        method: 'POST',
+        data: {'host': host, 'timerange': timerange_host, 'message': msg},
+        dataType: 'json', 
+        success: function(d) {
+		   	data = []
+		   	tick = []
+			for (var i = 0; i < d.data.length; i++) {
+				data.push([i, parseInt(d.data[i]['count'])]);
+				tick.push([i, d.data[i]['time'].substring(0, 11)]);
+			}
+	    	$('#similar_events_host_selector').empty().append(function() {
+	    		if (d.metadata['timerange'] == 7) {
+	    			text = 'one week';
+	    		} else if (d.metadata['timerange'] == 30) {
+	    			text = 'one month';
+	    		} else {
+	    			text = 'one year';
+	    		}
+	    		return text;
+	    	});
+			$.plot($('#similar_events_host_graph'), [data], {
+				xaxis: {
+					ticks: tick,
+					rotateTicks: 50
+				},
+				lines: {
+				      show: true,
+				      lineWidth: 1,
+			          align: "center",
+			          barWidth: 0.6,
+				      fill: false,
+				      fillColor: { colors: ["#729fcf", "#3465af"] }
+				},
+			    legend: {
+			        show: false
+			    },
+				grid: { 
+					hoverable: true, 
+		                  clickable: true,
+					autoHighlight: true 
+				},
+				tooltip: true,
+				tooltipOpts: {
+					content: "%y",
+					defaultTheme:  false
+				},
+				colors: ["#204a87"],
+			}).resize();
+			$("#similar_events_host_graph").bind("plotclick", function (event, pos, item) {
+				if (item) {
+					link = '/events';
+					link += '?host=' + tick[item.dataIndex][1];
+					link += '&message=' + msg;
+					link += '&start_time=' + timerange;
+					$(location).attr('href', encodeURI(link));
+				}
+			});
+	    }
+    });
+}
+
+
+/*
+ * button actions
+ */
+$('#nextbutton').click(function(){
+	get_event(event_id + 1);
+});
+$('#prevbutton').click(function(){
+	if (event_id > 0) {
+		get_event(event_id - 1);
+	}
+});
+
+add_qtips();
+get_event({{event_id}});
+
+//]]></script>
+
 {% endblock %}

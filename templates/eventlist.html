@@ -44,7 +44,7 @@
 				<th id="column_facility"><input type="text" name="filter_facility" id="filter_facility" class="filter" placeholder="filter" size="5" /></th>
 				<th id="column_severity"><input type="text" name="filter_severity" id="filter_severity" class="filter" placeholder="filter" size="5" /></th>
 				<th id="column_program"><input type="text" name="filter_program" id="filter_program" class="filter" placeholder="filter" size="5" /></th>
-				<th id="column_message"><input type="text" name="filter_message" id="filter_message" class="filter" placeholder="filter" size="5" /></th>
+				<th id="column_message"><input type="text" name="filter_message" id="filter_message" class="filter" placeholder="filter" size="5" {% if message %}value="{{message}}"{% endif %} /></th>
 			</tr>
 		</thead>
 		

@@ -35,19 +35,86 @@ class Events:
 
     @cherrypy.expose
     def __call__(self,
-                 host = None):
+                 host = None,
+                 message = None,
+                 start_time = None):
         template = templates.get_template('eventlist.html')
         return template.render(pagename = "events",
-                               host = host)
+                               host = host,
+                               message = message,
+                               start_time = start_time)
 
 
     @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_similar_events(self,
+                           message,
+                           timerange = 1):
+        starttime = datetime.datetime.now() - datetime.timedelta(days = int(timerange))
+        similar_events = backend.get_similar_events(message,
+                                                    starttime)
+
+        data = {}
+        data['data'] = similar_events
+        data['metadata'] = {"timerange": timerange}
+        return data
+
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_similar_events_history(self,
+                                   host,
+                                   message,
+                                   timerange = None):
+        filters = {}
+        filters['host'] = host
+        filters['message'] = message
+        filters['start_time'], filters['end_time'] = backend.event_timestamp_range()
+
+        if timerange is not None:
+            filters['start_time'] = datetime.datetime.now() - datetime.timedelta(days = int(timerange))
+
+        similar_events = backend.get_similar_events_history(filters, 'day')
+        for s in similar_events:
+            s['time'] = str(s['time'])
+
+        data = {}
+        data['data'] = similar_events
+        data['metadata'] = {"timerange": timerange}
+        return data
+
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_event_details(self,
+                          event_id):
+        event = backend.get_event(event_id)
+
+        if event is not None:
+            event['existend'] = 1
+
+            try:
+                event['ip'] = socket.gethostbyname(event['host'])
+            except:
+                event['ip'] = 'Unknown'
+
+            event['ago_time'] = humanize.naturaltime(datetime.datetime.now() - event['reported_time'])
+
+            event['reported_time'] = str(event['reported_time'])
+            event['received_time'] = str(event['received_time'])
+
+        else:
+            event = {}
+            event['id'] = int(event_id)
+            event['existend'] = 0
+
+        return event
+
+
     def details(self,
                 event_id):
         template = templates.get_template('event.html')
-
-        event = backend.get_event(event_id)
-        return template.render(event = event)
+        return template.render(event_id = event_id)
 
 
     @cherrypy.expose

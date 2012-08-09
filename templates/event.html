@@ -9,7 +9,8 @@
 <div class="row-fluid">
 	<div class="span12">
 		<div class="page-header">
-			<h1 class="inline">Details for Event {{event_id}}</h1>
+			<h1 class="inline" id="heading">Details for Event {{event_id}}</h1>
+			<span class="label" id="label"></span>
    			<div id="navi" class="btn-toolbar inline pull-right" style="margin-top: -10px;">
 				<div class="btn-group">
 					<a class="btn left q_tip" title="Previous Event" href="javascript:void(0);" id="prevbutton">Prev</a>
@@ -34,7 +35,7 @@
 
 <div class="row-fluid">
 	<div class="span8">
-		<table class="well table table-striped">
+		<table class="table table-striped table-bordered">
 			<tr>
 				<td width="120">Time logged</td>
 				<td id="reported_time"></td>
@@ -140,6 +141,7 @@ function get_event(id) {
 				host = d['host'];
 				msg = d['message'];
 				
+				$('#heading').empty().append('Details for Event ' + d['id']);
 				$('#reported_time').empty().append(d['reported_time'] + "&nbsp; (" + d['ago_time'] + ")");
 				$('#received_time').empty().append(d['received_time']);
 				$('#host').empty().append(d['host']);
@@ -157,8 +159,13 @@ function get_event(id) {
 				$('#program').empty().append(d['program']);
 				$('#message').empty().append(d['message']);
 				
+				$('#label').empty().append(d['facility'] + ':' + d['severity']);
+				$('#label').removeClass().addClass('label color_' + d['severity']);
+				
 				similar_events();
 				similar_events_history();
+
+				add_qtips();
 				
 			} else {
 				$('#not_found_alert').show();
@@ -307,7 +314,6 @@ $('#prevbutton').click(function(){
 	}
 });
 
-add_qtips();
 get_event({{event_id}});
 
 //]]></script>

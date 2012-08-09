@@ -91,6 +91,9 @@ table#events td {
   padding: 1px 8px;
 }
 
+/*
+ *	severity colors / label colors
+ */
 .color_debug {
 	background: #d3d7cf;
 }

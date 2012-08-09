@@ -21,6 +21,7 @@ import socket
 import datetime
 import humanize
 import math
+import geoip
 
 import cherrypy
 
@@ -98,6 +99,7 @@ class Events:
             except:
                 event['ip'] = 'Unknown'
 
+            event['country'] = geoip.country(event['ip'])
             event['ago_time'] = humanize.naturaltime(datetime.datetime.now() - event['reported_time'])
 
             event['reported_time'] = str(event['reported_time'])

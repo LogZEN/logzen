@@ -144,7 +144,12 @@ function get_event(id) {
 				$('#received_time').empty().append(d['received_time']);
 				$('#host').empty().append(d['host']);
 				$('#ins_host').empty().append('(host: ' + d['host'] + ')');
-				$('#ip').empty().append(d['ip']);
+				
+				ip_string = d['ip'];
+				if (d['country']) {
+					ip_string += ' <img class="q_tip" src="/static/img/flags/' + d['country'].toLowerCase() + '.gif" title="' + d['country'] + '" alt="' + d['country'] + '"/>'
+				}
+				$('#ip').empty().append(ip_string);
 				$('#facility').empty().append(d['facility']);
 				$('#severity').empty().append(d['severity']);
 				$('#level').empty().append(d['level']);

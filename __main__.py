@@ -24,7 +24,6 @@ import os
 from logview.authentication.auth import AuthController
 
 from logview.config import Config
-from logview.settings import Settings
 from logview.help import Help
 from logview.overview import Overview
 from logview.events import Events
@@ -32,28 +31,33 @@ from logview.events import Events
 
 if __name__ == '__main__':
   dispatcher = cherrypy.dispatch.RoutesDispatcher()
-  dispatcher.connect('overview1', '/', Overview(), action = 'index')
-  dispatcher.connect('overview2', '/overview/events_by_host', Overview(), action = "get_events_by_host")
-  dispatcher.connect('overview3', '/overview/top_hosts', Overview(), action = "get_top_hosts")
-  dispatcher.connect('overview4', '/overview/new_events', Overview(), action = "get_new_events")
-  dispatcher.connect('overview5', '/overview/severity_by_host', Overview(), action = "get_severity_by_host")
-  dispatcher.connect('overview6', '/overview/program_by_host', Overview(), action = "get_program_by_host")
 
-  dispatcher.connect('events1', '/events', Events(), action = 'index')
-  dispatcher.connect('events2', '/events/update', Events(), action = 'update')
-  dispatcher.connect('events3', '/events/tooltip', Events(), action = 'tooltip')
+  if Config().logview['configured'] != "True":
+    dispatcher.connect('overview1', '/', Help(), action = 'unconfigured')
+    dispatcher.connect('help2', '/help/create_user', Help(), action = 'user_create')
 
-  dispatcher.connect('event1', '/event/event_details', Events(), action = 'get_event_details')
-  dispatcher.connect('event2', '/event/similar_events', Events(), action = 'get_similar_events')
-  dispatcher.connect('event3', '/event/similar_events_history', Events(), action = 'get_similar_events_history')
-  dispatcher.connect('event4', '/event/:event_id', Events(), action = 'details')
+  else:
+    dispatcher.connect('overview1', '/', Overview(), action = 'index')
+    dispatcher.connect('overview2', '/overview/events_by_host', Overview(), action = "get_events_by_host")
+    dispatcher.connect('overview3', '/overview/top_hosts', Overview(), action = "get_top_hosts")
+    dispatcher.connect('overview4', '/overview/new_events', Overview(), action = "get_new_events")
+    dispatcher.connect('overview5', '/overview/severity_by_host', Overview(), action = "get_severity_by_host")
+    dispatcher.connect('overview6', '/overview/program_by_host', Overview(), action = "get_program_by_host")
 
-  dispatcher.connect('settings1', '/settings/users/create', Settings(), action = 'user_create')
+    dispatcher.connect('events1', '/events', Events(), action = 'index')
+    dispatcher.connect('events2', '/events/update', Events(), action = 'update')
+    dispatcher.connect('events3', '/events/tooltip', Events(), action = 'tooltip')
 
-  dispatcher.connect('help1', '/help/about', Help(), action = 'about')
+    dispatcher.connect('event1', '/event/event_details', Events(), action = 'get_event_details')
+    dispatcher.connect('event2', '/event/similar_events', Events(), action = 'get_similar_events')
+    dispatcher.connect('event3', '/event/similar_events_history', Events(), action = 'get_similar_events_history')
+    dispatcher.connect('event4', '/event/:event_id', Events(), action = 'details')
 
-  dispatcher.connect('auth1', '/auth/login', AuthController(), action = 'login')
-  dispatcher.connect('auth2', '/auth/logout', AuthController(), action = 'logout')
+    dispatcher.connect('help1', '/help/about', Help(), action = 'about')
+    dispatcher.connect('help2', '/help/create_user', Help(), action = 'user_create')
+
+    dispatcher.connect('auth1', '/auth/login', AuthController(), action = 'login')
+    dispatcher.connect('auth2', '/auth/logout', AuthController(), action = 'logout')
 
 
   config = {

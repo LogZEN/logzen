@@ -17,7 +17,7 @@
 
 <div class="row">
 	<div class="span7 pull-center">
-		<form class="well form-horizontal" method="post" action="/settings/users/create">
+		<form class="well form-horizontal" method="post" action="/help/create_user?backlink={{backlink}}">
 			<fieldset>
 				<legend>Enter the new users credentials</legend>
 				<div class="control-group">
@@ -41,6 +41,9 @@
 				<br />
 				<div class="form-actions">
 					<button type="submit" class="btn btn-primary"> &nbsp; Create configuration section &nbsp; </button>
+          {% if backlink == "1" %}
+          <a href="/" class="btn"> &nbsp; Go Back &nbsp; </a>
+          {% endif %}
 				</div>
 			</fieldset>
 		</form>

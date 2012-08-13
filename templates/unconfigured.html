@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="span8 pull-center">
+    <div class="alert alert-block">
+      <a class="close" data-dismiss="alert" href="#">×</a>
+      If you already finished the initial configuration, please set 
+      <i>configured = True</i> in your <i>logview.conf</i> configuration file
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span8 pull-center">
+    <div class="well">
+      <h1>Welcome to pyLogView</h1>
+      <p style="text-align:justify">
+        pyLogView is a next-generation web-based syslog viewer. 
+        It currently supports displaying and searching through syslog 
+        messages stored in a postgresql database. A dashboard allows you
+        to display nice-looking statistics as well as the latest events. 
+      </p>
+      
+      <h2>Initial configuration</h2>
+      <p style="text-align:justify">
+        Before you will be able to use this software, an initial configuration
+        is needed. PyLogView uses configuration files to store it's settings 
+        and user information. The syntax of these configuration files is very 
+        simple. They can have multiple sections where each section can have 
+        multiple Key-Value pairs. Comments start with a semicolon and empty 
+        lines are ignored.
+      </p>
+      <pre>
+[section] &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &larr; a section
+key = value &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &larr; a key-value pair
+bla = blubb &nbsp; ; comment &nbsp; &nbsp; &nbsp; &larr; a key-value pair followed by a comment
+;comment &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &larr; a comment
+</pre>
+      <br />
+      
+      <p>
+        To get started have a look at the <i>config</i> directory inside your
+        pyLogView installation. The configuration files you will find there are:
+      </p>
+      <table class="table table-bordered">
+        <tr>
+          <td>cherrypy.conf</td>
+          <td>Webserver settings - the address and port number to listen on</td>
+        </tr>
+        <tr>
+          <td>logview.conf</td>
+          <td>pyLogView configuration - syslog backend configuration</td>
+        </tr>
+        <tr>
+          <td>users.conf</td>
+          <td>pyLogView users - users that are allowed to login</td>
+        </tr>
+      </table>
+      
+      <h2>Adding a user</h2>
+      <p>
+        Before you are able to login, you must create a user. Users are stored
+        in the configuration file users.conf. The name of a user must be set as 
+        a section name. The only key-value pair the section owns is the users
+        password.
+      </p>
+      <p>
+        Passwords are stored in form of a sha256 hash. You can use the user 
+        creation form to generate a user section and hashed password.
+      </p>
+      <a href="/help/create_user?backlink=1" class="btn btn-primary input-large">Create a user</a>
+            
+      <h2>Starting over</h2>
+      <p>
+        After you have finished the configuration, set <i>configured = True</i>
+        in your <i>logview.conf</i> configuration file and restart the application.
+      </p>
+      <p>
+        Have fun.
+      </p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

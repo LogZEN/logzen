@@ -27,42 +27,41 @@ from logview.config import Config
 
 
 class Settings(object):
-    _cp_config = {
-        'tools.auth.on': True
-    }
+  _cp_config = {
+    'tools.auth.on': True
+  }
 
-    def __init__(self):
-        pass
+  def __init__(self):
+    pass
 
+  #=============================================================================
+  # create user form
+  #=============================================================================
+  @cherrypy.expose
+  @require()
+  def user_create(self,
+                  username = None,
+                  password = None):
+    template = templates.get_template('create_user.html')
+    error_msg = ""
+    configsection = None
 
-    @cherrypy.expose
-    @require()
-    def user_list(self):
-        pass
+    if username is None or password is None:
+      pass
 
+    elif username == "" or password == "":
+      error_msg = "Please set a username and password"
 
-    @cherrypy.expose
-    @require()
-    def user_create(self,
-                    username = None,
-                    password = None):
-        template = templates.get_template('create_user.html')
-        error_msg = ""
-        configsection = None
+    else:
+      if Config().has_section(username):
+        error_msg = '''
+          The username you choose already exists in your configuration file.
+          <br />Please be aware that usernames must be unique.
+        '''
 
-        if username is None or password is None:
-            pass
+      configsection = {'username': username,
+                       'password': hashlib.sha256(password).hexdigest()}
 
-        elif username == "" or password == "":
-            error_msg = "Please set a username and password"
-
-        else:
-            if Config().has_section(username):
-                error_msg = "The username you choose already exists in your configuration file. <br />Please be aware that usernames must be unique."
-
-            configsection = {'username': username,
-                             'password': hashlib.sha256(password).hexdigest()}
-
-        return template.render(pagename = "create",
-                               error_msg = error_msg,
-                               configsection = configsection)
+    return template.render(pagename = "create",
+                           error_msg = error_msg,
+                           configsection = configsection)

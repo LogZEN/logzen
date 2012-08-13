@@ -16,10 +16,3 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with pyLogView.  If not, see <http://www.gnu.org/licenses/>.
 '''
-
-import os
-
-import jinja2
-
-loader = jinja2.FileSystemLoader(os.path.join(os.getcwd(), 'templates'))
-templates = jinja2.Environment(loader = loader)

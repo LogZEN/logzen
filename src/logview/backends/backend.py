@@ -19,73 +19,83 @@ along with pyLogView.  If not, see <http://www.gnu.org/licenses/>.
 
 from abc import ABCMeta, abstractmethod
 
+
 class Result:
-    __metaclass__ = ABCMeta
+  __metaclass__ = ABCMeta
 
-    @abstractmethod
-    def get_count(self):
-        pass
+  @abstractmethod
+  def __init__(self):
+    pass
 
-    @abstractmethod
-    def get_rows(self,
-                 offset,
-                 count):
-        pass
+  @abstractmethod
+  def get_count(self):
+    pass
+
+  @abstractmethod
+  def get_rows(self,
+               offset,
+               count):
+    pass
 
 class Backend:
-    __metaclass__ = ABCMeta
+  __metaclass__ = ABCMeta
 
-    @abstractmethod
-    def get_events(self,
-                   filters = {}):
-        pass
+  @abstractmethod
+  def __init__(self):
+    pass
 
-    @abstractmethod
-    def get_event(self,
-                  event_id):
-        pass
+  @abstractmethod
+  def get_events(self,
+                 filters):
+    pass
 
-    @abstractmethod
-    def get_similar_events(self,
-                           event_id):
-        pass
+  @abstractmethod
+  def get_event(self,
+                event_id):
+    pass
 
-    @abstractmethod
-    def get_similar_events_history(self,
-                                   filters,
-                                   steps):
-        pass
+  @abstractmethod
+  def get_similar_events(self,
+                         message,
+                         starttime):
+    pass
 
-    @abstractmethod
-    def event_peaks(self,
-                    timerange):
-        pass
+  @abstractmethod
+  def get_similar_events_history(self,
+                                 filters,
+                                 steps):
+    pass
 
-    @abstractmethod
-    def event_count_by_host(self):
-        pass
+  @abstractmethod
+  def event_peaks(self,
+                  timerange):
+    pass
 
-    @abstractmethod
-    def event_count_by_time(self,
-                            filters,
-                            steps):
-        pass
+  @abstractmethod
+  def event_count_by_host(self):
+    pass
 
-    @abstractmethod
-    def new_events(self,
-                   filter):
-        pass
+  @abstractmethod
+  def event_count_by_time(self,
+                          filters,
+                          steps):
+    pass
 
-    @abstractmethod
-    def get_severity_count(self,
-                           host):
-        pass
+  @abstractmethod
+  def new_events(self,
+                 filters):
+    pass
 
-    @abstractmethod
-    def get_program_count(self,
-                           host):
-        pass
+  @abstractmethod
+  def get_severity_count(self,
+                         host):
+    pass
 
-    @abstractmethod
-    def get_hosts(self):
-        pass
+  @abstractmethod
+  def get_program_count(self,
+                         host):
+    pass
+
+  @abstractmethod
+  def get_hosts(self):
+    pass

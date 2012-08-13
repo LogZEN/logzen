@@ -44,7 +44,7 @@
 		$.ajax({
 			url: "/overview/new_events",
 			method: 'POST',
-	        data: {'filter': new_events_filter},
+	        data: {'filters': new_events_filter},
 			dataType: 'json',
 			beforeSend: function(){
 				$("#loading").show();

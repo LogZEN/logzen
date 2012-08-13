@@ -24,9 +24,9 @@
 	</div>
 </div>
 
-<div class="row-fluid" id="not_found_alert" style="display:none;">
+<div class="row-fluid" id="not_found_alert">
 	<div class="span12">
-		<div class="alert alert-block">
+		<div class="alert alert-block" style="display:none;">
 			<a class="close" data-dismiss="alert" href="#">×</a>
 			The requested event (id = {{event_id}}) was not found
 		</div>
@@ -84,8 +84,8 @@
 			<h4 class="inline">Similar events <small>(all hosts)</small></h4>
 			<div class="btn-group inline pull-right" style="padding-bottom: 2px;">
 				<a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
-				  	<span id="similar_events_all_selector">last 24 hours</span>
-				  	<span class="caret"></span>
+			  	<span id="similar_events_all_selector">last 24 hours</span>
+			  	<span class="caret"></span>
 				</a>
 				<ul class="dropdown-menu">
 					<li><a href="javascript:void(0);" onclick="timerange_all=1; similar_events();">show last day</a></li>
@@ -102,8 +102,8 @@
 			<h4 class="inline">Similar events <small id="ins_host"></small></h4>
 			<div class="btn-group inline pull-right" style="padding-bottom: 2px;">
 				<a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
-				  	<span id="similar_events_host_selector">one week</span>
-				  	<span class="caret"></span>
+			  	<span id="similar_events_host_selector">one week</span>
+			  	<span class="caret"></span>
 				</a>
 				<ul class="dropdown-menu">
 					<li><a href="javascript:void(0);" onclick="timerange_host=7; similar_events_history();">one week</a></li>
@@ -168,7 +168,7 @@ function get_event(id) {
 				add_qtips();
 				
 			} else {
-				$('#not_found_alert').show();
+				$('#not_found_alert .alert').show();
 			}
 		}
 	});
@@ -301,10 +301,6 @@ function similar_events_history() {
     });
 }
 
-
-/*
- * button actions
- */
 $('#nextbutton').click(function(){
 	get_event(event_id + 1);
 });

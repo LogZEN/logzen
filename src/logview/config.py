@@ -20,49 +20,51 @@ along with pyLogView.  If not, see <http://www.gnu.org/licenses/>.
 from ConfigParser import SafeConfigParser
 
 
-defaults = {'backend.minconn': '1',
+DEFAULTS = {'backend.minconn': '1',
             'backend.maxconn': '20',
             'backend.port': '5432'
             }
 
 class Config(object):
-    __instance = None
+  __instance = None
 
-    def __new__(cls, *args, **kwargs):
-        if cls.__instance is None:
-            cls.__instance = object.__new__(cls)
-            cls.__instance.__init()
+  def __new__(cls, *args, **kwargs):
+    if cls.__instance is None:
+      cls.__instance = object.__new__(cls)
+      cls.__instance.__init()
 
-        return cls.__instance
+    return cls.__instance
 
-    def __init(self):
-        self.__parser = SafeConfigParser(defaults)
+  def __init(self):
+    self.__parser = SafeConfigParser(DEFAULTS)
 
-        config_files = ['config/logview.conf',
-                        'config/users.conf']
+    config_files = ['config/logview.conf',
+                    'config/users.conf']
 
-        config_found = self.__parser.read(config_files)
-        config_missing = set(config_files) - set(config_found)
+    config_found = self.__parser.read(config_files)
+    config_missing = set(config_files) - set(config_found)
 
-        if config_missing is not None:
-            print "Warning: Missing configuration files: %s" % config_missing
+    if len(config_missing) is not 0:
+      print "Warning: Missing configuration files: %s" % config_missing
 
+  def __getattr__(self,
+                  section):
+    parser = self.__parser
 
-    def __getattr__(self,
-                    section):
-        parser = self.__parser
+    class SectionWrapper():
+      def __init__(self):
+        pass
 
-        class section_wrapper():
-            def __getitem__(self, option):
-                return parser.get(section, option)
+      def __getitem__(self, option):
+        return parser.get(section, option)
 
-        return section_wrapper()
+    return SectionWrapper()
 
-    def has_section(self,
-                    section):
-        return self.__parser.has_section(section)
+  def has_section(self,
+                  section):
+    return self.__parser.has_section(section)
 
-    def get(self,
-            section,
-            option):
-        return self.__parser.get(section, option)
+  def get(self,
+          section,
+          option):
+    return self.__parser.get(section, option)

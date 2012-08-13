@@ -42,7 +42,6 @@ class Events:
   #=============================================================================
   # eventlist
   #=============================================================================
-  @cherrypy.expose
   @require()
   def index(self,
             host = None,
@@ -54,7 +53,6 @@ class Events:
                            message = message,
                            start_time = start_time)
 
-  @cherrypy.expose
   @cherrypy.tools.json_out()
   @require()
   def update(self,
@@ -142,14 +140,12 @@ class Events:
   #=============================================================================
   # event details page
   #=============================================================================
-  @cherrypy.expose
   @require()
   def details(self,
               event_id):
     template = templates.get_template('event.html')
     return template.render(event_id = event_id)
 
-  @cherrypy.expose
   @cherrypy.tools.json_out()
   @require()
   def get_event_details(self,
@@ -176,7 +172,6 @@ class Events:
 
     return event
 
-  @cherrypy.expose
   @cherrypy.tools.json_out()
   @require()
   def get_similar_events(self,
@@ -192,7 +187,6 @@ class Events:
 
     return data
 
-  @cherrypy.expose
   @cherrypy.tools.json_out()
   @require()
   def get_similar_events_history(self,
@@ -220,7 +214,6 @@ class Events:
   #=============================================================================
   # event tooltip
   #=============================================================================
-  @cherrypy.expose
   @require()
   def tooltip(self,
               event_id):

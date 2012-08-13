@@ -39,20 +39,17 @@ class Overview:
   #=============================================================================
   # dashboard
   #=============================================================================
-  @cherrypy.expose
   @require()
   def index(self):
     template = templates.get_template('overview.html')
     return template.render(pagename = "overview")
 
-  @cherrypy.expose
   @cherrypy.tools.json_out()
   @require()
   def get_events_by_host(self):
     events_by_host = backend.event_count_by_host()
     return events_by_host
 
-  @cherrypy.expose
   @cherrypy.tools.json_out()
   @require()
   def get_top_hosts(self,
@@ -66,7 +63,6 @@ class Overview:
 
     return data
 
-  @cherrypy.expose
   @cherrypy.tools.json_out()
   @require()
   def get_new_events(self,
@@ -79,7 +75,6 @@ class Overview:
 
     return eventmap
 
-  @cherrypy.expose
   @cherrypy.tools.json_out()
   @require()
   def get_severity_by_host(self,
@@ -101,7 +96,6 @@ class Overview:
     data['hosts'] = backend.get_hosts()
     return data
 
-  @cherrypy.expose
   @cherrypy.tools.json_out()
   @require()
   def get_program_by_host(self,

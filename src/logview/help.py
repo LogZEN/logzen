@@ -32,7 +32,6 @@ class Help:
   #=============================================================================
   # about
   #=============================================================================
-  @cherrypy.expose
   def about(self):
     template = templates.get_template('about.html')
     return template.render(pagename = "help")

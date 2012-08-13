@@ -25,6 +25,7 @@ from logview.authentication.auth import AuthController
 
 from logview.config import Config
 from logview.settings import Settings
+from logview.help import Help
 from logview.overview import Overview
 from logview.events import Events
 
@@ -48,6 +49,8 @@ if __name__ == '__main__':
   dispatcher.connect('event4', '/event/:event_id', Events(), action = 'details')
 
   dispatcher.connect('settings1', '/settings/users/create', Settings(), action = 'user_create')
+
+  dispatcher.connect('help1', '/help/about', Help(), action = 'about')
 
   dispatcher.connect('auth1', '/auth/login', AuthController(), action = 'login')
   dispatcher.connect('auth2', '/auth/logout', AuthController(), action = 'logout')

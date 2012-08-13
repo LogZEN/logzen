@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="span10 pull-center">
+    <h1>About</h1>
+    <div class="row">
+      <div class="span5">
+        <h2>pyLogView</h2>
+        <p>
+          pyLogView is a next-generation web-based syslog viewer.<br />
+        </p>
+        <p style="text-align:justify">
+          It currently supports displaying and searching through syslog 
+          messages stored in a postgresql database. A dashboard allows you
+          to display nice-looking statistics as well as the latest events.  
+        </p>
+        
+        <h2>Developers</h2>
+        <p>
+          Sven Reissmann &lt;sven@0x80.io&gt;
+        </p>
+        
+        <h2>License</h2>
+        <p style="text-align:justify">
+          pyLogView is free software: you can redistribute it and/or modify
+          it under the terms of the GNU General Public License as published
+          by the Free Software Foundation, either version 3 of the License,
+          or (at your option) any later version.
+        </p>
+        <p style="text-align:justify">
+        pyLogView is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU General Public License for more details.
+        </p>
+        <p style="text-align:justify">
+        You should have received a copy of the GNU General Public License
+        along with pyLogView.  If not, see <a href="http://www.gnu.org/licenses/" target="_blank">here</a>.
+        </p>
+      </div>
+      <div class="span5">
+        <h2>Bugs and Features</h2>
+        <p style="text-align:justify">
+          pyLogView is a relatively new project. We are constantly thinking 
+          about our own and other peoples needs to make it even better.
+        </p>
+        <p style="text-align:justify">
+          If you have any toughts please join the discussion or send patches.
+        </p>
+        <br />
+        <a href="http://dev.open-desk.org/projects/logview" target="_blank" class="btn btn-primary input-large">Bugs and Feature requests</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

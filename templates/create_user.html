@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Create User{% endblock %}
+
+{% block content %}
+
+{% if error_msg %}
+<div class="row">
+	<div class="span7 pull-center">
+		<div class="alert alert-block">
+			<a class="close" data-dismiss="alert" href="#">×</a>
+			{{error_msg}}
+		</div>
+	</div>
+</div>
+{% endif %}
+
+<div class="row">
+	<div class="span7 pull-center">
+		<form class="well form-horizontal" method="post" action="/settings/users/create">
+			<fieldset>
+				<legend>Enter the new users credentials</legend>
+				<div class="control-group">
+					<label class="control-label" for="input_user">Username</label>
+					<div class="controls">
+						<div class="input-prepend">
+							<span class="add-on"><i class="icon-user"></i></span><input type="text" class="input-xlarge" id="input_user" name="username">
+							<p class="help-block">The new users unique name</p>
+						</div>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="input_pass">Password</label>
+					<div class="controls">
+						<div class="input-prepend">
+							<span class="add-on"><i class="icon-lock"></i></span><input type="password" class="input-xlarge" id="input_pass" name="password">
+							<p class="help-block">The new users password</p>
+						</div>
+					</div>
+				</div>
+				<br />
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary"> &nbsp; Create configuration section &nbsp; </button>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+</div>
+
+{% if configsection %}
+<div class="row">
+	<div class="span7 pull-center">
+		<div class="alert alert-success">
+			<a class="close" data-dismiss="alert" href="#">×</a>
+			<p>
+			Please add the following lines to your configuration file (config/users.conf) 
+			and restart the application to be able to login as the new user.
+			</p>
+<pre>
+[{{configsection.username}}]
+password = {{configsection.password}}
+</pre>
+		</div>
+	</div>
+</div>
+{% endif %}
+
+{% endblock %}

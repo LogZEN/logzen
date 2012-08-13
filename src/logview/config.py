@@ -57,3 +57,12 @@ class Config(object):
                 return parser.get(section, option)
 
         return section_wrapper()
+
+    def has_section(self,
+                    section):
+        return self.__parser.has_section(section)
+
+    def get(self,
+            section,
+            option):
+        return self.__parser.get(section, option)

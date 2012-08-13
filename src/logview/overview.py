@@ -21,23 +21,29 @@ import datetime
 import cherrypy
 import humanize
 
+from logview.authentication.auth import require
 from logview.backends import backend
-
 from logview import templates
 
 
 class Overview:
+    _cp_config = {
+        'tools.auth.on': True
+    }
+
     def __init__(self):
         pass
 
+
     @cherrypy.expose
-    def __call__(self):
+    @require()
+    def index(self):
         template = templates.get_template('overview.html')
         return template.render(pagename = "overview")
 
-
     @cherrypy.expose
     @cherrypy.tools.json_out()
+    @require()
     def get_events_by_host(self):
         events_by_host = backend.event_count_by_host()
         return events_by_host
@@ -45,6 +51,7 @@ class Overview:
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
+    @require()
     def get_top_hosts(self,
                       timerange = 1):
         starttime = datetime.datetime.now() - datetime.timedelta(days = int(timerange))
@@ -57,6 +64,7 @@ class Overview:
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
+    @require()
     def get_new_events(self,
                        filter = 7):
         eventmap = []
@@ -69,6 +77,7 @@ class Overview:
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
+    @require()
     def get_severity_by_host(self,
                              host = None):
         if host == "":
@@ -90,6 +99,7 @@ class Overview:
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
+    @require()
     def get_program_by_host(self,
                             host):
         if host == "":

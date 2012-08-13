@@ -9,6 +9,11 @@ div#main {
 	padding:				0 15px;
 }
 
+.pull-center {
+	margin:					0 auto;
+	float:					none;	
+}
+
 h1 {
 	padding:				0;
 	font-size:				14pt;

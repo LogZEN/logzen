@@ -8,10 +8,17 @@
 				<span id="link_image" class="tip" title="Permanent link"></span>
 			</a>
 			<br />
+      {% if searchengine == "google" %}
 			<a href="http://google.com/search?q={{ event.message }}" target="_blank">
 				<span id=text>Google</span>
 				<span id="google_image" class="tip" title="Google this message"></span>
 			</a>
+      {% elif searchengine == "ixquick" %}
+      <a href="https://ixquick.com/do/search?q={{ event.message }}" target="_blank">
+        <span id=text>Google</span>
+        <span id="ixquick_image" class="tip" title="Look up this message on ixquick"></span>
+      </a>
+      {% endif %}
 		</td>
 	</tr>
 	<tr><td class="spacing">&nbsp;</td></tr>

@@ -26,7 +26,7 @@ from logview import templates
 from logview.config import Config
 
 
-SESSION_KEY = '_logview_username'
+SESSION_KEY = Config().logview['sessionkey']
 
 def check_credentials(username, password):
   if Config().has_section(username):

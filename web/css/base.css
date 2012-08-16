@@ -189,14 +189,18 @@ span#eventcount {
 	display:                 none;
 }
 
-#tooltip_event td span#google_image {
+#tooltip_event td span#google_image,
+#tooltip_event td span#ixquick_image,
+#tooltip_event td span#link_image {
   display:                 block;
 	width:                   16px;
 	height:                  16px;
 	
 	margin-left:             5px;
 	float:                   right;
-	
+}
+
+#tooltip_event td span#google_image {
   background-image:        url('/static/img/google.png');
 }
 
@@ -204,14 +208,15 @@ span#eventcount {
   background-image:        url('/static/img/google_hover.png');
 }
 
+#tooltip_event td span#ixquick_image {
+  background-image:        url('/static/img/ixquick.png');
+}
+
+#tooltip_event td span#ixquick_image:hover {
+  background-image:        url('/static/img/ixquick_hover.png');
+}
+
 #tooltip_event td span#link_image {
-  display:                 block;
-  width:                   16px;
-  height:                  16px;
-  
-  margin-left:             5px;
-  float:                   right;
-  
   background-image:        url('/static/img/link.png');
 }
 

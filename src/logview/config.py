@@ -22,7 +22,8 @@ from ConfigParser import SafeConfigParser
 
 DEFAULTS = {'backend.minconn': '1',
             'backend.maxconn': '20',
-            'backend.port': '5432'
+            'backend.port': '5432',
+            'ui.searchengine': 'google'
             }
 
 class Config(object):

@@ -29,6 +29,7 @@ from logview.authentication.auth import require
 from logview.backends import backend
 from logview.geoip import geoip
 from logview import templates
+from logview.config import Config
 
 
 class Events:
@@ -37,7 +38,7 @@ class Events:
   }
 
   def __init__(self):
-    pass
+    templates.globals['searchengine'] = Config().logview['ui.searchengine']
 
   #=============================================================================
   # eventlist

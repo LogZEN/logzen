@@ -225,18 +225,18 @@ class PostgresBackend(Backend):
   def new_events(self,
                  filters):
     where = ""
-    if filter != 7:
-      if filter >= 1:
+    if filters != 7:
+      if filters >= 1:
         where += "WHERE severity = 'alert'"
-      if filter >= 2:
+      if filters >= 2:
         where += " OR severity = 'crit'"
-      if filter >= 3:
+      if filters >= 3:
         where += " OR severity = 'err'"
-      if filter >= 4:
+      if filters >= 4:
         where += " OR severity = 'warning'"
-      if filter >= 5:
+      if filters >= 5:
         where += " OR severity = 'notice'"
-      if filter >= 6:
+      if filters >= 6:
         where += " OR severity = 'info'"
 
     sql = '''

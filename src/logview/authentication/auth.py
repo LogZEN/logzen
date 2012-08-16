@@ -78,6 +78,7 @@ class AuthController(object):
     else:
       cherrypy.session.regenerate()
       cherrypy.session[SESSION_KEY] = cherrypy.request.login = username
+      templates.globals['session_username'] = username
       raise cherrypy.HTTPRedirect(from_page or "/")
 
 
@@ -86,6 +87,7 @@ class AuthController(object):
              from_page = "/"):
     username = cherrypy.session.get(SESSION_KEY, None)
     cherrypy.session[SESSION_KEY] = None
+    templates.globals['session_username'] = None
 
     if username:
       cherrypy.request.login = None

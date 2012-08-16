@@ -2,6 +2,8 @@
 	<div class="navbar-inner">
 		<div class="container">
 			<a class="brand" href="#">pyLogView</a>
+      
+      {% if session_username %}
 			<ul class="nav pull-right" id="clock">
 				<li{% if pagename == "overview" %} class="active"{% endif %}><a href="/">Overview</a></li>
 				<li{% if pagename == "events" %} class="active"{% endif %}><a href="/events">Events</a></li>
@@ -24,6 +26,8 @@
 				<li class="sec navbar-text"></li>
 				<li class="offset navbar-text">&nbsp; (GMT)</li>
 			</ul>
+      {% endif %}
+      
 		</div>
 	</div>
 </div>

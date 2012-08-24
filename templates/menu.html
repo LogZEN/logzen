@@ -1,4 +1,4 @@
-<div id="menu"  class="navbar navbar-fixed-top"> 
+<div id="menu" class="navbar navbar-fixed-top"> 
 	<div class="navbar-inner">
 		<div class="container">
 			<a class="brand" href="#">pyLogView</a>
@@ -21,10 +21,7 @@
 					</ul>
 				</li>
 				<li class="divider-vertical navbar-text"></li>
-				<li class="hour navbar-text"></li>
-				<li class="min navbar-text"></li>
-				<li class="sec navbar-text"></li>
-				<li class="offset navbar-text">&nbsp; (GMT)</li>
+				<li class="navbar-text" id="clock"></li>
 			</ul>
       {% endif %}
       
@@ -33,5 +30,5 @@
 </div>
 
 <script type="text/javascript">//<![CDATA[
-	$('#clock').clock({offset: '0'});
+	$('#clock').clock();
 //]]></script>

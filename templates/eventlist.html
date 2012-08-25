@@ -104,6 +104,7 @@
 	 			}
 	 		});
 	 	});
+	 	loadIpTooltips();
 	 	add_qtips();
 	 }
 
@@ -230,7 +231,7 @@
 					rows += '<td class="event color_' + object['level'] + '" id="' + object['id'] + '"><a href="javascript:void(0)" onclick="$(\'#filter_facility\').val($(this).html()); updateAction();">' + object['facility'] + '</a></td>';
 					rows += '<td class="event" id="' + object['id'] + '"><a href="javascript:void(0)" onclick="$(\'#filter_severity\').val($(this).html()); updateAction();">' + object['severity'] + '</a></td>';
 					rows += '<td class="event" id="' + object['id'] + '"><a href="javascript:void(0)" onclick="$(\'#filter_program\').val($(this).html()); updateAction();">' + object['program'] + '</a></td>';
-					rows += '<td class="event" id="' + object['id'] + '"><a href="javascript:void(0)" onclick="$(\'#filter_message\').val($(this).html()); updateAction();">' + object['message'] + '</a></td>';
+					rows += '<td id="' + object['id'] + '"><a href="javascript:void(0)" onclick="$(\'#filter_message\').val(\'' + object['message'] + '\'); updateAction();">' + addIpTooltipTags(object['message']) + '</a></td>';
 					rows += '</tr>';
 				}
 			} else {

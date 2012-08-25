@@ -49,6 +49,7 @@ if __name__ == '__main__':
     dispatcher.connect('events2', '/events/update', Events(), action = 'update')
 
     dispatcher.connect('tooltips1', '/tooltips/event', Tooltips(), action = 'event')
+    dispatcher.connect('tooltips2', '/tooltips/ip', Tooltips(), action = 'ip_address')
 
     dispatcher.connect('event1', '/event/event_details', Events(), action = 'get_event_details')
     dispatcher.connect('event2', '/event/similar_events', Events(), action = 'get_similar_events')

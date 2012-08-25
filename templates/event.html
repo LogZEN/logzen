@@ -157,7 +157,7 @@ function get_event(id) {
 				$('#level').empty().append(d['level']);
 				$('#tag').empty().append(d['tag']);
 				$('#program').empty().append(d['program']);
-				$('#message').empty().append(d['message']);
+				$('#message').empty().append(addIpTooltipTags(d['message']));
 				
 				$('#label').empty().append(d['facility'] + ':' + d['severity']);
 				$('#label').removeClass().addClass('label color_' + d['severity']);
@@ -166,6 +166,7 @@ function get_event(id) {
 				similar_events_history();
 
 				add_qtips();
+				loadIpTooltips();
 				
 			} else {
 				$('#not_found_alert .alert').show();

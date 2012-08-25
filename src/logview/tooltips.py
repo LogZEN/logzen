@@ -17,15 +17,20 @@ You should have received a copy of the GNU General Public License
 along with pyLogView.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import cherrypy
+
 import socket
 import humanize
+import string
 
 from datetime import datetime
 
 from logview.authentication.auth import require
 from logview.backends import backend
+from logview.geoip import geoip
 from logview import templates
 from logview.config import Config
+
 
 class Tooltips:
   _cp_config = {
@@ -41,7 +46,7 @@ class Tooltips:
   @require()
   def event(self,
             event_id):
-    template = templates.get_template('tooltip.ajax.html')
+    template = templates.get_template('tooltip.event.html')
 
     event = backend.get_event(event_id)
 
@@ -53,3 +58,29 @@ class Tooltips:
     event['ago_time'] = humanize.naturaltime(datetime.now() - event['reported_time'])
 
     return template.render(event = event)
+
+  #=============================================================================
+  # ip address tooltip
+  #=============================================================================
+  @require()
+  def ip_address(self,
+                 ip):
+    template = templates.get_template('tooltip.ip.html')
+
+    data = {}
+    data['ip'] = ip
+
+    try:
+      name, aliaslist, addresslist = socket.gethostbyaddr(ip)
+      data['dns'] = name
+      data['aliaslist'] = string.join(aliaslist, "<br />")
+      data['addresslist'] = string.join(addresslist, "<br />")
+    except:
+      data['dns'] = "Unknown"
+      data['aliaslist'] = ""
+      data['addresslist'] = ""
+
+    data['country'] = geoip.country(ip)
+    data['flagimg'] = string.lower(data['country'])
+
+    return template.render(data = data)

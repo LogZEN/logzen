@@ -22,6 +22,7 @@ div#main {
 	float:                 none;	
 }
 
+
 /*
  * page and widget headings
  */
@@ -226,6 +227,17 @@ span#eventcount {
 
 #tooltip_event td.spacing {
 	line-height:             2px;
+}
+
+/*
+ * ip address tooltips
+ */
+.tooltip_ip {
+  color:                  #0088cc;
+  cursor:                 default;
+}
+.tooltip_ip:hover {
+  color:                  #005588;
 }
 
 /*

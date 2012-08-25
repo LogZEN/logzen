@@ -27,6 +27,7 @@ from logview.config import Config
 from logview.help import Help
 from logview.overview import Overview
 from logview.events import Events
+from logview.tooltips import Tooltips
 
 
 if __name__ == '__main__':
@@ -46,7 +47,8 @@ if __name__ == '__main__':
 
     dispatcher.connect('events1', '/events', Events(), action = 'index')
     dispatcher.connect('events2', '/events/update', Events(), action = 'update')
-    dispatcher.connect('events3', '/events/tooltip', Events(), action = 'tooltip')
+
+    dispatcher.connect('tooltips1', '/tooltips/event', Tooltips(), action = 'event')
 
     dispatcher.connect('event1', '/event/event_details', Events(), action = 'get_event_details')
     dispatcher.connect('event2', '/event/similar_events', Events(), action = 'get_similar_events')

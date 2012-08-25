@@ -19,8 +19,8 @@ along with pyLogView.  If not, see <http://www.gnu.org/licenses/>.
 
 import cherrypy
 
-import socket
 import humanize
+import socket
 import math
 
 from datetime import datetime, timedelta
@@ -29,7 +29,6 @@ from logview.authentication.auth import require
 from logview.backends import backend
 from logview.geoip import geoip
 from logview import templates
-from logview.config import Config
 
 
 class Events:
@@ -38,7 +37,7 @@ class Events:
   }
 
   def __init__(self):
-    templates.globals['searchengine'] = Config().logview['ui.searchengine']
+    pass
 
   #=============================================================================
   # eventlist
@@ -211,22 +210,3 @@ class Events:
     data['metadata'] = {"timerange": timerange}
 
     return data
-
-  #=============================================================================
-  # event tooltip
-  #=============================================================================
-  @require()
-  def tooltip(self,
-              event_id):
-    template = templates.get_template('tooltip.ajax.html')
-
-    event = backend.get_event(event_id)
-
-    try:
-      event['ip'] = socket.gethostbyname(event['host'])
-    except:
-      event['ip'] = 'Unknown'
-
-    event['ago_time'] = humanize.naturaltime(datetime.now() - event['reported_time'])
-
-    return template.render(event = event)

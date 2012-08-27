@@ -41,6 +41,7 @@ def check_auth(*args, **kwargs):
   if username:
     cherrypy.request.login = username
   else:
+    templates.globals['session_username'] = None
     raise cherrypy.HTTPRedirect("/auth/login?from_page=%s" % get_parmas)
 
 cherrypy.tools.auth = cherrypy.Tool('before_handler', check_auth)
@@ -57,7 +58,6 @@ def require(func = None):
 
 
 class AuthController(object):
-  @cherrypy.expose
   def login(self,
             username = None,
             password = None,
@@ -81,8 +81,6 @@ class AuthController(object):
       templates.globals['session_username'] = username
       raise cherrypy.HTTPRedirect(from_page or "/")
 
-
-  @cherrypy.expose
   def logout(self,
              from_page = "/"):
     username = cherrypy.session.get(SESSION_KEY, None)

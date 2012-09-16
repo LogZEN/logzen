@@ -20,7 +20,7 @@
 			if (seconds < 10) seconds = '0' + seconds;
 			if (offset > 0) offset = '+' + offset
 			
-			jQuery(_this).find("#clock").html(hours + ':' + minutes + ':' + seconds + ' GMT' + offset);
+			$(_this).html(hours + ':' + minutes + ':' + seconds + ' GMT' + offset);
 		}
 		refreshClock()
 		setInterval(refreshClock, 1000);

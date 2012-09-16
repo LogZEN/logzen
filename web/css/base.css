@@ -1,15 +1,33 @@
 /*
-Copyright 2012 Sven Reissmann <sven@0x80.io>
+ * Copyright 2012 Sven Reissmann <sven@0x80.io>
+ *
+ * This file is part of pyLogView. It is licensed under the terms of the 
+ * GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
+ */
 
-This file is part of pyLogView. It is licensed under the terms of the 
-GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
-*/
+/*
+ * bootstrap additions
+ */
+
+/* dropdown menu triggered by mouse hover */
+.hover-nav {
+  margin: 0;
+}
+.hover-nav:hover .dropdown-menu {
+  display: block;
+  margin-top: 0;
+}
+.hover-nav li a {
+  cursor: default;
+}
+
 
 /*
  * main content area
  */
 body {
 	background:            #f6f6f6;
+	overflow-x:            hidden;
 }
 
 div#main {
@@ -44,6 +62,7 @@ h4.inline {
 	display:               inline-block;
 }
 
+
 /*
  * noscript warning
  */
@@ -73,12 +92,43 @@ h4.inline {
 	font-size:             16pt;
 }
 
+
 /*
  * navigation
- */
-#clock li {
+ *
+li#navclock {
 	display:               inline;
 }
+
+/*
+ * severity colors
+ */
+.color_debug {
+  background:              #d3d7cf;
+}
+.color_info {
+  background:              #3465a4;
+}
+.color_notice {
+  background:              #4e9a06;
+}
+.color_warning {
+  background:              #edd400;
+}
+.color_err {
+  background:              #f57900;
+}
+.color_crit {
+  background:              #ef2929;
+}
+.color_emerge {
+  background:              #cc0000;
+}
+.color_alert {
+  background:              #a40000;
+}
+
+
 
 /*
  * eventlist table
@@ -86,7 +136,7 @@ h4.inline {
 table#events {
   width:                  100%;
   
-  border:                 1px #ddd solid;
+  border:                 1px #aaa solid;
   border-collapse:        collapse;
   
   font-size:              10pt;
@@ -94,12 +144,12 @@ table#events {
 }
 
 table#events tr#first th {
-  border-top:             1px #ddd solid;
+  border-top:             1px #aaa solid;
 }
 
 table#events th {
   background-color:       #F6F6F6;
-  border-top:             1px #999999 solid;
+  border-top:             1px #aaa solid;
   border-bottom:          1px #999999 solid;
   height:                 2em;
 }
@@ -128,6 +178,79 @@ table#events td#noresults {
 }
 
 /*
+ * eventlist filter 
+ */
+th.input-col {
+	padding-right: 0px;
+}
+th.input-col input {
+    border-radius: 3px 0 0 3px;
+    margin: 0px auto;
+    height: 16px;
+    line-height: 16px;
+    font-size: 12px;
+    
+}
+th.clear-col {
+  width: 18px;
+  margin: 0px;
+  padding: 0px;
+  padding-right: 5px;
+  border: 0px;
+}
+.clear-addon {
+  background-color: #EEEEEE;
+  border: 1px solid #CCCCCC;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: normal;
+  height: 16px;
+  line-height: 16px;
+  min-width: 12px;
+  padding: 4px 5px;
+  text-align: center;
+  text-shadow: 0 1px 0 #FFFFFF;
+  width: 14px;
+  border-radius: 0 3px 3px 0;
+  margin-left: -1px;
+  vertical-align: top;
+}
+#column_time,
+#filter_time {
+	margin-right: 0px;
+	width: 100px;
+}
+#column_host,
+#filter_host {
+    margin-right: 0px;
+    width: 110px;
+}
+#column_facility,
+#filter_facility {
+    margin-right: 0px;
+    width: 70px;
+}
+#column_severity,
+#filter_severity {
+    margin-right: 0px;
+    width: 60px;
+}
+#column_program,
+#filter_program {
+    margin-right: 0px;
+    width: 110px;
+}
+#filter_message {
+    margin-right: 0px;
+    width:100%;
+}
+.column_menu {
+    padding: 0px;
+    margin: 0px;
+    width: 35px;
+}
+
+/*
  * eventlist navigation
  */
 #navi {
@@ -141,107 +264,29 @@ span#eventcount {
   font-size:               12px;
   text-decoration:         none;
   padding-top:             -10px;
+  padding-right:           12px;
   vertical-align:          middle;
 }
 
 /*
- * severity colors / label colors
+ * eventlist chart
  */
-.color_debug {
-	background:              #d3d7cf;
-}
-.color_info {
-	background:              #3465a4;
-}
-.color_notice {
-	background:              #4e9a06;
-}
-.color_warning {
-	background:              #edd400;
-}
-.color_err {
-	background:              #f57900;
-}
-.color_crit {
-	background:              #ef2929;
-}
-.color_emerge {
-	background:              #cc0000;
-}
-.color_alert {
-	background:              #a40000;
+#chartdiv #zoombutton {
+    position:               absolute;
+    top:                    5px;
+    right:                  3px;
+    padding:                2px;
+    z-index:                99;
+
+    background-color:       #eee;
+    color:                  #999;
+
+    cursor:                 default;
+    font-size:              smaller;
 }
 
 /*
- * event tooltips
- */
-#tooltip_event td,
-#tooltip_event th {
-	vertical-align:          top;
-	clear:                   both;
-	color:                   #eee;
-}
-#tooltip_event th {
-	padding-right:           15px;
-	white-space:             nowrap;
-}
-
-#tooltip_event td span#text {
-	display:                 none;
-}
-
-#tooltip_event td span#google_image,
-#tooltip_event td span#ixquick_image,
-#tooltip_event td span#link_image {
-  display:                 block;
-	width:                   16px;
-	height:                  16px;
-	
-	margin-left:             5px;
-	float:                   right;
-}
-
-#tooltip_event td span#google_image {
-  background-image:        url('/static/img/google.png');
-}
-
-#tooltip_event td span#google_image:hover {
-  background-image:        url('/static/img/google_hover.png');
-}
-
-#tooltip_event td span#ixquick_image {
-  background-image:        url('/static/img/ixquick.png');
-}
-
-#tooltip_event td span#ixquick_image:hover {
-  background-image:        url('/static/img/ixquick_hover.png');
-}
-
-#tooltip_event td span#link_image {
-  background-image:        url('/static/img/link.png');
-}
-
-#tooltip_event td span#link_image:hover {
-	background-image:        url('/static/img/link_hover.png');
-}
-
-#tooltip_event td.spacing {
-	line-height:             2px;
-}
-
-/*
- * ip address tooltips
- */
-.tooltip_ip {
-  color:                  #0088cc;
-  cursor:                 default;
-}
-.tooltip_ip:hover {
-  color:                  #005588;
-}
-
-/*
- * loading icon
+ * eventlist loading icon
  */
 #loading {
 	position:                absolute;
@@ -257,9 +302,12 @@ span#eventcount {
 	background-image:        url('/static/img/ajax-loader.gif');
 }
 
+
 /*
- * flot tooltips
+ * tooltips
  */
+
+/* flot tooltips */
 #flotTip {
 	background:					     #555;
 	color:						       #eee;
@@ -269,22 +317,61 @@ span#eventcount {
 	border-radius: 				   6px;
 }
 
-/*
- * chart
- */
-#chartdiv #zoombutton {
-    position:               absolute;
-    top:                    5px;
-    right:                  3px;
-    padding:                2px;
-    z-index:                99;
-
-    background-color:       #eee;
-    color:                  #999;
-
-    cursor:                 default;
-    font-size:              smaller;
+/* ip address tooltips */
+.tooltip_ip {
+  color:                  #0088cc;
+  cursor:                 default;
 }
+.tooltip_ip:hover {
+  color:                  #005588;
+}
+
+/* event tooltips */
+#tooltip_event td,
+#tooltip_event th {
+  vertical-align:          top;
+  clear:                   both;
+  color:                   #eee;
+}
+#tooltip_event th {
+  padding-right:           15px;
+  white-space:             nowrap;
+}
+#tooltip_event td span#text {
+  display:                 none;
+}
+#tooltip_event td span#google_image,
+#tooltip_event td span#ixquick_image,
+#tooltip_event td span#link_image {
+  display:                 block;
+  width:                   16px;
+  height:                  16px;
+  
+  margin-left:             5px;
+  float:                   right;
+}
+#tooltip_event td span#google_image {
+  background-image:        url('/static/img/google.png');
+}
+#tooltip_event td span#google_image:hover {
+  background-image:        url('/static/img/google_hover.png');
+}
+#tooltip_event td span#ixquick_image {
+  background-image:        url('/static/img/ixquick.png');
+}
+#tooltip_event td span#ixquick_image:hover {
+  background-image:        url('/static/img/ixquick_hover.png');
+}
+#tooltip_event td span#link_image {
+  background-image:        url('/static/img/link.png');
+}
+#tooltip_event td span#link_image:hover {
+  background-image:        url('/static/img/link_hover.png');
+}
+#tooltip_event td.spacing {
+  line-height:             2px;
+}
+
 
 
 /*

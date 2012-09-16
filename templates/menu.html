@@ -4,7 +4,7 @@
 			<a class="brand" href="#">pyLogView</a>
       
       {% if session_username %}
-			<ul class="nav pull-right" id="clock">
+			<ul class="nav pull-right">
 				<li{% if pagename == "overview" %} class="active"{% endif %}><a href="/">Overview</a></li>
 				<li{% if pagename == "events" %} class="active"{% endif %}><a href="/events">Events</a></li>
 				<li class="divider-vertical"></li>
@@ -21,7 +21,7 @@
 					</ul>
 				</li>
 				<li class="divider-vertical navbar-text"></li>
-				<li class="navbar-text" id="clock"></li>
+				<li class="navbar-text" id="navclock"></li>
 			</ul>
       {% endif %}
       
@@ -30,5 +30,5 @@
 </div>
 
 <script type="text/javascript">//<![CDATA[
-	$('#clock').clock();
+	$('#navclock').clock();
 //]]></script>

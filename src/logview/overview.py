@@ -24,7 +24,7 @@ import humanize
 from datetime import datetime, timedelta
 
 from logview.authentication.auth import require
-from logview.backends import backend
+from logview.backend import backend
 from logview import templates
 
 

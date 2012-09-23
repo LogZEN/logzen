@@ -59,6 +59,9 @@ class Config(object):
       def __getitem__(self, option):
         return parser.get(section, option)
 
+      def __iter__(self):
+        return iter(parser.items(section))
+
     return SectionWrapper()
 
   def has_section(self,

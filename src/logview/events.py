@@ -26,7 +26,7 @@ import math
 from datetime import datetime, timedelta
 
 from logview.authentication.auth import require
-from logview.backends import backend
+from logview.backend import backend
 from logview.geoip import geoip
 from logview import templates
 

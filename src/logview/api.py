@@ -17,21 +17,20 @@ You should have received a copy of the GNU General Public License
 along with pyLogView.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from logview.config import Config
+import cherrypy
 
-from logview.backends.postgres.backend import PostgresBackend
+from logview.backend import backend
+
+from logview.authentication.auth import require
 
 
-def __init_backend():
-    backend = Config().logview['backend.type']
+class Api:
+  def __init__(self):
+    pass
 
-    if backend == 'postgres':
-        return PostgresBackend()
+  @cherrypy.tools.json_in()
+  @cherrypy.tools.json_out()
+  def query(self):
+    query = cherrypy.request.json
 
-    elif backend == 'elasticsearch':
-        raise NotImplementedError
-
-    else:
-        raise NotImplementedError
-
-backend = __init_backend()
+    return backend.query(query)

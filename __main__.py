@@ -28,6 +28,7 @@ from logview.help import Help
 from logview.overview import Overview
 from logview.events import Events
 from logview.tooltips import Tooltips
+from logview.api import Api
 
 
 if __name__ == '__main__':
@@ -39,22 +40,11 @@ if __name__ == '__main__':
 
   else:
     dispatcher.connect('overview1', '/', Overview(), action = 'index')
-    dispatcher.connect('overview2', '/overview/events_by_host', Overview(), action = "get_events_by_host")
-    dispatcher.connect('overview3', '/overview/top_hosts', Overview(), action = "get_top_hosts")
-    dispatcher.connect('overview4', '/overview/new_events', Overview(), action = "get_new_events")
-    dispatcher.connect('overview5', '/overview/severity_by_host', Overview(), action = "get_severity_by_host")
-    dispatcher.connect('overview6', '/overview/program_by_host', Overview(), action = "get_program_by_host")
-
     dispatcher.connect('events1', '/events', Events(), action = 'index')
-    dispatcher.connect('events2', '/events/update', Events(), action = 'update')
+    dispatcher.connect('event4', '/event/:event_id', Events(), action = 'details')
 
     dispatcher.connect('tooltips1', '/tooltips/event', Tooltips(), action = 'event')
     dispatcher.connect('tooltips2', '/tooltips/ip', Tooltips(), action = 'ip_address')
-
-    dispatcher.connect('event1', '/event/event_details', Events(), action = 'get_event_details')
-    dispatcher.connect('event2', '/event/similar_events', Events(), action = 'get_similar_events')
-    dispatcher.connect('event3', '/event/similar_events_history', Events(), action = 'get_similar_events_history')
-    dispatcher.connect('event4', '/event/:event_id', Events(), action = 'details')
 
     dispatcher.connect('help1', '/help/about', Help(), action = 'about')
     dispatcher.connect('help2', '/help/create_user', Help(), action = 'user_create')
@@ -62,6 +52,7 @@ if __name__ == '__main__':
     dispatcher.connect('auth1', '/auth/login', AuthController(), action = 'login')
     dispatcher.connect('auth2', '/auth/logout', AuthController(), action = 'logout')
 
+    dispatcher.connect('query', '/_api/query', Api(), action = 'query')
 
   config = {
     '/': {

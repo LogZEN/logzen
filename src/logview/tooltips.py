@@ -26,7 +26,7 @@ import string
 from datetime import datetime
 
 from logview.authentication.auth import require
-from logview.backends import backend
+from logview.backend import backend
 from logview.geoip import geoip
 from logview import templates
 from logview.config import Config

@@ -17,16 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pyLogView.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import cherrypy
-
-import humanize
-import socket
-import math
-
-from datetime import datetime, timedelta
-
 from logview.authentication.auth import require
-from logview.backend import backend
 from logview.geoip import geoip
 from logview import templates
 
@@ -43,16 +34,12 @@ class Events:
   # eventlist
   #=============================================================================
   @require()
-  def index(self,
-            host = None,
-            message = None,
-            start_time = None):
+  def index(self):
     template = templates.get_template('eventlist.html')
-    return template.render(pagename = "events",
-                           host = host,
-                           message = message,
-                           start_time = start_time)
+    return template.render(pagename = "events")
 
+
+'''
   @cherrypy.tools.json_out()
   @require()
   def update(self,
@@ -210,3 +197,4 @@ class Events:
     data['metadata'] = {"timerange": timerange}
 
     return data
+'''

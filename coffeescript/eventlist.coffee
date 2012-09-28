@@ -5,18 +5,28 @@ This file is part of pyLogView. It is licensed under the terms of the
 GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
+class EventModel
+    constructor: (data) ->
+      @id = data._id
+      @timegenerated = data._source.timegenerated
+      @timereported = data._source.timereported
+      @facility = data._source.facility
+      @facilityName = ko.computed () =>
+        Defaults.facility[@facility]
+      @severity = data._source.severity
+      @severityName = ko.computed () =>
+        Defaults.severity[@severity]
+      @detail_url = "/event/" + data._id
+      @host = data._source.hostname
+      @program = data._source.program
+      @message = data._source.message
 
-class Eventlist
+class EventListModel
   constructor: ->
-    timerange = []
-  
-  displayLoadingIcon: ->
-    $("#loading").show()
+    @events = ko.observableArray []
+    @loading = ko.observable false
     
-  hideLoadingIcon: ->
-    $("#loading").hide()
-  
-  # return the map of filters or all if nothing was selected
+  # return a map of filters or the match_all filter if nothing was selected
   getFilters: ->
     result = {}
     $('.filter').each (index, element) =>
@@ -32,7 +42,7 @@ class Eventlist
       "query": evlist.getFilters()
       "facets": 
         "range1" :
-          "range" :
+          "range":
             "field" : "timereported",
             "ranges" : [
               "from": 2012,
@@ -43,64 +53,18 @@ class Eventlist
             "field" : "timereported",
             "interval" : "day"
           
-    $.ajax({
-      url: $('#filterform').attr('action'),
-      type: 'POST',
-      contentType: "application/json",
-      data: JSON.stringify(es_query),
-      dataType: 'json',
-      success: evlist.handleResult,
-      beforeSend: evlist.displayLoadingIcon
-    })
-    
-  handleResult: (result) ->
-    evlist.hideLoadingIcon()
-    console.log(JSON.stringify(result))
-    
-    rows = ""
-    if result.hits.hits.length
-      for i in [0 .. result.hits.hits.length - 1]
-        object = result.hits.hits[_i];
-        console.log(object)
-        rows += '
-          <tr> 
-            <td class="column_menu">
-              <ul class="nav hover-nav" style="display:inline-block">
-                <li class="dropdown">
-                  <a class="dropdown-toggle" href="#"><i class="icon-chevron-down"></i></a>
-                  <ul class="dropdown-menu">
-                    <li><a href="/event/' + object['_id'] + '"><i class="icon-info-sign"></i> Display details</a></li>
-                    <li><a href="{{searchengine}}' + encodeURIComponent(object._source['message']) + '"><i class="icon-globe"></i> Search with {{searchengine_name}}</a></li>
-                  </ul>
-                </li>
-              </ul>
-              <i class="icon-eye-open event_tooltip" title="' + object['_id'] + '"></i>
-            </td>
-            <td colspan="2" class="event">' + object._source['timereported'] + '</td>
-            <td colspan="2" class="event">
-              <span class="badge color_' + object._source['severity'] + '" id="' + object._source['id'] + '">
-                <a href="javascript:void(0)" onclick="$(\'#filter_severity\').val($(this).html()); updateAction();">' + object._source['severity'] + '</a>
-              </span>
-            </td>
-            <td colspan="2" class="event">
-              <a href="javascript:void(0)" onclick="$(\'#filter_facility\').val($(this).html()); updateAction();">' + object._source['facility'] + '</a>
-            </td>
-            <td colspan="2" class="event">
-              <a href="javascript:void(0)" onclick="$(\'#filter_host\').val($(this).html()); updateAction();">' + object._source['fromhost'] + '</a>
-            </td>
-            <td colspan="2" class="event">
-              <a href="javascript:void(0)" onclick="$(\'#filter_program\').val($(this).html()); updateAction();"></a>
-            </td>
-            <td colspan="2">
-              <a href="javascript:void(0)" onclick="$(\'#filter_message\').val(\'' + object._source['message'] + '\'); updateAction();">' + addIpTooltipTags(object._source['message']) + '</a>
-            </td>
-          </tr>
-        '
-    else
-      rows = '<tr><td colspan="13" id="noresults">No events found</td></tr>'
+    $.ajax
+      url: $('#filterform').attr('action')
+      type: 'POST'
+      contentType: "application/json"
+      data: JSON.stringify(es_query)
+      dataType: 'json'
+      beforeSend: () => 
+        @loading true
+      success: (result) =>
+        @events (new EventModel event for event in result.hits.hits)
+        @loading false
 
-    $('tbody').empty().append(rows);
-    
   
   plotGraph: (data, tickrange) ->
     plot = $.plot($('#chartdiv'), [data], options = {
@@ -126,11 +90,10 @@ class Eventlist
       selection: { mode: "x" }
     });
 
-evlist = new Eventlist 
+evlist = new EventListModel
 evlist.plotGraph([[0,0], [0,0]], [])
 evlist.loadEvents()
 
-console.log (defaults.severity[0])
 
 # Actions
 
@@ -144,4 +107,6 @@ $(".clear-addon").each (index, element) =>
 
 $("#chartdiv").bind 'plotselected', (event) =>
   evlist.loadEvents()
-  
+
+
+ko.applyBindings(evlist);  

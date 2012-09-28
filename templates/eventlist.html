@@ -12,7 +12,7 @@
 
 {% block content %}
 
-<div id="loading"></div>
+<div id="loading" data-bind="visible: loading"></div>
 
 <div class="row-fluid">
   <div class="span12">
@@ -76,20 +76,50 @@
       </tr>
     </thead>
 
-    <tbody id="tbody_content">
-      <tr>
-        <td class="column_menu"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-      </tr>
+    <tbody>
+    <!-- ko foreach: events -->
+	  <tr>
+	    <td class="column_menu">
+	      <ul class="nav hover-nav" style="display:inline-block">
+	        <li class="dropdown">
+	        <a class="dropdown-toggle" href="#"><i class="icon-chevron-down"></i></a>
+	          <ul class="dropdown-menu">
+	            <li><a data-bind="attr: { href: detail_url}"><i class="icon-info-sign"></i> Display details</a></li>
+	            <li><a href="{{searchengine}}' + encodeURIComponent() + '"><i class="icon-globe"></i> Search with {{searchengine_name}}</a></li>
+	          </ul>
+	        </li>
+	      </ul>
+	      <i class="icon-eye-open event_tooltip" title="<%_id%>"></i>
+	    </td>
+	    
+	    <td colspan="2" class="event" data-bind="text: timereported"></td>
+	    <td colspan="2" class="event"><a data-bind="text: severityName, css: { 
+		    color_emerge: severity == 0,
+		    color_alert: severity == 1,
+		    color_critical: severity == 2,
+		    color_error: severity == 3,
+		    color_warning: severity == 4,
+		    color_notice: severity == 5,
+		    color_info: severity == 6,
+		    color_debug: severity == 7
+	    }" class="badge"></a></td>
+	    <td colspan="2" class="event"><a data-bind="text: facilityName"></a></td>
+        <td colspan="2" class="event"><a data-bind="text: host"></a></td>
+        <td colspan="2" class="event"><a data-bind="text: program"></a></td>
+	    <td colspan="2"><a data-bind="text: message"></a></td>
+	  </tr>
+	  <!-- /ko -->
+      <!--  ko ifnot: events().length -->
+        <tr><td colspan="13" id="noresults">No Events</td></tr>
+	  <!-- /ko -->
     </tbody>
+    
   </table>
   </form>
 </div>
+
+
+
 
 <script language="javascript" type="text/javascript" src="/static/js/eventlist.js"></script>
 

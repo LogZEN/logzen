@@ -9,25 +9,42 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
 
 (function() {
-  var Eventlist, evlist,
+  var EventListModel, EventModel, evlist,
     _this = this;
 
-  Eventlist = (function() {
+  EventModel = (function() {
 
-    function Eventlist() {
-      var timerange;
-      timerange = [];
+    function EventModel(data) {
+      var _this = this;
+      this.id = data._id;
+      this.timegenerated = data._source.timegenerated;
+      this.timereported = data._source.timereported;
+      this.facility = data._source.facility;
+      this.facilityName = ko.computed(function() {
+        return Defaults.facility[_this.facility];
+      });
+      this.severity = data._source.severity;
+      this.severityName = ko.computed(function() {
+        return Defaults.severity[_this.severity];
+      });
+      this.detail_url = "/event/" + data._id;
+      this.host = data._source.hostname;
+      this.program = data._source.program;
+      this.message = data._source.message;
     }
 
-    Eventlist.prototype.displayLoadingIcon = function() {
-      return $("#loading").show();
-    };
+    return EventModel;
 
-    Eventlist.prototype.hideLoadingIcon = function() {
-      return $("#loading").hide();
-    };
+  })();
 
-    Eventlist.prototype.getFilters = function() {
+  EventListModel = (function() {
+
+    function EventListModel() {
+      this.events = ko.observableArray([]);
+      this.loading = ko.observable(false);
+    }
+
+    EventListModel.prototype.getFilters = function() {
       var result,
         _this = this;
       result = {};
@@ -47,8 +64,9 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
       }
     };
 
-    Eventlist.prototype.loadEvents = function() {
-      var es_query;
+    EventListModel.prototype.loadEvents = function() {
+      var es_query,
+        _this = this;
       es_query = {
         "query": evlist.getFilters(),
         "facets": {
@@ -77,62 +95,27 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
         contentType: "application/json",
         data: JSON.stringify(es_query),
         dataType: 'json',
-        success: evlist.handleResult,
-        beforeSend: evlist.displayLoadingIcon
+        beforeSend: function() {
+          return _this.loading(true);
+        },
+        success: function(result) {
+          var event;
+          _this.events((function() {
+            var _i, _len, _ref, _results;
+            _ref = result.hits.hits;
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              event = _ref[_i];
+              _results.push(new EventModel(event));
+            }
+            return _results;
+          })());
+          return _this.loading(false);
+        }
       });
     };
 
-    Eventlist.prototype.handleResult = function(result) {
-      var i, object, rows, _i, _ref;
-      evlist.hideLoadingIcon();
-      console.log(JSON.stringify(result));
-      rows = "";
-      if (result.hits.hits.length) {
-        for (i = _i = 0, _ref = result.hits.hits.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-          object = result.hits.hits[_i];
-          console.log(object);
-          rows += '\
-          <tr> \
-            <td class="column_menu">\
-              <ul class="nav hover-nav" style="display:inline-block">\
-                <li class="dropdown">\
-                  <a class="dropdown-toggle" href="#"><i class="icon-chevron-down"></i></a>\
-                  <ul class="dropdown-menu">\
-                    <li><a href="/event/' + object['_id'] + '"><i class="icon-info-sign"></i> Display details</a></li>\
-                    <li><a href="{{searchengine}}' + encodeURIComponent(object._source['message']) + '"><i class="icon-globe"></i> Search with {{searchengine_name}}</a></li>\
-                  </ul>\
-                </li>\
-              </ul>\
-              <i class="icon-eye-open event_tooltip" title="' + object['_id'] + '"></i>\
-            </td>\
-            <td colspan="2" class="event">' + object._source['timereported'] + '</td>\
-            <td colspan="2" class="event">\
-              <span class="badge color_' + object._source['severity'] + '" id="' + object._source['id'] + '">\
-                <a href="javascript:void(0)" onclick="$(\'#filter_severity\').val($(this).html()); updateAction();">' + object._source['severity'] + '</a>\
-              </span>\
-            </td>\
-            <td colspan="2" class="event">\
-              <a href="javascript:void(0)" onclick="$(\'#filter_facility\').val($(this).html()); updateAction();">' + object._source['facility'] + '</a>\
-            </td>\
-            <td colspan="2" class="event">\
-              <a href="javascript:void(0)" onclick="$(\'#filter_host\').val($(this).html()); updateAction();">' + object._source['fromhost'] + '</a>\
-            </td>\
-            <td colspan="2" class="event">\
-              <a href="javascript:void(0)" onclick="$(\'#filter_program\').val($(this).html()); updateAction();"></a>\
-            </td>\
-            <td colspan="2">\
-              <a href="javascript:void(0)" onclick="$(\'#filter_message\').val(\'' + object._source['message'] + '\'); updateAction();">' + addIpTooltipTags(object._source['message']) + '</a>\
-            </td>\
-          </tr>\
-        ';
-        }
-      } else {
-        rows = '<tr><td colspan="13" id="noresults">No events found</td></tr>';
-      }
-      return $('tbody').empty().append(rows);
-    };
-
-    Eventlist.prototype.plotGraph = function(data, tickrange) {
+    EventListModel.prototype.plotGraph = function(data, tickrange) {
       var options, plot;
       return plot = $.plot($('#chartdiv'), [data], options = {
         xaxis: {
@@ -162,17 +145,15 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
       });
     };
 
-    return Eventlist;
+    return EventListModel;
 
   })();
 
-  evlist = new Eventlist;
+  evlist = new EventListModel;
 
   evlist.plotGraph([[0, 0], [0, 0]], []);
 
   evlist.loadEvents();
-
-  console.log(defaults.severity[0]);
 
   $('#filterform').bind('keyup', function(event) {
     return evlist.loadEvents();
@@ -188,5 +169,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
   $("#chartdiv").bind('plotselected', function(event) {
     return evlist.loadEvents();
   });
+
+  ko.applyBindings(evlist);
 
 }).call(this);

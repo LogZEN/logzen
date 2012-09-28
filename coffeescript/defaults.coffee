@@ -5,9 +5,9 @@
  * GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-class Defaults
+class @Defaults
   # syslog severity names
-  severity = [
+  @severity: [
     "Emerge",
     "Alert",
     "Critical",
@@ -19,7 +19,7 @@ class Defaults
   ]
   
   # syslog facility names
-  facility = [
+  @facility: [
     "kern",
     "user",
     "mail",
@@ -49,7 +49,3 @@ class Defaults
   # Colors
   
   # Graphs
-
-
-defaults = new Defaults
-console.log(defaults.severity[0])

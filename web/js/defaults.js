@@ -9,23 +9,17 @@
 
 
 (function() {
-  var Defaults, defaults;
 
-  Defaults = (function() {
-    var facility, severity;
+  this.Defaults = (function() {
 
     function Defaults() {}
 
-    severity = ["Emerge", "Alert", "Critical", "Error", "Warning", "Notice", "Info", "Debug"];
+    Defaults.severity = ["Emerge", "Alert", "Critical", "Error", "Warning", "Notice", "Info", "Debug"];
 
-    facility = ["kern", "user", "mail", "daemons", "auth", "syslog", "lpr", "news", "uucp", "cron", "security", "ftp", "ntp", "logaudit", "logalert", "clock", "local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7"];
+    Defaults.facility = ["kern", "user", "mail", "daemons", "auth", "syslog", "lpr", "news", "uucp", "cron", "security", "ftp", "ntp", "logaudit", "logalert", "clock", "local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7"];
 
     return Defaults;
 
   })();
-
-  defaults = new Defaults;
-
-  console.log(defaults.severity[0]);
 
 }).call(this);

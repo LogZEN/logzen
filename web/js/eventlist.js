@@ -15,21 +15,14 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
   EventModel = (function() {
 
     function EventModel(data) {
-      var _this = this;
       this.id = data._id;
       this.timegenerated = data._source.timegenerated;
       this.timereported = data._source.timereported;
       this.facility = data._source.facility;
-      this.facilityName = ko.computed(function() {
-        return Defaults.facility[_this.facility];
-      });
       this.severity = data._source.severity;
-      this.severityName = ko.computed(function() {
-        return Defaults.severity[_this.severity];
-      });
       this.detail_url = "/event/" + data._id;
       this.host = data._source.hostname;
-      this.program = data._source.program;
+      this.tag = data._source.tag;
       this.message = data._source.message;
     }
 
@@ -84,7 +77,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
           "histo1": {
             "date_histogram": {
               "field": "timereported",
-              "interval": "day"
+              "interval": "2h"
             }
           }
         }
@@ -110,39 +103,28 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
             }
             return _results;
           })());
+          evlist.timeSeries(result.facets.histo1.entries);
           return _this.loading(false);
         }
       });
     };
 
-    EventListModel.prototype.plotGraph = function(data, tickrange) {
-      var options, plot;
-      return plot = $.plot($('#chartdiv'), [data], options = {
-        xaxis: {
-          ticks: tickrange
-        },
-        bars: {
-          show: true,
-          lineWidth: 1,
-          fill: true,
-          fillColor: {
-            colors: ["#729fcf", "#3465af"]
-          }
-        },
-        grid: {
-          hoverable: true,
-          autoHighlight: true
-        },
-        tooltip: true,
-        tooltipOpts: {
-          content: "%y",
-          defaultTheme: false
-        },
-        colors: ["#204a87"],
-        selection: {
-          mode: "x"
-        }
+    EventListModel.prototype.timeSeries = function(data) {
+      var chart;
+      chart = nv.models.multiBarChart().x(function(d) {
+        return d.time;
+      }).y(function(d) {
+        return d.count;
       });
+      chart.xAxis.tickFormat(d3.format(',f')).rotateLabels(-45);
+      chart.yAxis.tickFormat(d3.format(',.1f'));
+      d3.select('#timeSeries svg').datum([
+        {
+          "key": "events",
+          "values": data
+        }
+      ]).transition().duration(200).call(chart);
+      return nv.utils.windowResize(chart.update);
     };
 
     return EventListModel;
@@ -150,8 +132,6 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
   })();
 
   evlist = new EventListModel;
-
-  evlist.plotGraph([[0, 0], [0, 0]], []);
 
   evlist.loadEvents();
 

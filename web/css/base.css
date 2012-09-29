@@ -216,12 +216,12 @@ th.clear-col {
   vertical-align: top;
 }
 #column_time,
-#filter_time {
+#filter_timereported {
 	margin-right: 0px;
-	width: 100px;
+	width: 120px;
 }
 #column_host,
-#filter_host {
+#filter_fromhost {
     margin-right: 0px;
     width: 110px;
 }
@@ -267,6 +267,19 @@ span#eventcount {
   padding-right:           12px;
   vertical-align:          middle;
 }
+
+
+
+
+/*
+ * d3
+ */
+.chart rect {
+  fill: steelblue;
+  stroke: white;
+}
+
+
 
 /*
  * eventlist chart

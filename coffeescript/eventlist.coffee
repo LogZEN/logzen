@@ -11,14 +11,10 @@ class EventModel
       @timegenerated = data._source.timegenerated
       @timereported = data._source.timereported
       @facility = data._source.facility
-      @facilityName = ko.computed () =>
-        Defaults.facility[@facility]
       @severity = data._source.severity
-      @severityName = ko.computed () =>
-        Defaults.severity[@severity]
       @detail_url = "/event/" + data._id
       @host = data._source.hostname
-      @program = data._source.program
+      @tag = data._source.tag
       @message = data._source.message
 
 class EventListModel
@@ -51,8 +47,7 @@ class EventListModel
         "histo1" :
           "date_histogram" :
             "field" : "timereported",
-            "interval" : "day"
-          
+            "interval" : "2h"
     $.ajax
       url: $('#filterform').attr('action')
       type: 'POST'
@@ -63,35 +58,29 @@ class EventListModel
         @loading true
       success: (result) =>
         @events (new EventModel event for event in result.hits.hits)
+        evlist.timeSeries result.facets.histo1.entries
         @loading false
+        
+  timeSeries: (data) ->
+    chart = nv.models.multiBarChart()
+      .x((d) -> d.time)
+      .y((d) -> d.count)
+      
+    chart.xAxis
+      .tickFormat(d3.format(',f'))
+      .rotateLabels(-45)
+    chart.yAxis
+      .tickFormat(d3.format(',.1f'))
+    
+    d3.select('#timeSeries svg')
+      .datum([{"key": "events", "values": data}])
+      .transition().duration(200).call(chart)
 
-  
-  plotGraph: (data, tickrange) ->
-    plot = $.plot($('#chartdiv'), [data], options = {
-      xaxis: {
-        ticks: tickrange,
-      },
-      bars: {
-        show: true,
-        lineWidth: 1,
-        fill: true,
-        fillColor: { colors: ["#729fcf", "#3465af"] }
-      },
-      grid: { 
-        hoverable: true, 
-        autoHighlight: true 
-      },
-      tooltip: true,
-      tooltipOpts: {
-        content: "%y",
-        defaultTheme:  false
-      },
-      colors: ["#204a87"],
-      selection: { mode: "x" }
-    });
+    nv.utils.windowResize(chart.update)
+    
+
 
 evlist = new EventListModel
-evlist.plotGraph([[0,0], [0,0]], [])
 evlist.loadEvents()
 
 

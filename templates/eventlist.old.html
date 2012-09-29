@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% if searchengine == "google" %}
+  {% set searchengine = "https://www.google.com/search?q=" %}
+  {% set searchengine_name = "Google" %}
+{% else %}
+  {% set searchengine = "https://ixquick.com/do/search?q=" %}
+  {% set searchengine_name = "ixquick" %}
+{% endif %}
+
+{% block title %}Events{% endblock %}
+
+{% block content %}
+
+<div id="loading"></div>
+
+<div class="row-fluid">
+  <div class="span12">
+  	<div id="navi" class="btn-toolbar">
+    	<span id="eventcount"></span>
+    	<div class="btn-group">
+    		<a href="javascript:void(0);" class="btn q_tip" id="zoomoutbutton" title="Zoom out to a wider timerange">Zoom Out</a>
+    	</div>
+    	<div class="btn-group">
+    		<a class="btn left q_tip" title="Newer" href="javascript:void(0);" id="prevbutton">Prev</a><a class="btn right q_tip" title="Older" href="javascript:void(0);" id="nextbutton">Next</a>
+    	</div>
+    </div>
+  </div>
+</div>
+
+<div class="row-fluid">
+ 	<div class="span12">
+	  <div id="chartdiv" style="height: 120px; width: 98%;"></div>
+ 	</div>
+</div>
+
+<div class="row-fluid">
+  <form action="/_api/query" method="post" id="filterform" class="form-inline">
+  <table id="events" class="table-condensed">
+    <thead>
+      <tr id="first">
+        <th class="column_menu"></th>
+        <th colspan="2">Time</th>
+        <th colspan="2">Severity</th>
+        <th colspan="2">Facility</th>
+        <th colspan="2">Host</th>
+        <th colspan="2">Program</th>
+        <th colspan="2">Message</th>
+      </tr>
+      <tr>
+        <th class="column_menu"></th>
+        <th class="input-col" id="column_time">
+          <input type="text" name="timereported" id="filter_timereported" placeholder="filter" readonly="readonly" size="5" />
+        </th>
+        <th class="clear-col"><span class="q_tip clear-addon btn" id="time" title="Clear this filter">x</span></th>
+        <th class="input-col" id="column_severity">
+          <input type="text" name="severity" id="filter_severity" class="filter" placeholder="filter" size="5" />
+        </th>
+        <th class="clear-col"><span class="q_tip clear-addon btn" id="severity" title="Clear this filter">x</span></th>
+        <th class="input-col" id="column_facility">
+          <input type="text" name="facility" id="filter_facility" class="filter" placeholder="filter" size="5" />
+        </th>
+        <th class="clear-col"><span class="q_tip clear-addon btn" id="facility" title="Clear this filter">x</span></th>
+        <th class="input-col" id="column_host">
+          <input type="text" name="fromhost" id="filter_fromhost" class="filter" placeholder="filter" size="5" {% if host %}value="{{host}}"{% endif %} />
+        </th>
+        <th class="clear-col"><span class="q_tip clear-addon btn" id="fromhost" title="Clear this filter">x</span></th>
+        <th class="input-col" id="column_program">
+          <input type="text" name="program" id="filter_program" class="filter" placeholder="filter" size="5" />
+        </th>
+        <th class="clear-col"><span class="q_tip clear-addon btn" id="program" title="Clear this filter">x</span></th>
+        <th class="input-col" id="column_message">
+          <input type="text" name="message" id="filter_message" class="filter" placeholder="filter" size="5" {% if message %}value="{{message}}"{% endif %} />
+        </th>
+        <th class="clear-col"><span class="q_tip clear-addon btn" id="message" title="Clear this filter">x</span></th>
+      </tr>
+    </thead>
+
+    <tbody id="tbody_content">
+      <tr>
+        <td class="column_menu"></td>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+      </tr>
+    </tbody>
+  </table>
+  </form>
+</div>
+
+<script type="text/javascript">//<![CDATA[
+  var zoomlevel = null;
+  var page = 0;
+  var maxpages = 1;
+  var plot = null;
+  //var timerange = [];
+  var prevrange = new Array(1);
+  for (var i = 0; i < 6; i++) {
+	  prevrange[i] = new Array(2);
+  }
+
+  /*
+  $(".clear-addon").each(function() {
+  	$(this).click(function() {
+  	  $("#filter_" + $(this).attr("id")).val("");
+  	  updateAction();
+  	});
+  });
+	*/
+	
+  /*
+	 * set the tooltip for each result row
+	 */
+	function loadTooltips() {
+	 	$(".event_tooltip").each(function() {
+	 		$(this).qtip({
+	 			content: {
+	 				text: 'Loading...',
+	 				ajax: {
+	 					url: '/tooltips/event',
+	 					type: 'GET',
+	 					data: { event_id: this.title },
+	 					success: function(data, status) {
+	 						this.set('content.text', data);
+	 					}
+	 				}
+	 			},
+	 			position: {
+	 				my: 'top left',
+	 				at: 'bottom right'
+	 			},
+	 			hide: {
+	 		        fixed: true,
+	 				delay: 200
+	 			},
+	 			style: {
+	 				classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
+	 			}
+	 		});
+	 	});
+	 	loadIpTooltips();
+	 	add_qtips();
+	}
+ 
+  /*
+	 * trigger search for events and update eventlist contents
+	 */
+	function updateAction(event, ranges) {
+		var $form = $('#filterform');
+    var params = {};
+/* 
+    params['host'] = $form.find('input[name="filter_host"]').val();
+    params['facility'] = $form.find('input[name="filter_facility"]').val();
+    params['severity'] = $form.find('input[name="filter_severity"]').val();
+    params['tag'] = $form.find('input[name="filter_tag"]').val();
+    params['program'] = $form.find('input[name="filter_program"]').val();
+    params['message'] = $form.find('input[name="filter_message"]').val();
+ */
+
+   if(ranges) {
+      prevrange[zoomlevel]['start_time'] = timerange['start_time']
+      prevrange[zoomlevel]['end_time'] = timerange['end_time']
+      timerange['start_time'] = tick[Math.floor(ranges.xaxis.from)][1];
+      timerange['end_time'] = tick[Math.ceil(ranges.xaxis.to)][1];
+    }
+    params['start_time'] = timerange['start_time'];
+    params['end_time'] = timerange['end_time'];
+    
+    /*
+    terms = {}
+    terms.push({'start_time': timerange['start_time']});
+    
+    q['query']['term'].push({'start_time': timerange['start_time']});
+    q['query']['term']['end_time'] = timerange['end_time'];
+    
+
+
+    */
+    
+    /*
+    q = {
+    	"query": function() {
+	    	        var result = {}
+	    	        $('.filter').each(function() {
+	    	            var name = $(this).attr('name');
+	    	            if($(this).val() != "") {
+	    	                result[name] = $(this).val();
+	    	            }
+	    	        });
+	    	        if (result == {}) {
+	    	            return {"match_all":{}};
+	    	        } else {
+	    	        	return {"term": result};
+	    	        }
+    	    
+    	}
+    }
+    console.log (JSON.stringify(q));
+    */
+    /*
+    $.ajax({
+      url: $('#filterform').attr('action'),
+      type: 'POST',
+      contentType: "application/json",
+      data: JSON.stringify(q),
+      dataType: 'json',
+      success: handleResult,
+      beforeSend: function(){
+    	  $("#loading").show();
+      }
+    });
+    */
+    function handleResult(s) {
+    	/*
+      $("#loading").hide();
+      */
+    	
+      // set current page
+      //page = s.metadata['page'];
+      //maxpages = s.metadata['maxpages'];
+        	
+      // update eventcount
+      if (s.hits['total'] < 10000) {
+      	var event_count_label = s.hits['total']
+      } else {
+      	var event_count_label = '<span class="q_tip" title="' + 
+      		s.hits['total'] + ' events">quite a few</span>'
+      }
+      //$('#eventcount').empty().append(s.metadata['event_first'] + " - " + 
+      //		s.metadata['event_last'] + " of " + event_count_label)
+      
+      // enable or disable navigation buttons
+      if (page > 0) {
+      	$('#prevbutton').removeAttr("disabled");
+      } else {
+      	$('#prevbutton').attr("disabled", "disabled");
+      }
+      if (page + 1 < maxpages) {
+      	$('#nextbutton').removeAttr("disabled");
+      } else {
+      	$('#nextbutton').attr("disabled", "disabled");
+      }
+        	
+			// update events
+			/*
+			var rows = ""
+			if (s.hits.hits.length > 0) {
+				for (var i = 0; i < s.hits.hits.length; i++) {
+					var object = s.hits.hits[i];
+					rows += '\
+					  <tr> \
+					    <td class="column_menu"> \
+					      <ul class="nav hover-nav" style="display:inline-block"> \
+					        <li class="dropdown"> \
+			              <a class="dropdown-toggle" href="#"><i class="icon-chevron-down"></i></a> \
+			              <ul class="dropdown-menu"> \
+		                  <li><a href="/event/' + object['_id'] + '"><i class="icon-info-sign"></i> Display details</a></li> \
+		                  <li><a href="{{searchengine}}' + encodeURIComponent(object._source['message']) + '"><i class="icon-globe"></i> Search with {{searchengine_name}}</a></li> \
+		                </ul> \
+		              </li> \
+		            </ul> \
+		            <i class="icon-eye-open event_tooltip" title="' + object['_id'] + '"></i> \
+		          </td> \
+					    <td colspan="2" class="event">' + object._source['timereported'] + '</td> \
+					    <td colspan="2" class="event"> \
+					      <span class="badge color_' + object._source['severity'] + '" id="' + object._source['id'] + '"> \
+					        <a href="javascript:void(0)" onclick="$(\'#filter_severity\').val($(this).html()); updateAction();">' + object._source['severity'] + '</a> \
+					      </span> \
+					    </td> \
+			        <td colspan="2" class="event"> \
+			          <a href="javascript:void(0)" onclick="$(\'#filter_facility\').val($(this).html()); updateAction();">' + object._source['facility'] + '</a> \
+			        </td> \
+			        <td colspan="2" class="event"> \
+			          <a href="javascript:void(0)" onclick="$(\'#filter_host\').val($(this).html()); updateAction();">' + object._source['fromhost'] + '</a> \
+			        </td> \
+		          <td colspan="2" class="event"> \
+		            <a href="javascript:void(0)" onclick="$(\'#filter_program\').val($(this).html()); updateAction();"></a> \
+		          </td> \
+					    <td colspan="2"> \
+					      <a href="javascript:void(0)" onclick="$(\'#filter_message\').val(\'' + object._source['message'] + '\'); updateAction();">' + addIpTooltipTags(object._source['message']) + '</a> \
+					    </td> \
+					  </tr>';
+				}
+      } else {
+      	rows = '<tr><td colspan="13" id="noresults">No events found</td></tr>'
+      }
+      $('tbody').empty().append(rows);
+      $('html, body').animate({scrollTop:0}, 'fast');
+      */
+      
+      // update tooltips
+      loadTooltips();
+
+      // update graph
+      //zoomlevel = s.metadata['zoom']
+      if (zoomlevel > 1) {
+      	$('#zoomoutbutton').removeAttr("disabled");
+      } else {
+      	$('#zoomoutbutton').attr("disabled", "disabled");
+      }
+
+      if (zoomlevel < 3) {
+        tickend = 10;
+      } else if (zoomlevel < 5) {
+        tickend = 16;
+      } else {
+        tickend = 19;
+      }
+	    
+      data = []
+      tick = []
+      tickrange = []
+	    	
+	    if (s.eventcount.length > 0) {
+				for (var i = 0; i < s.eventcount.length; i++) {
+					var object = s.eventcount[i];
+	    			data.push([i, parseInt(object['count'])]);
+	    			tick.push([i, object['time']]);
+				}
+	    }
+      tick.push([i, s.metadata['maxtime']])
+      tickrange.push([tick[0][0], $.trim(tick[0][1]).substring(0, tickend)]);
+      tickrange.push([tick[Math.round((tick.length - 1) / 2)][0], $.trim(tick[Math.round((tick.length - 1) / 2)][1]).substring(0, tickend)]);
+      tickrange.push([tick[tick.length - 1][0], $.trim(tick[tick.length - 1][1]).substring(0, tickend)]);
+
+      /*
+      plot = $.plot($('#chartdiv'), [data], options = {
+      	xaxis: {
+      		ticks: tickrange,
+      	},
+      	bars: {
+      		show: true,
+      		lineWidth: 1,
+      		fill: true,
+      		fillColor: { colors: ["#729fcf", "#3465af"] }
+      	},
+      	grid: { 
+      		hoverable: true, 
+      		autoHighlight: true 
+      	},
+      	tooltip: true,
+      	tooltipOpts: {
+      		content: "%y",
+      		defaultTheme:  false
+      	},
+      	colors: ["#204a87"],
+      	selection: { mode: "x" }
+      });
+      */
+		}
+	}
+
+	/*
+	 * add events and actions
+	 *
+	 
+  $('#filterform').bind('keyup', function() {
+  	updateAction();
+  });
+*/
+
+  $('#zoomoutbutton').click(function (e) {
+    e.preventDefault();
+  	if (zoomlevel > 0) {
+    	timerange['start_time'] = prevrange[zoomlevel - 1]['start_time']
+    	timerange['end_time'] = prevrange[zoomlevel - 1]['end_time']
+    }
+    updateAction();
+  });
+
+  $('#prevbutton').click(function() {
+  	if(page > 0) {
+  		var action = '/events/update?page=' + (page - 1)
+  		$('#filterform').get(0).setAttribute('action', action);
+  		updateAction();
+  	}
+  });
+
+	$('#nextbutton').click(function() {
+		if(page + 1 < maxpages) {
+			var action = '/events/update?page=' + (page + 1)
+			$('#filterform').get(0).setAttribute('action', action);
+			updateAction();
+		}
+	});
+	
+	/*
+	$("#chartdiv").bind("plotselected", updateAction);
+	*/
+	
+	/*
+	 *	fire the initial event
+	 */
+	 /*
+	$.plot($('#chartdiv'), [[[0,0], [0,0]]], {
+		bars: {
+      show: true,
+      lineWidth: 1,
+      fill: true,
+      fillColor: { colors: ["#729fcf", "#3465af"] }
+		},
+		colors: ["#204a87"],
+		selection: { mode: "x" }
+	});
+
+	updateAction(); 
+  */
+//]]></script>
+
+{% endblock %}

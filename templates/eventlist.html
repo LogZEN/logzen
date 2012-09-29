@@ -30,7 +30,7 @@
 
 <div class="row-fluid">
  	<div class="span12">
-	  <div id="chartdiv" style="height: 120px; width: 98%;"></div>
+	  <div id="timeSeries" style="width: 100%;"><svg></svg></div>
  	</div>
 </div>
 
@@ -78,39 +78,40 @@
 
     <tbody>
     <!-- ko foreach: events -->
-	  <tr>
-	    <td class="column_menu">
-	      <ul class="nav hover-nav" style="display:inline-block">
-	        <li class="dropdown">
-	        <a class="dropdown-toggle" href="#"><i class="icon-chevron-down"></i></a>
-	          <ul class="dropdown-menu">
-	            <li><a data-bind="attr: { href: detail_url}"><i class="icon-info-sign"></i> Display details</a></li>
-	            <li><a href="{{searchengine}}' + encodeURIComponent() + '"><i class="icon-globe"></i> Search with {{searchengine_name}}</a></li>
-	          </ul>
-	        </li>
-	      </ul>
-	      <i class="icon-eye-open event_tooltip" title="<%_id%>"></i>
-	    </td>
-	    
-	    <td colspan="2" class="event" data-bind="text: timereported"></td>
-	    <td colspan="2" class="event"><a data-bind="text: severityName, css: { 
-		    color_emerge: severity == 0,
-		    color_alert: severity == 1,
-		    color_critical: severity == 2,
-		    color_error: severity == 3,
-		    color_warning: severity == 4,
-		    color_notice: severity == 5,
-		    color_info: severity == 6,
-		    color_debug: severity == 7
-	    }" class="badge"></a></td>
-	    <td colspan="2" class="event"><a data-bind="text: facilityName"></a></td>
-        <td colspan="2" class="event"><a data-bind="text: host"></a></td>
-        <td colspan="2" class="event"><a data-bind="text: program"></a></td>
-	    <td colspan="2"><a data-bind="text: message"></a></td>
-	  </tr>
+  	  <tr>
+  	    <td class="column_menu">
+  	      <ul class="nav hover-nav" style="display:inline-block">
+  	        <li class="dropdown">
+  	        <a class="dropdown-toggle" href="#"><i class="icon-chevron-down"></i></a>
+  	          <ul class="dropdown-menu">
+  	            <li><a data-bind="attr: { href: detail_url}"><i class="icon-info-sign"></i> Display details</a></li>
+  	            <li><a href="{{searchengine}}' + encodeURIComponent() + '"><i class="icon-globe"></i> Search with {{searchengine_name}}</a></li>
+  	          </ul>
+  	        </li>
+  	      </ul>
+  	      <i class="icon-eye-open event_tooltip" title="<%_id%>"></i>
+  	    </td>
+  	    
+  	    <td colspan="2" class="event" data-bind="text: timereported"></td>
+  	    <td colspan="2" class="event"><a data-bind="text: severity, css: {
+  		    color_emerge: severity == 'emerge',
+  		    color_alert: severity == 'alert',
+  		    color_critical: severity == 'crit',
+  		    color_error: severity == 'err',
+  		    color_warning: severity == 'warning',
+  		    color_notice: severity == 'notice',
+  		    color_info: severity == 'info',
+  		    color_debug: severity == 'debug'
+  	    }" class="badge"></a></td>
+  	    <td colspan="2" class="event"><a data-bind="text: facility"></a></td>
+          <td colspan="2" class="event"><a data-bind="text: host"></a></td>
+          <td colspan="2" class="event"><a data-bind="text: tag"></a></td>
+  	    <td colspan="2"><a data-bind="text: message"></a></td>
+  	  </tr>
 	  <!-- /ko -->
-      <!--  ko ifnot: events().length -->
-        <tr><td colspan="13" id="noresults">No Events</td></tr>
+    
+    <!--  ko ifnot: events().length -->
+      <tr><td colspan="13" id="noresults">No Events</td></tr>
 	  <!-- /ko -->
     </tbody>
     
@@ -119,9 +120,7 @@
 </div>
 
 
-
-
-<script language="javascript" type="text/javascript" src="/static/js/eventlist.js"></script>
+<script type="text/javascript" src="/static/js/eventlist.js"></script>
 
 
 {% endblock %}

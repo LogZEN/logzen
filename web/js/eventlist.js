@@ -52,7 +52,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
         };
       } else {
         return {
-          "term": result
+          "prefix": result
         };
       }
     };
@@ -77,9 +77,12 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
           "histo1": {
             "date_histogram": {
               "field": "timereported",
-              "interval": "2h"
+              "interval": "3h"
             }
-          }
+          },
+          "from": 0,
+          "size": 50,
+          "sort": []
         }
       };
       return $.ajax({
@@ -116,7 +119,9 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
       }).y(function(d) {
         return d.count;
       });
-      chart.xAxis.tickFormat(d3.format(',f')).rotateLabels(-45);
+      chart.xAxis.tickFormat(function(d) {
+        return d3.time.format('%x')(new Date(d));
+      }).rotateLabels(-45);
       chart.yAxis.tickFormat(d3.format(',.1f'));
       d3.select('#timeSeries svg').datum([
         {

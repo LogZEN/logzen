@@ -54,11 +54,11 @@
         </th>
         <th class="clear-col"><span class="q_tip clear-addon btn" id="time" title="Clear this filter">x</span></th>
         <th class="input-col" id="column_severity">
-          <input type="text" name="severity" id="filter_severity" class="filter" placeholder="filter" size="5" />
+          <input type="text" name="severity" id="filter_severity" class="filter" placeholder="filter" size="5" data-bind="value: filterSeverity" data-provide="typeahead" data-items="4" data-source='["emerge","alert","critical","error","warning","notice","info","debug"]' />
         </th>
         <th class="clear-col"><span class="q_tip clear-addon btn" id="severity" title="Clear this filter">x</span></th>
         <th class="input-col" id="column_facility">
-          <input type="text" name="facility" id="filter_facility" class="filter" placeholder="filter" size="5" />
+          <input type="text" name="facility" id="filter_facility" class="filter" placeholder="filter" size="5" data-bind="value: filterFacility" />
         </th>
         <th class="clear-col"><span class="q_tip clear-addon btn" id="facility" title="Clear this filter">x</span></th>
         <th class="input-col" id="column_host">
@@ -93,7 +93,7 @@
   	    </td>
   	    
   	    <td colspan="2" class="event" data-bind="text: timereported"></td>
-  	    <td colspan="2" class="event"><a data-bind="text: severity, css: {
+  	    <td colspan="2" class="event"><a data-bind="text: severity, click: $root.setSeverityText, css: {
   		    color_emerge: severity == 'emerge',
   		    color_alert: severity == 'alert',
   		    color_critical: severity == 'crit',
@@ -103,7 +103,7 @@
   		    color_info: severity == 'info',
   		    color_debug: severity == 'debug'
   	    }" class="badge"></a></td>
-  	    <td colspan="2" class="event"><a data-bind="text: facility"></a></td>
+  	    <td colspan="2" class="event"><a data-bind="text: facility, click: $root.setFacilityText"></a></td>
           <td colspan="2" class="event"><a data-bind="text: host"></a></td>
           <td colspan="2" class="event"><a data-bind="text: tag"></a></td>
   	    <td colspan="2"><a data-bind="text: message"></a></td>

@@ -8,14 +8,14 @@
 class @Defaults
   # syslog severity names
   @severity: [
-    "Emerge",
-    "Alert",
-    "Critical",
-    "Error",
-    "Warning",
-    "Notice",
-    "Info",
-    "Debug"
+    "emerge",
+    "alert",
+    "critical",
+    "error",
+    "warning",
+    "notice",
+    "info",
+    "debug"
   ]
   
   # syslog facility names

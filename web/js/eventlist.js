@@ -10,6 +10,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
 (function() {
   var EventListModel, EventModel, evlist,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     _this = this;
 
   EventModel = (function() {
@@ -33,9 +34,24 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
   EventListModel = (function() {
 
     function EventListModel() {
+      this.setFacilityText = __bind(this.setFacilityText, this);
+
+      this.setSeverityText = __bind(this.setSeverityText, this);
       this.events = ko.observableArray([]);
       this.loading = ko.observable(false);
+      this.filterSeverity = ko.observable(null);
+      this.filterFacility = ko.observable(null);
     }
+
+    EventListModel.prototype.setSeverityText = function(el) {
+      this.filterSeverity(Defaults.severity[el.severity]);
+      return evlist.loadEvents();
+    };
+
+    EventListModel.prototype.setFacilityText = function(el) {
+      this.filterFacility(Defaults.facility[el.facility]);
+      return evlist.loadEvents();
+    };
 
     EventListModel.prototype.getFilters = function() {
       var result,
@@ -79,11 +95,11 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
               "field": "timereported",
               "interval": "3h"
             }
-          },
-          "from": 0,
-          "size": 50,
-          "sort": []
-        }
+          }
+        },
+        "from": 0,
+        "size": 50,
+        "sort": []
       };
       return $.ajax({
         url: $('#filterform').attr('action'),
@@ -114,7 +130,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
     EventListModel.prototype.timeSeries = function(data) {
       var chart;
-      chart = nv.models.multiBarChart().x(function(d) {
+      chart = nv.models.multiBarTimeSeriesChart().x(function(d) {
         return d.time;
       }).y(function(d) {
         return d.count;
@@ -122,23 +138,22 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
       chart.xAxis.tickFormat(function(d) {
         return d3.time.format('%x')(new Date(d));
       }).rotateLabels(-45);
-      chart.yAxis.tickFormat(d3.format(',.1f'));
+      chart.yAxis.tickFormat(d3.format(',.0f'));
+      chart.tooltip = function(key, x, y, e, graph) {
+        return "<h3>" + key + "</h3><p>" + y + " during " + x + "</p>";
+      };
       d3.select('#timeSeries svg').datum([
         {
           "key": "events",
           "values": data
         }
-      ]).transition().duration(200).call(chart);
+      ]).transition().duration(100).call(chart);
       return nv.utils.windowResize(chart.update);
     };
 
     return EventListModel;
 
   })();
-
-  evlist = new EventListModel;
-
-  evlist.loadEvents();
 
   $('#filterform').bind('keyup', function(event) {
     return evlist.loadEvents();
@@ -154,6 +169,10 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
   $("#chartdiv").bind('plotselected', function(event) {
     return evlist.loadEvents();
   });
+
+  evlist = new EventListModel;
+
+  evlist.loadEvents();
 
   ko.applyBindings(evlist);
 

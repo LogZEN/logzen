@@ -14,7 +14,7 @@
 
     function Defaults() {}
 
-    Defaults.severity = ["Emerge", "Alert", "Critical", "Error", "Warning", "Notice", "Info", "Debug"];
+    Defaults.severity = ["emerge", "alert", "critical", "error", "warning", "notice", "info", "debug"];
 
     Defaults.facility = ["kern", "user", "mail", "daemons", "auth", "syslog", "lpr", "news", "uucp", "cron", "security", "ftp", "ntp", "logaudit", "logalert", "clock", "local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7"];
 

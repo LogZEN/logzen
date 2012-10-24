@@ -34,4 +34,10 @@ class ElasticSearchBackend:
                                             indices = Config().es['index'],
                                             doc_types = Config().es['type'])
 
+    def get(self,
+            id):
+        return self.__connection.get(id = id,
+                                     index = Config().es['index'],
+                                     doc_type = Config().es['type'],)
+
 backend = ElasticSearchBackend()

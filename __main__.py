@@ -52,7 +52,8 @@ if __name__ == '__main__':
     dispatcher.connect('auth1', '/auth/login', AuthController(), action = 'login')
     dispatcher.connect('auth2', '/auth/logout', AuthController(), action = 'logout')
 
-    dispatcher.connect('query', '/_api/query', Api(), action = 'query')
+    dispatcher.connect('api_query', '/_api/query', Api(), action = 'query')
+    dispatcher.connect('api_get', '/_api/get', Api(), action = 'get')
 
   config = {
     '/': {

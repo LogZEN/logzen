@@ -25,6 +25,10 @@ from logview.authentication.auth import require
 
 
 class Api:
+  _cp_config = {
+    'tools.auth.on': True
+  }
+
   def __init__(self):
     pass
 
@@ -32,5 +36,9 @@ class Api:
   @cherrypy.tools.json_out()
   def query(self):
     query = cherrypy.request.json
-
     return backend.query(query)
+
+
+  @cherrypy.tools.json_out()
+  def get(self, id):
+    return backend.get(id)

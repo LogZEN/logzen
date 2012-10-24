@@ -16,11 +16,21 @@ class EventModel
     @host = data._source.hostname
     @tag = data._source.tag
     @message = data._source.message
-
+    
 class EventListModel
   constructor: ->
     @events = ko.observableArray []
     @loading = ko.observable false
+    @filterSeverity = ko.observable null
+    @filterFacility = ko.observable null
+    
+  setSeverityText: (el) =>
+    @filterSeverity Defaults.severity[el.severity]
+    evlist.loadEvents()
+    
+  setFacilityText: (el) =>
+    @filterFacility Defaults.facility[el.facility]
+    evlist.loadEvents()
     
   # return a map of filters or the match_all filter if nothing was selected
   getFilters: ->
@@ -48,9 +58,9 @@ class EventListModel
           "date_histogram" :
             "field" : "timereported"
             "interval" : "3h"
-        "from": 0
-        "size": 50
-        "sort": []
+      "from": 0
+      "size": 50
+      "sort": []
         
     $.ajax
       url: $('#filterform').attr('action')
@@ -66,7 +76,7 @@ class EventListModel
         @loading false
         
   timeSeries: (data) ->
-    chart = nv.models.multiBarChart()
+    chart = nv.models.multiBarTimeSeriesChart()
       .x((d) -> d.time)
       .y((d) -> d.count)
       
@@ -74,18 +84,17 @@ class EventListModel
       .tickFormat((d) -> d3.time.format('%x') new Date(d))
       .rotateLabels(-45)
     chart.yAxis
-      .tickFormat(d3.format(',.1f'))
-    
+      .tickFormat(d3.format(',.0f'))
+      
+    chart.tooltip = (key, x, y, e, graph) ->
+      "<h3>#{key}</h3><p>#{y} during #{x}</p>"
+        
     d3.select('#timeSeries svg')
       .datum([{"key": "events", "values": data}])
-      .transition().duration(200).call(chart)
+      .transition().duration(100).call(chart)
 
     nv.utils.windowResize(chart.update)
     
-
-
-evlist = new EventListModel
-evlist.loadEvents()
 
 
 # Actions
@@ -101,5 +110,7 @@ $(".clear-addon").each (index, element) =>
 $("#chartdiv").bind 'plotselected', (event) =>
   evlist.loadEvents()
 
+evlist = new EventListModel
+evlist.loadEvents()
 
-ko.applyBindings(evlist);  
+ko.applyBindings evlist

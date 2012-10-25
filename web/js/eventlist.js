@@ -40,6 +40,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
       var _this = this;
       this.events = ko.observableArray([]);
       this.loading = ko.observable(false);
+      this.error = ko.observable(null);
       this.filters = {
         'severity': ko.observable(""),
         'facility': ko.observable(""),
@@ -94,7 +95,14 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
               }
               return _results;
             })());
+            _this.error(null);
             return _this.loading(false);
+          },
+          error: function(jqXHR, status, error) {
+            _this.events([]);
+            _this.error(error);
+            _this.loading(false);
+            return console.log(_this.error());
           }
         });
       });

@@ -20,7 +20,11 @@ class EventModel
 class EventListModel
   constructor: ->
     @events = ko.observableArray []
+    
     @loading = ko.observable false
+    
+    @error = ko.observable null
+    
     @filters = 
       'severity': ko.observable ""
       'facility': ko.observable ""
@@ -54,7 +58,14 @@ class EventListModel
         success: (result) =>
           @events (new EventModel event for event in result.hits.hits)
           #evlist.timeSeries result.facets.histo1.entries
+          @error null
           @loading false
+        error: (jqXHR, status, error) =>
+          @events []
+          @error error
+          @loading false
+          
+          console.log @error()
 
       
   setFilter: (name) =>

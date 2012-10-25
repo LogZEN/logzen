@@ -123,8 +123,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
           error: function(jqXHR, status, error) {
             _this.events([]);
             _this.error(error);
-            _this.loading(false);
-            return console.log(_this.error());
+            return _this.loading(false);
           }
         });
       });

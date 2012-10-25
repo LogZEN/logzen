@@ -24,6 +24,7 @@ class EventModel
     @program = data._source.program
     @message = data._source.message
     
+    
 class EventListModel
   constructor: ->
     @events = ko.observableArray []
@@ -75,19 +76,13 @@ class EventListModel
           @events []
           @error error
           @loading false
-          
-          console.log @error()
 
-      
   setFilter: (name) =>
     (el) => @filters[name] el[name]
   
   clearFilter: (name) =>
     () => @filters[name] null
 
-  
-
-        
   timeSeries: (data) ->
     chart = nv.models.multiBarTimeSeriesChart()
       .x((d) -> d.time)
@@ -107,16 +102,8 @@ class EventListModel
       .transition().duration(100).call(chart)
 
     nv.utils.windowResize(chart.update)
-    
-
-
-# Actions
-
-#$('#filterform').bind 'change', (event) =>
-#  evlist.loadEvents()
 
 
 evlist = new EventListModel
-#evlist.loadEvents()
 
 ko.applyBindings evlist

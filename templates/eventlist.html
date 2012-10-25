@@ -54,25 +54,25 @@
         </th>
         <th class="clear-col"><span class="q_tip clear-addon btn" id="time" title="Clear this filter">x</span></th>
         <th class="input-col" id="column_severity">
-          <input type="text" name="severity" id="filter_severity" class="filter" placeholder="filter" size="5" data-bind="value: filterSeverity" data-provide="typeahead" data-items="4" data-source='["emerge","alert","critical","error","warning","notice","info","debug"]' />
+          <input type="text" name="severity" id="filter_severity" class="filter" placeholder="filter" size="5" data-bind="value: filters.severity, valueUpdate: 'afterkeydown'" data-provide="typeahead" data-items="4" data-source='["emerge","alert","critical","error","warning","notice","info","debug"]' />
         </th>
-        <th class="clear-col"><span class="q_tip clear-addon btn" id="severity" title="Clear this filter">x</span></th>
+        <th class="clear-col"><span class="q_tip clear-addon btn" id="severity" title="Clear this filter" data-bind="click: $root.clearFilter('severity')">x</span></th>
         <th class="input-col" id="column_facility">
-          <input type="text" name="facility" id="filter_facility" class="filter" placeholder="filter" size="5" data-bind="value: filterFacility" />
+          <input type="text" name="facility" id="filter_facility" class="filter" placeholder="filter" size="5" data-bind="value: filters.facility, valueUpdate: 'afterkeydown'" />
         </th>
-        <th class="clear-col"><span class="q_tip clear-addon btn" id="facility" title="Clear this filter">x</span></th>
+        <th class="clear-col"><span class="q_tip clear-addon btn" id="facility" title="Clear this filter" data-bind="click: $root.clearFilter('facility')">x</span></th>
         <th class="input-col" id="column_host">
-          <input type="text" name="fromhost" id="filter_fromhost" class="filter" placeholder="filter" size="5" {% if host %}value="{{host}}"{% endif %} />
+          <input type="text" name="fromhost" id="filter_fromhost" class="filter" placeholder="filter" size="5" data-bind="value: filters.host, valueUpdate: 'afterkeydown'" />
         </th>
-        <th class="clear-col"><span class="q_tip clear-addon btn" id="fromhost" title="Clear this filter">x</span></th>
+        <th class="clear-col"><span class="q_tip clear-addon btn" id="fromhost" title="Clear this filter" data-bind="click: $root.clearFilter('host')">x</span></th>
         <th class="input-col" id="column_program">
-          <input type="text" name="program" id="filter_program" class="filter" placeholder="filter" size="5" />
+          <input type="text" name="program" id="filter_program" class="filter" placeholder="filter" size="5" data-bind="value: filters.program, valueUpdate: 'afterkeydown'" />
         </th>
-        <th class="clear-col"><span class="q_tip clear-addon btn" id="program" title="Clear this filter">x</span></th>
+        <th class="clear-col"><span class="q_tip clear-addon btn" id="program" title="Clear this filter" data-bind="click: $root.clearFilter('program')">x</span></th>
         <th class="input-col" id="column_message">
-          <input type="text" name="message" id="filter_message" class="filter" placeholder="filter" size="5" {% if message %}value="{{message}}"{% endif %} />
+          <input type="text" name="message" id="filter_message" class="filter" placeholder="filter" size="5" data-bind="value: filters.message, valueUpdate: 'afterkeydown'" />
         </th>
-        <th class="clear-col"><span class="q_tip clear-addon btn" id="message" title="Clear this filter">x</span></th>
+        <th class="clear-col"><span class="q_tip clear-addon btn" id="message" title="Clear this filter" data-bind="click: $root.clearFilter('message')">x</span></th>
       </tr>
     </thead>
 
@@ -93,7 +93,7 @@
   	    </td>
   	    
   	    <td colspan="2" class="event" data-bind="text: timereported"></td>
-  	    <td colspan="2" class="event"><a data-bind="text: severity, click: $root.setSeverityText, css: {
+  	    <td colspan="2" class="event"><a data-bind="text: severity, click: $root.setFilter('severity'), css: {
   		    color_emerge: severity == 'emerge',
   		    color_alert: severity == 'alert',
   		    color_critical: severity == 'crit',
@@ -103,10 +103,10 @@
   		    color_info: severity == 'info',
   		    color_debug: severity == 'debug'
   	    }" class="badge"></a></td>
-  	    <td colspan="2" class="event"><a data-bind="text: facility, click: $root.setFacilityText"></a></td>
-          <td colspan="2" class="event"><a data-bind="text: host"></a></td>
-          <td colspan="2" class="event"><a data-bind="text: tag"></a></td>
-  	    <td colspan="2"><a data-bind="text: message"></a></td>
+  	    <td colspan="2" class="event"><a data-bind="text: facility, click: $root.setFilter('facility')"></a></td>
+          <td colspan="2" class="event"><a data-bind="text: host, click: $root.setFilter('host')"></a></td>
+          <td colspan="2" class="event"><a data-bind="text: program, click: $root.setFilter('program')"></a></td>
+  	    <td colspan="2"><a data-bind="text: message, click: $root.setFilter('message')"></a></td>
   	  </tr>
 	  <!-- /ko -->
     
@@ -118,7 +118,6 @@
   </table>
   </form>
 </div>
-
 
 <script type="text/javascript" src="/static/js/eventlist.js"></script>
 

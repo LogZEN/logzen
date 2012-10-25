@@ -14,66 +14,57 @@ class EventModel
     @severity = data._source.severity
     @detail_url = "/event/" + data._id
     @host = data._source.hostname
-    @tag = data._source.tag
+    @program = data._source.program
     @message = data._source.message
     
 class EventListModel
   constructor: ->
     @events = ko.observableArray []
     @loading = ko.observable false
-    @filterSeverity = ko.observable null
-    @filterFacility = ko.observable null
-    
-  setSeverityText: (el) =>
-    @filterSeverity Defaults.severity[el.severity]
-    evlist.loadEvents()
-    
-  setFacilityText: (el) =>
-    @filterFacility Defaults.facility[el.facility]
-    evlist.loadEvents()
-    
-  # return a map of filters or the match_all filter if nothing was selected
-  getFilters: ->
-    result = {}
-    $('.filter').each (index, element) =>
-      result[$(element).attr('name')] = $(element).val() if $(element).val() != ""
+    @filters = 
+      'severity': ko.observable ""
+      'facility': ko.observable ""
+      'host': ko.observable ""
+      'program': ko.observable ""
+      'message': ko.observable "" 
       
-    if JSON.stringify(result) is "{}"
-      return {"match_all":{}}
-    else
-      return {"prefix": result}
-
-  loadEvents: ->
-    es_query = 
-      "query": evlist.getFilters()
-      "facets": 
-        "range1" :
-          "range":
-            "field" : "timereported"
-            "ranges" : [
-              "from": 2012
-              "to": 2012
-            ] 
-        "histo1" :
-          "date_histogram" :
-            "field" : "timereported"
-            "interval" : "3h"
+    @filledFilters = ko.computed () =>
+      ({'name': name, 'value': filter() } for name, filter of @filters when filter() != "")
+      
+      
+    @query = ko.computed () =>
+      "query": 
+        "match_all" : {}
+#      "filters": 
+#        "and":
+#          ({ 'prefix': { filter: filter['value'] }} for filter in @filledFilters())
       "from": 0
       "size": 50
       "sort": []
-        
-    $.ajax
-      url: $('#filterform').attr('action')
-      type: 'POST'
-      contentType: "application/json"
-      data: JSON.stringify(es_query)
-      dataType: 'json'
-      beforeSend: () => 
-        @loading true
-      success: (result) =>
-        @events (new EventModel event for event in result.hits.hits)
-        evlist.timeSeries result.facets.histo1.entries
-        @loading false
+    
+    @loadEvents = ko.computed (query) =>
+      $.ajax
+        url: $('#filterform').attr('action')
+        type: 'POST'
+        contentType: "application/json"
+        data: JSON.stringify @query()
+        dataType: 'json'
+        beforeSend: () => 
+          @loading true
+        success: (result) =>
+          @events (new EventModel event for event in result.hits.hits)
+          #evlist.timeSeries result.facets.histo1.entries
+          @loading false
+
+      
+  setFilter: (name) =>
+    (el) => @filters[name] el[name]
+  
+  clearFilter: (name) =>
+    () => @filters[name] null
+
+  
+
         
   timeSeries: (data) ->
     chart = nv.models.multiBarTimeSeriesChart()
@@ -99,18 +90,11 @@ class EventListModel
 
 # Actions
 
-$('#filterform').bind 'keyup', (event) =>
-  evlist.loadEvents()
-  
-$(".clear-addon").each (index, element) =>
-  $(element).bind 'click', (event) =>
-    $("#filter_" + $(element).attr("id")).val("")
-    evlist.loadEvents()
+#$('#filterform').bind 'change', (event) =>
+#  evlist.loadEvents()
 
-$("#chartdiv").bind 'plotselected', (event) =>
-  evlist.loadEvents()
 
 evlist = new EventListModel
-evlist.loadEvents()
+#evlist.loadEvents()
 
 ko.applyBindings evlist

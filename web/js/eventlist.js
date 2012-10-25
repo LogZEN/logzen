@@ -10,8 +10,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
 (function() {
   var EventListModel, EventModel, evlist,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    _this = this;
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   EventModel = (function() {
 
@@ -23,7 +22,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
       this.severity = data._source.severity;
       this.detail_url = "/event/" + data._id;
       this.host = data._source.hostname;
-      this.tag = data._source.tag;
+      this.program = data._source.program;
       this.message = data._source.message;
     }
 
@@ -34,98 +33,85 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
   EventListModel = (function() {
 
     function EventListModel() {
-      this.setFacilityText = __bind(this.setFacilityText, this);
+      this.clearFilter = __bind(this.clearFilter, this);
 
-      this.setSeverityText = __bind(this.setSeverityText, this);
+      this.setFilter = __bind(this.setFilter, this);
+
+      var _this = this;
       this.events = ko.observableArray([]);
       this.loading = ko.observable(false);
-      this.filterSeverity = ko.observable(null);
-      this.filterFacility = ko.observable(null);
+      this.filters = {
+        'severity': ko.observable(""),
+        'facility': ko.observable(""),
+        'host': ko.observable(""),
+        'program': ko.observable(""),
+        'message': ko.observable("")
+      };
+      this.filledFilters = ko.computed(function() {
+        var filter, name, _ref, _results;
+        _ref = _this.filters;
+        _results = [];
+        for (name in _ref) {
+          filter = _ref[name];
+          if (filter() !== "") {
+            _results.push({
+              'name': name,
+              'value': filter()
+            });
+          }
+        }
+        return _results;
+      });
+      this.query = ko.computed(function() {
+        return {
+          "query": {
+            "match_all": {}
+          },
+          "from": 0,
+          "size": 50,
+          "sort": []
+        };
+      });
+      this.loadEvents = ko.computed(function(query) {
+        return $.ajax({
+          url: $('#filterform').attr('action'),
+          type: 'POST',
+          contentType: "application/json",
+          data: JSON.stringify(_this.query()),
+          dataType: 'json',
+          beforeSend: function() {
+            return _this.loading(true);
+          },
+          success: function(result) {
+            var event;
+            _this.events((function() {
+              var _i, _len, _ref, _results;
+              _ref = result.hits.hits;
+              _results = [];
+              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                event = _ref[_i];
+                _results.push(new EventModel(event));
+              }
+              return _results;
+            })());
+            return _this.loading(false);
+          }
+        });
+      });
     }
 
-    EventListModel.prototype.setSeverityText = function(el) {
-      this.filterSeverity(Defaults.severity[el.severity]);
-      return evlist.loadEvents();
-    };
-
-    EventListModel.prototype.setFacilityText = function(el) {
-      this.filterFacility(Defaults.facility[el.facility]);
-      return evlist.loadEvents();
-    };
-
-    EventListModel.prototype.getFilters = function() {
-      var result,
-        _this = this;
-      result = {};
-      $('.filter').each(function(index, element) {
-        if ($(element).val() !== "") {
-          return result[$(element).attr('name')] = $(element).val();
-        }
-      });
-      if (JSON.stringify(result) === "{}") {
-        return {
-          "match_all": {}
-        };
-      } else {
-        return {
-          "prefix": result
-        };
-      }
-    };
-
-    EventListModel.prototype.loadEvents = function() {
-      var es_query,
-        _this = this;
-      es_query = {
-        "query": evlist.getFilters(),
-        "facets": {
-          "range1": {
-            "range": {
-              "field": "timereported",
-              "ranges": [
-                {
-                  "from": 2012,
-                  "to": 2012
-                }
-              ]
-            }
-          },
-          "histo1": {
-            "date_histogram": {
-              "field": "timereported",
-              "interval": "3h"
-            }
-          }
-        },
-        "from": 0,
-        "size": 50,
-        "sort": []
+    EventListModel.prototype.setFilter = function(name) {
+      var _this = this;
+      return function(el) {
+        return _this.filters[name](el[name]);
       };
-      return $.ajax({
-        url: $('#filterform').attr('action'),
-        type: 'POST',
-        contentType: "application/json",
-        data: JSON.stringify(es_query),
-        dataType: 'json',
-        beforeSend: function() {
-          return _this.loading(true);
-        },
-        success: function(result) {
-          var event;
-          _this.events((function() {
-            var _i, _len, _ref, _results;
-            _ref = result.hits.hits;
-            _results = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              event = _ref[_i];
-              _results.push(new EventModel(event));
-            }
-            return _results;
-          })());
-          evlist.timeSeries(result.facets.histo1.entries);
-          return _this.loading(false);
-        }
-      });
+    };
+
+    EventListModel.prototype.clearFilter = function(name) {
+      var _this = this;
+      return function() {
+        return _this.filters[name](null);
+      };
     };
 
     EventListModel.prototype.timeSeries = function(data) {
@@ -155,24 +141,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
   })();
 
-  $('#filterform').bind('keyup', function(event) {
-    return evlist.loadEvents();
-  });
-
-  $(".clear-addon").each(function(index, element) {
-    return $(element).bind('click', function(event) {
-      $("#filter_" + $(element).attr("id")).val("");
-      return evlist.loadEvents();
-    });
-  });
-
-  $("#chartdiv").bind('plotselected', function(event) {
-    return evlist.loadEvents();
-  });
-
   evlist = new EventListModel;
-
-  evlist.loadEvents();
 
   ko.applyBindings(evlist);
 

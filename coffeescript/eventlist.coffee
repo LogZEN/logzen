@@ -5,6 +5,13 @@ This file is part of pyLogView. It is licensed under the terms of the
 GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
+pivot = (key, value, data) ->
+  result = {}
+  result[data[key]] = data[value]
+  
+  return result
+
+
 class EventModel
   constructor: (data) ->
     @id = data._id
@@ -33,20 +40,24 @@ class EventListModel
       'message': ko.observable "" 
       
     @filledFilters = ko.computed () =>
-      ({'name': name, 'value': filter() } for name, filter of @filters when filter() != "")
-      
+      for name, filter of @filters when filter() != ""
+        {'name': name, 'value': filter() }
       
     @query = ko.computed () =>
       "query": 
         "match_all" : {}
-#      "filters": 
-#        "and":
-#          ({ 'prefix': { filter: filter['value'] }} for filter in @filledFilters())
+      "filters": 
+        if @filledFilters().length > 0
+          "and":
+            for filter in @filledFilters()
+              { 'prefix': pivot('name', 'value', filter) }
+        else
+          {}
       "from": 0
       "size": 50
       "sort": []
     
-    @loadEvents = ko.computed (query) =>
+    @loadEvents = ko.computed () =>
       $.ajax
         url: $('#filterform').attr('action')
         type: 'POST'

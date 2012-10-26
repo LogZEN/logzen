@@ -18,11 +18,11 @@ curl -X PUT "http://localhost:9200/syslog" -d '{
                     "type" : "string",
                     "index" : "not_analyzed"
                 },
-                "facility" : {
+                "severity" : {
                     "type" : "integer",
                     "index" : "not_analyzed"
                 },
-                "severity" : {
+                "facility" : {
                     "type" : "integer",
                     "index" : "not_analyzed"
                 },

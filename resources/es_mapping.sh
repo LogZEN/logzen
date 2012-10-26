@@ -7,7 +7,7 @@ curl -X PUT "http://localhost:9200/syslog" -d '{
         "event" : {
             "_ttl" : {
                 "enabled" : true,
-                "default" : "1y"
+                "default" : "365d"
             },
             "properties" : {
                 "time" : {
@@ -16,19 +16,19 @@ curl -X PUT "http://localhost:9200/syslog" -d '{
                 },
                 "host" : {
                     "type" : "string",
-                    "index" : "not_analized"
+                    "index" : "not_analyzed"
                 },
                 "facility" : {
                     "type" : "integer",
-                    "index" : "not_analized"
+                    "index" : "not_analyzed"
                 },
                 "severity" : {
                     "type" : "integer",
-                    "index" : "not_analized"
+                    "index" : "not_analyzed"
                 },
                 "program" : {
                     "type" : "string",
-                    "index" : "not_analized"
+                    "index" : "not_analyzed"
                 },
                 "message" : {
                     "type" : "string",

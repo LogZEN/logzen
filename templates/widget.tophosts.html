@@ -1,8 +1,10 @@
 <!-- widget.tophosts -->
+
 <div class="span6 dashpadded">
 	<h2 class="inline">Events by Host</h2>
-	<div id="events_by_host" style="height: 220px; width: 100%;"></div>
+	<div id="events_by_host" style="height: 220px; width: 100%;"><svg></svg></div>
 </div>
+
 <div class="span6 dashpadded">
 	<div class="clearfix">
 		<h2 class="inline">TOP 5 Host</h2>
@@ -19,109 +21,8 @@
 			</ul>
 		</div>
 	</div>
-	<div id="top_hosts" style="height: 220px; width: 100%;"></div>
+	<div id="top_hosts" style="height: 220px; width: 100%;"><svg></svg></div>
 </div>
 
-<script type="text/javascript">//<![CDATA[
-	function events_by_host() {
-	    $.ajax({
-	        url: "/overview/events_by_host",
-	        dataType: 'json', 
-	        success: function(d) {
-	        	data = []
-		    	for (var i = 0; i < d.length; i++) {
-		    		data[i] = { label: d[i]['host'], data: d[i]['count'], color: piecolors[i] }
-		    	}
-		    	$.plot($('#events_by_host'), data, {
-		    		series: {
-		    		    pie: {
-		    		        show: true,
-		    	            radius: 0.92,
-		    	            combine: {
-		    	                color: '#2e3436',
-		    	                threshold: 0.1
-		    	            },
-		    	            stroke: {
-		    	            	color: '#ccc'
-		    	            },
-		    				label: {
-		    				    show: true,
-		    				    radius: 3/4,
-		    				    formatter: function(label, series) {
-		    	                    return '<div style="font-size:8pt;text-align:center;padding:2px;color:white;">'+label+'<br/>'+Math.round(series.percent)+'%</div>'
-		    				    }
-		    				}
-		    		    }
-		    		},
-		    	    grid: {
-		    	        hoverable: true
-		    	    }
-		    	}).resize();
-		    }
-	    });
-	}
-	
-	function top_hosts(timerange) {
-	    $.ajax({
-	        url: "/overview/top_hosts",
-	        method: 'POST',
-	        data: timerange,
-	        dataType: 'json', 
-	        success: function(d) {
-		    	data = []
-		    	tick = []
-		    	for (var i = 0; i < d.data.length; i++) {
-		    		data.push([i, parseInt(d.data[i]['count'])]);
-		    		tick.push([i, d.data[i]['host']]);
-		    	}
-		    	$('#top_hosts_selector').empty().append(function() {
-		    		if (d.metadata['timerange'] == 1) {
-		    			text = 'last 24 hours';
-		    		} else {
-		    			text = 'last ' + d.metadata['timerange'] + ' days';
-		    		}
-		    		return text;
-		    	});
-				$.plot($('#top_hosts'), [data], {
-					xaxis: {
-						ticks: tick,
-						rotateTicks: 50
-					},
-					bars: {
-					      show: true,
-					      lineWidth: 1,
-				          align: "center",
-				          barWidth: 0.6,
-					      fill: true,
-					      fillColor: { colors: ["#729fcf", "#3465af"] }
-					},
-				    legend: {
-				        show: false
-				    },
-					grid: { 
-						hoverable: true, 
-                        clickable: true,
-						autoHighlight: true 
-					},
-					tooltip: true,
-					tooltipOpts: {
-						content: "%y",
-						defaultTheme:  false
-					},
-					colors: ["#204a87"],
-				}).resize();
-				
-				$("#top_hosts").bind("plotclick", function (event, pos, item) {
-					if (item) {
-						$(location).attr('href', '/events?host=' + tick[item.dataIndex][1]);
-					}
-				});
-		    }
-	    });
-	}
-
-	events_by_host();
-	top_hosts(1);
-	
-//]]></script>
+<script type="text/javascript" src="/static/js/widget.tophosts.js"></script>
 	

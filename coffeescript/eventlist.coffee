@@ -5,6 +5,13 @@ This file is part of pyLogView. It is licensed under the terms of the
 GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
+pivot = (key, value, data) ->
+  result = {}
+  result[data[key]] = data[value]
+  
+  return result
+
+
 class EventModel
   constructor: (data) ->
     @id = data._id
@@ -17,10 +24,15 @@ class EventModel
     @program = data._source.program
     @message = data._source.message
     
+    
 class EventListModel
   constructor: ->
     @events = ko.observableArray []
+    
     @loading = ko.observable false
+    
+    @error = ko.observable null
+    
     @filters = 
       'severity': ko.observable ""
       'facility': ko.observable ""
@@ -29,20 +41,24 @@ class EventListModel
       'message': ko.observable "" 
       
     @filledFilters = ko.computed () =>
-      ({'name': name, 'value': filter() } for name, filter of @filters when filter() != "")
-      
+      for name, filter of @filters when filter() != ""
+        {'name': name, 'value': filter() }
       
     @query = ko.computed () =>
       "query": 
         "match_all" : {}
-#      "filters": 
-#        "and":
-#          ({ 'prefix': { filter: filter['value'] }} for filter in @filledFilters())
+      "filters": 
+        if @filledFilters().length > 0
+          "and":
+            for filter in @filledFilters()
+              { 'prefix': pivot('name', 'value', filter) }
+        else
+          {}
       "from": 0
       "size": 50
       "sort": []
     
-    @loadEvents = ko.computed (query) =>
+    @loadEvents = ko.computed () =>
       $.ajax
         url: $('#filterform').attr('action')
         type: 'POST'
@@ -54,18 +70,19 @@ class EventListModel
         success: (result) =>
           @events (new EventModel event for event in result.hits.hits)
           #evlist.timeSeries result.facets.histo1.entries
+          @error null
+          @loading false
+        error: (jqXHR, status, error) =>
+          @events []
+          @error error
           @loading false
 
-      
   setFilter: (name) =>
     (el) => @filters[name] el[name]
   
   clearFilter: (name) =>
     () => @filters[name] null
 
-  
-
-        
   timeSeries: (data) ->
     chart = nv.models.multiBarTimeSeriesChart()
       .x((d) -> d.time)
@@ -85,16 +102,8 @@ class EventListModel
       .transition().duration(100).call(chart)
 
     nv.utils.windowResize(chart.update)
-    
-
-
-# Actions
-
-#$('#filterform').bind 'change', (event) =>
-#  evlist.loadEvents()
 
 
 evlist = new EventListModel
-#evlist.loadEvents()
 
 ko.applyBindings evlist

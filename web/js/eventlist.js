@@ -9,8 +9,15 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
 
 (function() {
-  var EventListModel, EventModel, evlist,
+  var EventListModel, EventModel, evlist, pivot,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  pivot = function(key, value, data) {
+    var result;
+    result = {};
+    result[data[key]] = data[value];
+    return result;
+  };
 
   EventModel = (function() {
 
@@ -40,6 +47,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
       var _this = this;
       this.events = ko.observableArray([]);
       this.loading = ko.observable(false);
+      this.error = ko.observable(null);
       this.filters = {
         'severity': ko.observable(""),
         'facility': ko.observable(""),
@@ -63,16 +71,31 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
         return _results;
       });
       this.query = ko.computed(function() {
+        var filter;
         return {
           "query": {
             "match_all": {}
           },
+          "filters": _this.filledFilters().length > 0 ? {
+            "and": (function() {
+              var _i, _len, _ref, _results;
+              _ref = this.filledFilters();
+              _results = [];
+              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                filter = _ref[_i];
+                _results.push({
+                  'prefix': pivot('name', 'value', filter)
+                });
+              }
+              return _results;
+            }).call(_this)
+          } : {},
           "from": 0,
           "size": 50,
           "sort": []
         };
       });
-      this.loadEvents = ko.computed(function(query) {
+      this.loadEvents = ko.computed(function() {
         return $.ajax({
           url: $('#filterform').attr('action'),
           type: 'POST',
@@ -94,6 +117,12 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
               }
               return _results;
             })());
+            _this.error(null);
+            return _this.loading(false);
+          },
+          error: function(jqXHR, status, error) {
+            _this.events([]);
+            _this.error(error);
             return _this.loading(false);
           }
         });

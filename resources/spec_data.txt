@@ -1,0 +1,19 @@
+{
+	### The time on which the log message was received by the last host in the log cascade
+  "time" : "%timegenerated:date-rfc3339%",
+  
+	### The name or the IP of the host as specified in the HOSTNAME field in rfc3164
+	"host" : "%hostname:::json%",
+  
+	### The facility of the message extracted from the PRI as specified in rfc3164
+	"facility" : "%syslogfacility%",
+  
+	### The severity of the message extracted from the PRI as specified in rfc3164
+	"severity" : "%syslogseverity%",
+  
+	### The content of the TAG field as specified in rfc3164 without the process id (known as programname in rsyslog)
+	"program" : "%programname:::json%",
+  
+	### The content part of the message without the process id prefixed by most logging clients
+	"message" : "%msg:::json%"
+}

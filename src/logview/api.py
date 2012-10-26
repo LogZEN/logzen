@@ -36,9 +36,17 @@ class Api:
   @cherrypy.tools.json_out()
   def query(self):
     query = cherrypy.request.json
-    return backend.query(query)
+    try:
+        return backend.query(query)
+
+    except Exception as e:
+        cherrypy.response.status = "500 %s" % str(e)
 
 
   @cherrypy.tools.json_out()
   def get(self, id):
-    return backend.get(id)
+    try:
+        return backend.get(id)
+
+    except Exception as e:
+        cherrypy.response.status = "500 %s" % str(e)

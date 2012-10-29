@@ -26,7 +26,20 @@ class ElasticSearchBackend:
     def __init__(self):
         servers = [value for key, value in Config().es if key.startswith('server_')]
 
-        self.__connection = pyes.ES(servers)
+        username = Config().es['username']
+        password = Config().es['password']
+
+        if username and password:
+            auth = {
+                'username' : username,
+                'password' : password
+            }
+
+        else:
+            auth = None
+
+        self.__connection = pyes.ES(servers,
+                                    basic_auth = auth)
 
     def query(self,
               query):
@@ -38,6 +51,6 @@ class ElasticSearchBackend:
             id):
         return self.__connection.get(id = id,
                                      index = Config().es['index'],
-                                     doc_type = Config().es['type'],)
+                                     doc_type = Config().es['type'])
 
 backend = ElasticSearchBackend()

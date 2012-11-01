@@ -115,7 +115,7 @@ li#navclock {
 .color_warning {
   background:              #edd400;
 }
-.color_err {
+.color_error {
   background:              #f57900;
 }
 .color_crit {
@@ -141,6 +141,8 @@ table#events {
   
   font-size:              10pt;
   cursor:                 default;
+  
+  table-layout:           fixed;
 }
 
 table#events tr#first th {
@@ -161,6 +163,10 @@ table#events tr:hover {
 table#events td {
   border-bottom:          1px #999999 dashed;
   padding:                1px 8px;
+
+  white-space:            nowrap; 
+  overflow:               hidden; 
+  text-overflow:          ellipsis;
 }
 
 table#events td a {

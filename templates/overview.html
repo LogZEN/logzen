@@ -5,17 +5,19 @@
 {% block content %}
 
 <div id="dashboard">
+<!-- 
 	<div class="row-fluid row-fluid-padded">
 	   	<div class="span6 dashwidget">
-	   		{% include 'widget.tophosts.html' %}
+	   		{ include 'widget.tophosts.html' %}
 	   	</div>
 	   	<div class="span6 dashwidget">
-        {% include 'widget.latestevents.html' %}
+        { include 'widget.latestevents.html' %}
 	    </div>
 	</div>
-	   
+-->
 	<div class="row-fluid row-fluid-padded">
 		<div class="span6 dashwidget">
+        {% include 'widget.topseverity.html' %}
 		</div>
 		<div class="span6 dashwidget">
 		</div>

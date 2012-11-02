@@ -28,7 +28,7 @@
 		        else if (seconds == 1)
 		            delta = "a second"
 		        else if (seconds < 60)
-		        	delta = seconds + " seconds"
+		        	delta = Math.floor(seconds) + " seconds"
 		        else if (seconds >= 60 && seconds < 120)
 		            delta = "a minute"
 		        else if (seconds >= 120 && seconds < 3600)
@@ -42,25 +42,23 @@
 		        if (days == 1)
 		        	delta = "a day"
 		        else if (months == 0)
-		        	delta = days + " days"
+		        	delta = Math.floor(days) + " days"
 		        else if (months == 1)
 		        	delta = "a month"
 		        else
-		        	delta = months + " months"
+		        	delta = Math.floor(months) + " months"
 		        	
 		    } else if (years == 1) {
-		        if (months == 0 && days == 0)
+		        if (months == 0)
 		        	delta = "a year"
-		        else if (months == 0)
-		        	delta = "1 year, " + days + " days"
 		        else
 		            if (months == 1)
 		            	delta = "1 year, 1 month"
 		            else
-		            	delta = "1 year, " + months + " months"
+		            	delta = "1 year, " + Math.floor(months) + " months"
 		    
 		    } else {
-		    	delta = years + " years"
+		    	delta = Math.floor(years) + " years"
 		    }
 
 		    if (delta == "a moment")

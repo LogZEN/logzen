@@ -73,5 +73,5 @@ class TopSeverity
             .call(chart1);
 
 
-view =  new TopSeverity
-ko.applyBindings view
+TopSeverityView =  new TopSeverity
+ko.applyBindings TopSeverityView, $('#widget_topseverity').get(0)

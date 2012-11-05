@@ -9,7 +9,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
 
 (function() {
-  var EventModel, LatestEvents, view,
+  var EventModel, LatestEvents, LatestEventsView,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   EventModel = (function() {
@@ -118,12 +118,12 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
   })();
 
-  view = new LatestEvents;
+  LatestEventsView = new LatestEvents;
 
-  view.load();
+  LatestEventsView.load();
 
-  setInterval(view.load, 5000);
+  setInterval(LatestEventsView.load, 5000);
 
-  ko.applyBindings(view);
+  ko.applyBindings(LatestEventsView, $('#widget_latestevents').get(0));
 
 }).call(this);

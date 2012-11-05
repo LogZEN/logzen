@@ -61,9 +61,9 @@ class LatestEvents
         @events (new EventModel event for event in result.hits.hits)
 
 
-view = new LatestEvents
-view.load()
+LatestEventsView = new LatestEvents
+LatestEventsView.load()
 
-setInterval view.load, 5000
+setInterval LatestEventsView.load, 5000
 
-ko.applyBindings view
+ko.applyBindings LatestEventsView, $('#widget_latestevents').get(0)

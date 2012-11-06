@@ -9,54 +9,97 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
 
 (function() {
-  var TopHosts, view;
+  var TopHosts, TopHostsView,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   TopHosts = (function() {
 
     function TopHosts() {
-      this.qry = {
-        "query": {
-          "match_all": {}
-        },
-        "from": 0,
-        "size": 0,
-        "sort": [],
-        "facets": {
-          "byhost": {
-            "terms": {
-              "field": "hostname"
+      this.updateRange = __bind(this.updateRange, this);
+
+      var _this = this;
+      this.rangeSelected = ko.observable(1);
+      this.rangeSelectedLabel = ko.computed(function() {
+        switch (_this.rangeSelected()) {
+          case 1:
+            return 'last day';
+          case 7:
+            return 'last week';
+          case 30:
+            return 'last month';
+          case 365:
+            return 'last year';
+        }
+      });
+      this.qry = ko.computed(function() {
+        var from, now;
+        now = new Date();
+        from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - _this.rangeSelected(), now.getHours(), now.getMinutes(), now.getSeconds(), 0);
+        return {
+          'query': {
+            'match_all': {}
+          },
+          'from': 0,
+          'size': 0,
+          'facets': {
+            'byhost': {
+              'terms': {
+                'field': 'host'
+              },
+              'facet_filter': {
+                'range': {
+                  'time': {
+                    'from': from,
+                    'to': '2012-11-03T00:00:00.000'
+                  }
+                }
+              }
             }
           }
-        }
-      };
+        };
+      });
     }
+
+    TopHosts.prototype.updateRange = function(range) {
+      this.rangeSelected(range);
+      return TopHostsView.load();
+    };
 
     TopHosts.prototype.load = function() {
       var _this = this;
       return $.ajax({
-        url: "/_api/query",
+        url: '/_api/query',
         dataType: 'json',
         type: 'POST',
-        contentType: "application/json",
-        data: JSON.stringify(this.qry),
+        contentType: 'application/json',
+        data: JSON.stringify(this.qry()),
         success: function(result) {
           var chart1, chart2, chart_data, data, next;
-          data = (function() {
-            var _i, _len, _ref, _results;
-            _ref = result.facets.byhost.terms;
-            _results = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              next = _ref[_i];
-              _results.push({
-                label: next['term'],
-                value: next['count']
-              });
-            }
-            return _results;
-          })();
+          if (result.facets.byhost.terms.length) {
+            data = (function() {
+              var _i, _len, _ref, _results;
+              _ref = result.facets.byhost.terms;
+              _results = [];
+              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                next = _ref[_i];
+                _results.push({
+                  label: next['term'],
+                  value: next['count']
+                });
+              }
+              return _results;
+            })();
+          } else {
+            data = [
+              {
+                label: 0,
+                value: 0
+              }
+            ];
+          }
           chart_data = [
             {
-              key: "events",
+              key: 'events',
               values: data
             }
           ];
@@ -65,7 +108,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
           }).y(function(d) {
             return d.value;
           }).showLabels(true);
-          d3.select("#events_by_host svg").datum(chart_data).transition().duration(200).call(chart1);
+          d3.select('#events_by_host svg').datum(chart_data).transition().duration(200).call(chart1);
           chart2 = nv.models.discreteBarChart().x(function(d) {
             return d.label;
           }).y(function(d) {
@@ -82,10 +125,10 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
   })();
 
-  view = new TopHosts;
+  TopHostsView = new TopHosts;
 
-  view.load();
+  TopHostsView.load();
 
-  ko.applyBindings(view);
+  ko.applyBindings(TopHostsView, $('#widget_tophosts').get(0));
 
 }).call(this);

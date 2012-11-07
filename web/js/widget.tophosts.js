@@ -50,7 +50,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
                 'range': {
                   'time': {
                     'from': from,
-                    'to': '2012-11-03T00:00:00.000'
+                    'to': now
                   }
                 }
               }

@@ -33,7 +33,7 @@ class TopHosts
             'range':
               'time' :
                  'from': from
-                 'to': '2012-11-03T00:00:00.000'
+                 'to': now
 
   updateRange: (range) =>
     @rangeSelected range

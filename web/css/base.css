@@ -50,16 +50,17 @@ h1 {
 }
 
 h2 {
-  padding:               10px 0 0 0;
-	font-size:             12pt;
+    padding:               10px 0 0 0;
+    font-size:             12pt;
 }
 
 h1.inline,
 h2.inline,
 h3.inline,
 h4.inline {
-  padding:               0 0 20px 0;
-	display:               inline-block;
+    margin:                0;
+    padding:               0 0 20px 0;
+    display:               inline-block;
 }
 
 
@@ -404,9 +405,10 @@ span#eventcount {
 	
 	border:                    1px solid #ccc;
 	border-radius:             6px;
+	margin-bottom:             10px;
 }
 .dashpadded {
-	padding:                   10px;
+	padding:                   5px 10px;
 }
 .row-fluid-padded {
 	padding-bottom:            20px;

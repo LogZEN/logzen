@@ -27,9 +27,9 @@
     <div class="row-fluid">
       <div class="span6 dashpadded">
     		<table>
-    			<tr><th>Number of Events    </th><th class="count"></th></tr>
+    			<tr><th>Number of Events    </th><th class="count" data-bind="text: severitySum"></th></tr>
     			<tr><td>&nbsp; Emergency    </td><td class="count" data-bind="text: severities['0']"></td></tr>
-                <tr><td>&nbsp; Alert        </td><td class="count" data-bind="text: severities['1']"></td></tr>
+          <tr><td>&nbsp; Alert        </td><td class="count" data-bind="text: severities['1']"></td></tr>
     			<tr><td>&nbsp; Critical     </td><td class="count" data-bind="text: severities['2']"></td></tr>
     			<tr><td>&nbsp; Error        </td><td class="count" data-bind="text: severities['3']"></td></tr>
     			<tr><td>&nbsp; Warning      </td><td class="count" data-bind="text: severities['4']"></td></tr>

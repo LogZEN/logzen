@@ -27,6 +27,16 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
         '6': ko.observable(0),
         '7': ko.observable(0)
       };
+      this.severitySum = ko.computed(function() {
+        var severity, sum, value, _ref;
+        sum = 0;
+        _ref = _this.severities;
+        for (severity in _ref) {
+          value = _ref[severity];
+          sum += value();
+        }
+        return sum;
+      });
       this.query = ko.computed(function() {
         return cs({
           'query': {
@@ -107,7 +117,8 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
             }).y(function(d) {
               return d.value;
             }).showLabels(true);
-            return d3.select("#topseverity svg").datum(chart_data).transition().duration(200).call(chart1);
+            d3.select("#topseverity svg").datum(chart_data).transition().duration(200).call(chart1);
+            return nv.utils.windowResize(chart1.update);
           }
         });
       });

@@ -20,6 +20,12 @@ class TopSeverity
       '6': ko.observable 0
       '7': ko.observable 0
 
+    @severitySum = ko.computed () =>
+      sum = 0
+      for severity, value of @severities
+        sum += value()
+      sum
+      
     @query = ko.computed () =>
       cs(
         'query':
@@ -72,6 +78,7 @@ class TopSeverity
             .transition().duration(200)
             .call(chart1);
 
+          nv.utils.windowResize(chart1.update)
 
 TopSeverityView =  new TopSeverity
 ko.applyBindings TopSeverityView, $('#widget_topseverity').get(0)

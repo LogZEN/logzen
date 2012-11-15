@@ -143,7 +143,6 @@ table#events {
   font-size:              10pt;
   cursor:                 default;
   
-  table-layout:           fixed;
 }
 
 table#events tr#first th {
@@ -164,10 +163,6 @@ table#events tr:hover {
 table#events td {
   border-bottom:          1px #999999 dashed;
   padding:                1px 8px;
-
-  white-space:            nowrap; 
-  overflow:               hidden; 
-  text-overflow:          ellipsis;
 }
 
 table#events td a {
@@ -223,7 +218,7 @@ th.clear-col {
   vertical-align: top;
 }
 #column_time,
-#filter_timereported {
+#filter_time {
 	margin-right: 0px;
 	width: 120px;
 }

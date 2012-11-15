@@ -21,7 +21,7 @@
         </div>
     </div>
     
-    <table id="events" style="font-size: 8pt;">
+    <table id="events" style="font-size: 8pt; table-layout: fixed;">
       <thead>
     		<tr id="first">
     			<th width="30">&nbsp;</th>
@@ -47,7 +47,7 @@
             </td>
             <td class="event" data-bind="text: time"></td>
             <td class="event" data-bind="text: host"></td>
-            <td class="event" data-bind="text: message, attr: { title: message }"></td>
+            <td class="event" data-bind="text: message, attr: { title: message }" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></td>
           </tr>
         <!-- /ko -->
         

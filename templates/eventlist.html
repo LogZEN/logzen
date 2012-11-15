@@ -61,7 +61,7 @@
       <tr>
         <th class="column_menu"></th>
         <th class="input-col" id="column_time">
-          <input type="text" name="timereported" id="filter_timereported" placeholder="filter" readonly="readonly" size="5" />
+          <input type="text" name="timereported" id="filter_time" placeholder="filter" readonly="readonly" size="5" />
         </th>
         <th class="clear-col"><span class="q_tip clear-addon btn" id="time" title="Clear this filter">x</span></th>
         <th class="input-col" id="column_severity">
@@ -103,8 +103,8 @@
   	      <i class="icon-eye-open event_tooltip" title="<%_id%>"></i>
   	    </td>
   	    
-  	    <td colspan="2" class="event" data-bind="text: timereported"></td>
-  	    <td colspan="2" class="event"><a data-bind="text: severity, click: $root.setFilter('severity'), css: {
+  	    <td colspan="2" data-bind="text: timereported"></td>
+  	    <td colspan="2"><a data-bind="text: severity, click: $root.setFilter('severity'), css: {
   		    color_emerge: severity == 'emerge',
   		    color_alert: severity == 'alert',
   		    color_critical: severity == 'crit',
@@ -114,10 +114,10 @@
   		    color_info: severity == 'info',
   		    color_debug: severity == 'debug'
   	    }" class="badge"></a></td>
-  	    <td colspan="2" class="event"><a data-bind="text: facility, click: $root.setFilter('facility')"></a></td>
-          <td colspan="2" class="event"><a data-bind="text: host, click: $root.setFilter('host')"></a></td>
-          <td colspan="2" class="event"><a data-bind="text: program, click: $root.setFilter('program')"></a></td>
-  	    <td colspan="2"><a data-bind="text: message, click: $root.setFilter('message')"></a></td>
+  	    <td colspan="2"><a data-bind="text: facility, click: $root.setFilter('facility')"></a></td>
+        <td colspan="2"><a data-bind="text: host,     click: $root.setFilter('host')"></a></td>
+        <td colspan="2"><a data-bind="text: program,  click: $root.setFilter('program')"></a></td>
+  	    <td colspan="2"><a data-bind="text: message,  click: $root.setFilter('message')"></a></td>
   	  </tr>
 	  <!-- /ko -->
     

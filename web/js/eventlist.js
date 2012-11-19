@@ -23,12 +23,17 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
     function EventModel(data) {
       this.id = data._id;
-      this.timegenerated = data._source.timegenerated;
-      this.timereported = data._source.timereported;
+      this.time = data._source.time;
       this.facility = data._source.facility;
+      this.facility_text = ko.computed(function() {
+        return this.Defaults.facility[data._source.facility];
+      });
       this.severity = data._source.severity;
+      this.severity_text = ko.computed(function() {
+        return this.Defaults.severity[data._source.severity];
+      });
       this.detail_url = "/event/" + data._id;
-      this.host = data._source.hostname;
+      this.host = data._source.host;
       this.program = data._source.program;
       this.message = data._source.message;
     }
@@ -40,13 +45,19 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
   EventListModel = (function() {
 
     function EventListModel() {
+      this.nextPage = __bind(this.nextPage, this);
+
+      this.prevPage = __bind(this.prevPage, this);
+
       this.clearFilter = __bind(this.clearFilter, this);
 
       this.setFilter = __bind(this.setFilter, this);
 
       var _this = this;
       this.events = ko.observableArray([]);
+      this.hits = 0;
       this.loading = ko.observable(false);
+      this.page = ko.observable(0);
       this.error = ko.observable(null);
       this.filters = {
         'severity': ko.observable(""),
@@ -72,35 +83,53 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
       });
       this.query = ko.computed(function() {
         var filter;
-        return {
+        return cs({
           "query": {
-            "match_all": {}
+            "filtered": {
+              "query": {
+                "match_all": {}
+              },
+              "filter": cs["if"](_this.filledFilters().length > 0, {
+                "and": (function() {
+                  var _i, _len, _ref, _results;
+                  _ref = this.filledFilters();
+                  _results = [];
+                  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                    filter = _ref[_i];
+                    _results.push({
+                      'prefix': pivot('name', 'value', filter)
+                    });
+                  }
+                  return _results;
+                }).call(_this)
+              }, {})
+            }
           },
-          "filters": _this.filledFilters().length > 0 ? {
-            "and": (function() {
-              var _i, _len, _ref, _results;
-              _ref = this.filledFilters();
-              _results = [];
-              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                filter = _ref[_i];
-                _results.push({
-                  'prefix': pivot('name', 'value', filter)
-                });
+          "facets": {
+            "histo1": {
+              "date_histogram": {
+                "field": "time",
+                "interval": "day"
               }
-              return _results;
-            }).call(_this)
-          } : {},
-          "from": 0,
+            }
+          },
+          "from": _this.page() * 50,
           "size": 50,
-          "sort": []
-        };
+          "sort": [
+            {
+              "time": {
+                "order": "desc"
+              }
+            }
+          ]
+        });
       });
       this.loadEvents = ko.computed(function() {
         return $.ajax({
           url: $('#filterform').attr('action'),
           type: 'POST',
           contentType: "application/json",
-          data: JSON.stringify(_this.query()),
+          data: JSON.stringify(_this.query()()),
           dataType: 'json',
           beforeSend: function() {
             return _this.loading(true);
@@ -117,6 +146,8 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
               }
               return _results;
             })());
+            _this.hits = result.hits.total;
+            evlist.timeSeries(result.facets.histo1.entries);
             _this.error(null);
             return _this.loading(false);
           },
@@ -139,8 +170,20 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
     EventListModel.prototype.clearFilter = function(name) {
       var _this = this;
       return function() {
-        return _this.filters[name](null);
+        return _this.filters[name]("");
       };
+    };
+
+    EventListModel.prototype.prevPage = function() {
+      if (this.page() > 0) {
+        return this.page(this.page() - 1);
+      }
+    };
+
+    EventListModel.prototype.nextPage = function() {
+      if (this.page() * 50 + 50 < this.hits) {
+        return this.page(this.page() + 1);
+      }
     };
 
     EventListModel.prototype.timeSeries = function(data) {

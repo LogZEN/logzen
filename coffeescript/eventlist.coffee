@@ -15,12 +15,15 @@ pivot = (key, value, data) ->
 class EventModel
   constructor: (data) ->
     @id = data._id
-    @timegenerated = data._source.timegenerated
-    @timereported = data._source.timereported
+    @time = data._source.time
     @facility = data._source.facility
+    @facility_text = ko.computed () ->
+      @Defaults.facility[data._source.facility]
     @severity = data._source.severity
+    @severity_text = ko.computed () ->
+      @Defaults.severity[data._source.severity]
     @detail_url = "/event/" + data._id
-    @host = data._source.hostname
+    @host = data._source.host
     @program = data._source.program
     @message = data._source.message
     
@@ -28,8 +31,11 @@ class EventModel
 class EventListModel
   constructor: ->
     @events = ko.observableArray []
+    @hits = 0
     
     @loading = ko.observable false
+    
+    @page = ko.observable 0
     
     @error = ko.observable null
     
@@ -45,31 +51,43 @@ class EventListModel
         {'name': name, 'value': filter() }
       
     @query = ko.computed () =>
-      "query": 
-        "match_all" : {}
-      "filters": 
-        if @filledFilters().length > 0
-          "and":
-            for filter in @filledFilters()
-              { 'prefix': pivot('name', 'value', filter) }
-        else
-          {}
-      "from": 0
-      "size": 50
-      "sort": []
-    
+      cs
+        "query": 
+          "filtered":
+            "query":
+              "match_all" : {}
+            "filter": 
+              cs.if @filledFilters().length > 0, {
+                "and":
+                  for filter in @filledFilters()
+                    { 'prefix': pivot('name', 'value', filter) }
+              }, {}
+        "facets":
+          "histo1":
+            "date_histogram":
+              "field": "time"
+              "interval": "day"
+        "from": @page() * 50
+        "size": 50
+        "sort": [
+          "time": 
+            "order": "desc"
+        ]
+
+      
     @loadEvents = ko.computed () =>
       $.ajax
         url: $('#filterform').attr('action')
         type: 'POST'
         contentType: "application/json"
-        data: JSON.stringify @query()
+        data: JSON.stringify @query()()
         dataType: 'json'
         beforeSend: () => 
           @loading true
         success: (result) =>
           @events (new EventModel event for event in result.hits.hits)
-          #evlist.timeSeries result.facets.histo1.entries
+          @hits = result.hits.total
+          evlist.timeSeries result.facets.histo1.entries
           @error null
           @loading false
         error: (jqXHR, status, error) =>
@@ -81,8 +99,16 @@ class EventListModel
     (el) => @filters[name] el[name]
   
   clearFilter: (name) =>
-    () => @filters[name] null
+    () => @filters[name] ""
 
+  prevPage: () =>
+    if @page() > 0
+      @page(@page() - 1)
+      
+  nextPage: () =>
+    if @page() * 50 + 50 < @hits
+      @page(@page() + 1)
+    
   timeSeries: (data) ->
     chart = nv.models.multiBarTimeSeriesChart()
       .x((d) -> d.time)
@@ -91,6 +117,7 @@ class EventListModel
     chart.xAxis
       .tickFormat((d) -> d3.time.format('%x') new Date(d))
       .rotateLabels(-45)
+      
     chart.yAxis
       .tickFormat(d3.format(',.0f'))
       

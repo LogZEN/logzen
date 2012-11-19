@@ -25,15 +25,13 @@
 </div>
 <!-- /ko -->
 
+Showing events <span data-bind="text: page() * 50 + 1"></span> - <span data-bind="text: page() * 50 + 50"></span>
 <div class="row-fluid">
   <div class="span12">
   	<div id="navi" class="btn-toolbar">
-    	<span id="eventcount"></span>
     	<div class="btn-group">
-    		<a href="javascript:void(0);" class="btn q_tip" id="zoomoutbutton" title="Zoom out to a wider timerange">Zoom Out</a>
-    	</div>
-    	<div class="btn-group">
-    		<a class="btn left q_tip" title="Newer" href="javascript:void(0);" id="prevbutton">Prev</a><a class="btn right q_tip" title="Older" href="javascript:void(0);" id="nextbutton">Next</a>
+    		<a class="btn left q_tip" title="Newer" href="javascript:void(0);" data-bind="click: $root.prevPage">Prev</a>
+    		<a class="btn right q_tip" title="Older" href="javascript:void(0);" data-bind="click: $root.nextPage">Next</a>
     	</div>
     </div>
   </div>
@@ -41,7 +39,7 @@
 
 <div class="row-fluid">
  	<div class="span12">
-	  <div id="timeSeries" style="width: 100%;"><svg></svg></div>
+	  <div id="timeSeries" style="width: 100%"><svg></svg></div>
  	</div>
 </div>
 
@@ -103,21 +101,21 @@
   	      <i class="icon-eye-open event_tooltip" title="<%_id%>"></i>
   	    </td>
   	    
-  	    <td colspan="2" data-bind="text: timereported"></td>
-  	    <td colspan="2"><a data-bind="text: severity, click: $root.setFilter('severity'), css: {
-  		    color_emerge: severity == 'emerge',
-  		    color_alert: severity == 'alert',
-  		    color_critical: severity == 'crit',
-  		    color_error: severity == 'err',
-  		    color_warning: severity == 'warning',
-  		    color_notice: severity == 'notice',
-  		    color_info: severity == 'info',
-  		    color_debug: severity == 'debug'
+  	    <td colspan="2" data-bind="text: time"></td>
+  	    <td colspan="2"><a data-bind="text: severity_text, click: $root.setFilter('severity'), css: {
+  		    color_emerge: severity == '0',
+  		    color_alert: severity == '1',
+  		    color_critical: severity == '2',
+  		    color_error: severity == '3',
+  		    color_warning: severity == '4',
+  		    color_notice: severity == '5',
+  		    color_info: severity == '6',
+  		    color_debug: severity == '7'
   	    }" class="badge"></a></td>
-  	    <td colspan="2"><a data-bind="text: facility, click: $root.setFilter('facility')"></a></td>
-        <td colspan="2"><a data-bind="text: host,     click: $root.setFilter('host')"></a></td>
-        <td colspan="2"><a data-bind="text: program,  click: $root.setFilter('program')"></a></td>
-  	    <td colspan="2"><a data-bind="text: message,  click: $root.setFilter('message')"></a></td>
+  	    <td colspan="2"><a data-bind="text: facility_text,  click: $root.setFilter('facility')"></a></td>
+        <td colspan="2"><a data-bind="text: host,           click: $root.setFilter('host')"></a></td>
+        <td colspan="2"><a data-bind="text: program,        click: $root.setFilter('program')"></a></td>
+  	    <td colspan="2"><a data-bind="text: message,        click: $root.setFilter('message')"></a></td>
   	  </tr>
 	  <!-- /ko -->
     

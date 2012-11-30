@@ -115,7 +115,7 @@ Showing events <span data-bind="text: page() * 50 + 1"></span> - <span data-bind
   	    <td colspan="2"><a data-bind="text: facility_text,  click: $root.setFilter('facility')"></a></td>
         <td colspan="2"><a data-bind="text: host,           click: $root.setFilter('host')"></a></td>
         <td colspan="2"><a data-bind="text: program,        click: $root.setFilter('program')"></a></td>
-  	    <td colspan="2"><a data-bind="text: message,        click: $root.setFilter('message')"></a></td>
+  	    <td colspan="2"><a data-bind="html: message_hl,     click: $root.setFilter('message')"></a></td>
   	  </tr>
 	  <!-- /ko -->
     

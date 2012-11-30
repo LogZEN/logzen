@@ -26,6 +26,7 @@ class EventModel
     @host = data._source.host
     @program = data._source.program
     @message = data._source.message
+    @message_hl = evlist.markIP data._source.message 
     
     
 class EventListModel
@@ -74,7 +75,6 @@ class EventListModel
             "order": "desc"
         ]
 
-      
     @loadEvents = ko.computed () =>
       $.ajax
         url: $('#filterform').attr('action')
@@ -85,15 +85,17 @@ class EventListModel
         beforeSend: () => 
           @loading true
         success: (result) =>
-          @events (new EventModel event for event in result.hits.hits)
-          @hits = result.hits.total
-          evlist.timeSeries result.facets.histo1.entries
+          @loading false
           @error null
-          @loading false
+          @hits = result.hits.total
+          @events (new EventModel event for event in result.hits.hits)
+          evlist.timeSeries result.facets.histo1.entries
+          evlist.addTooltips()
         error: (jqXHR, status, error) =>
-          @events []
-          @error error
           @loading false
+          @error error
+          @hits = 0
+          @events []
 
   setFilter: (name) =>
     (el) => @filters[name] el[name]
@@ -130,7 +132,32 @@ class EventListModel
 
     nv.utils.windowResize(chart.update)
 
+  markIP: (msg) ->
+    ipv4_regex = /((([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0))/g
+    msg.replace(ipv4_regex, '<span class="tooltip_ip">$1</span>');
+
+  addTooltips: -> 
+    $('.tooltip_ip').each (index, element) =>
+      el = $(element)
+      el.qtip
+        content:
+          text: 'Loading...',
+          ajax: 
+            url: '/tooltips/ip',
+            type: 'GET',
+            data: 
+              ip: el.text()
+            success: (data, status) ->
+              this.set('content.text', data)
+        position:
+          my: 'top left',
+          at: 'bottom center'
+        hide:
+          fixed: true,
+          delay: 200
+        style:
+          classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
+
 
 evlist = new EventListModel
-
 ko.applyBindings evlist

@@ -36,6 +36,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
       this.host = data._source.host;
       this.program = data._source.program;
       this.message = data._source.message;
+      this.message_hl = evlist.markIP(data._source.message);
     }
 
     return EventModel;
@@ -136,6 +137,9 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
           },
           success: function(result) {
             var event;
+            _this.loading(false);
+            _this.error(null);
+            _this.hits = result.hits.total;
             _this.events((function() {
               var _i, _len, _ref, _results;
               _ref = result.hits.hits;
@@ -146,15 +150,14 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
               }
               return _results;
             })());
-            _this.hits = result.hits.total;
             evlist.timeSeries(result.facets.histo1.entries);
-            _this.error(null);
-            return _this.loading(false);
+            return evlist.addTooltips();
           },
           error: function(jqXHR, status, error) {
-            _this.events([]);
+            _this.loading(false);
             _this.error(error);
-            return _this.loading(false);
+            _this.hits = 0;
+            return _this.events([]);
           }
         });
       });
@@ -207,6 +210,46 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
         }
       ]).transition().duration(100).call(chart);
       return nv.utils.windowResize(chart.update);
+    };
+
+    EventListModel.prototype.markIP = function(msg) {
+      var ipv4_regex;
+      ipv4_regex = /((([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0))/g;
+      return msg.replace(ipv4_regex, '<span class="tooltip_ip">$1</span>');
+    };
+
+    EventListModel.prototype.addTooltips = function() {
+      var _this = this;
+      return $('.tooltip_ip').each(function(index, element) {
+        var el;
+        el = $(element);
+        return el.qtip({
+          content: {
+            text: 'Loading...',
+            ajax: {
+              url: '/tooltips/ip',
+              type: 'GET',
+              data: {
+                ip: el.text()
+              },
+              success: function(data, status) {
+                return this.set('content.text', data);
+              }
+            }
+          },
+          position: {
+            my: 'top left',
+            at: 'bottom center'
+          },
+          hide: {
+            fixed: true,
+            delay: 200
+          },
+          style: {
+            classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
+          }
+        });
+      });
     };
 
     return EventListModel;

@@ -220,27 +220,27 @@ th.clear-col {
 #column_time,
 #filter_time {
 	margin-right: 0px;
-	width: 120px;
-}
-#column_host,
-#filter_fromhost {
-    margin-right: 0px;
-    width: 110px;
-}
-#column_facility,
-#filter_facility {
-    margin-right: 0px;
-    width: 70px;
+	width: 130px;
 }
 #column_severity,
 #filter_severity {
     margin-right: 0px;
-    width: 60px;
+    width: 40px;
+}
+#column_facility,
+#filter_facility {
+    margin-right: 0px;
+    width: 40px;
+}
+#column_host,
+#filter_fromhost {
+    margin-right: 0px;
+    width: 80px;
 }
 #column_program,
 #filter_program {
     margin-right: 0px;
-    width: 110px;
+    width: 80px;
 }
 #filter_message {
     margin-right: 0px;

@@ -48,7 +48,7 @@ class LatestEvents
 
   update: (severity) =>
     @severitySelected severity
-    view.load()
+    LatestEventsView.load()
     
   load: =>
     $.ajax

@@ -422,3 +422,21 @@ table td.count {
 	text-align:                right;
 	padding-left:              20px;
 }
+
+
+
+/*
+ * text-alignments
+ */
+.text-left {
+  text-align: left;
+}
+.text-center {
+  text-align: center;
+}
+.text-right {
+  text-align: right;
+}
+.text-justify {
+  text-align: justify;
+}

@@ -134,7 +134,7 @@ li#navclock {
 /*
  * eventlist table
  */
-table#events {
+table.events {
   width:                  100%;
   
   border:                 1px #aaa solid;
@@ -145,38 +145,46 @@ table#events {
   
 }
 
-table#events tr#first th {
+table.events tr:first-child th {
   border-top:             1px #aaa solid;
 }
 
-table#events th {
+table.events th {
   background-color:       #F6F6F6;
   border-top:             1px #aaa solid;
   border-bottom:          1px #999999 solid;
   height:                 2em;
 }
 
-table#events tr:hover {
+table.events tr:hover {
 	  background-color:     #eee;
 }
 
-table#events td {
+table.events td {
   border-bottom:          1px #999999 dashed;
   padding:                1px 8px;
 }
 
-table#events td a {
+table.events td a {
   color:                  #000;
   text-decoration:        none;
 }
 
-table#events td a:hover {
+table.events td a:hover {
   color:                  #39b;
 }
 
-table#events td#noresults {
+table.events td.noresults {
   line-height:            50px;
   text-align:             center;
+}
+
+table.widget_table {
+  border:                 0px;
+}
+
+table.widget_table tr:last-child td {
+  border-bottom:          0px;
 }
 
 /*

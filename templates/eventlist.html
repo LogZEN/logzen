@@ -45,9 +45,9 @@ Showing events <span data-bind="text: page() * 50 + 1"></span> - <span data-bind
 
 <div class="row-fluid">
   <form action="/_api/query" method="post" id="filterform" class="form-inline">
-  <table id="events" class="table-condensed">
+  <table class="events table-condensed">
     <thead>
-      <tr id="first">
+      <tr>
         <th class="column_menu"></th>
         <th colspan="2">Time</th>
         <th colspan="2">Severity</th>
@@ -120,7 +120,7 @@ Showing events <span data-bind="text: page() * 50 + 1"></span> - <span data-bind
 	  <!-- /ko -->
     
     <!--  ko ifnot: events().length -->
-      <tr><td colspan="13" id="noresults">No Events</td></tr>
+      <tr><td colspan="13" class="noresults">No Events</td></tr>
 	  <!-- /ko -->
     </tbody>
     

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% if searchengine == "google" %}
+  {% set searchengine = "https://www.google.com/search?q=" %}
+  {% set searchengine_name = "Google" %}
+{% else %}
+  {% set searchengine = "https://ixquick.com/do/search?q=" %}
+  {% set searchengine_name = "ixquick" %}
+{% endif %}
+
+{% block title %}Events{% endblock %}
+
+{% block content %}
+
+<div id="loading" data-bind="visible: loading"></div>
+
+<!--  ko if: error -->
+<div class="row-fluid">
+  <div class="span12">
+    <div class="alert alert-block alert-error">
+      <strong>Error:</strong>
+      <span data-bind="text: error"></span>
+    </div>
+  </div>
+</div>
+<!-- /ko -->
+
+
+<div class="row-fluid" id="eventlistlive">
+  <table class="events table-condensed table-striped">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Severity</th>
+        <th>Facility</th>
+        <th>Host</th>
+        <th>Program</th>
+        <th>Message</th>
+      </tr>
+    </thead>
+    <tbody>
+    <!-- ko foreach: events -->
+  	  <tr>
+  	    <td data-bind="text: time"></td>
+  	    <td><a data-bind="text: severity_text, css: {
+  		    color_emerge: severity == '0',
+  		    color_alert: severity == '1',
+  		    color_critical: severity == '2',
+  		    color_error: severity == '3',
+  		    color_warning: severity == '4',
+  		    color_notice: severity == '5',
+  		    color_info: severity == '6',
+  		    color_debug: severity == '7'
+  	    }" class="badge"></a></td>
+  	    <td><a data-bind="text: facility_text"></a></td>
+        <td><a data-bind="text: host"></a></td>
+        <td><a data-bind="text: program"></a></td>
+  	    <td><a data-bind="html: message_hl"></a></td>
+  	  </tr>
+	  <!-- /ko -->
+    
+    <!--  ko ifnot: events().length -->
+      <tr><td colspan="13" class="noresults">No Events</td></tr>
+	  <!-- /ko -->
+    </tbody>
+    
+  </table>
+</div>
+
+<script type="text/javascript" src="/static/js/eventlist_live.js"></script>
+
+
+{% endblock %}

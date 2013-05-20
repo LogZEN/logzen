@@ -41,6 +41,8 @@ if __name__ == '__main__':
   else:
     dispatcher.connect('overview1', '/', Overview(), action = 'index')
     dispatcher.connect('events1', '/events', Events(), action = 'index')
+    dispatcher.connect('events2', '/events/live', Events(), action = 'live')
+
     dispatcher.connect('event4', '/event/:event_id', Events(), action = 'details')
 
     dispatcher.connect('tooltips1', '/tooltips/event', Tooltips(), action = 'event')

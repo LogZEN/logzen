@@ -94,6 +94,28 @@ h4.inline {
 }
 
 
+.brand {
+  position: relative;
+  top: 8px;
+  margin: 0px;
+  
+}
+.brand span {
+  font-size: 20px;
+  color: #ccc;
+  padding: 6px 16px 8px 16px;
+  background-color: #909AAA;
+  border-radius: 10px;
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
+  background: -webkit-gradient(linear, left bottom, left top, from(#025080), to(#809ACA));
+  background: -moz-linear-gradient(center bottom, #025080, #809ACA);
+}
+.navbar {
+  box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.4);
+}
+
 /*
  * navigation
  *
@@ -439,4 +461,19 @@ table td.count {
 }
 .text-justify {
   text-align: justify;
+}
+
+
+/*
+ * eventlist live
+ */
+
+
+#eventlistlive table {
+  width: 100%;
+  border: 0px;
+}
+
+#eventlistlive th {
+  border-top: 0px;
 }

@@ -83,8 +83,8 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
           'facets': {
             'byevent': {
               'terms': {
-                'field': 'message',
-                "size": 5,
+                'script_field': '_fields.message',
+                'count': 5,
                 'exclude': _this.excludeMessages()
               },
               'facet_filter': {

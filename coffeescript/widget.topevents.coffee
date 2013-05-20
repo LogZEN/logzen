@@ -45,8 +45,8 @@ class TopEvents
       'facets':
         'byevent':
           'terms':
-            'field': 'message'
-            "size": 5
+            'script_field': '_fields.message'
+            'count': 5
             'exclude' : @excludeMessages()
           'facet_filter':
             'and': [
@@ -55,8 +55,7 @@ class TopEvents
                 'severity':
                   'from': 0
                   'to': @severitySelected()
-              }
-              {
+              }, {
               'range':
                 'time' :
                    'from': from

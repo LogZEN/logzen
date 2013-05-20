@@ -103,7 +103,14 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
                   }
                   return _results;
                 }).call(_this)
-              }, {})
+              }, {
+                "range": {
+                  "severity": {
+                    "from": 0,
+                    "to": 8
+                  }
+                }
+              })
             }
           },
           "facets": {

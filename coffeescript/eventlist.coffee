@@ -62,7 +62,12 @@ class EventListModel
                 "and":
                   for filter in @filledFilters()
                     { 'prefix': pivot('name', 'value', filter) }
-              }, {}
+              }, {
+                "range":
+                  "severity":
+                    "from": 0,
+                    "to": 8
+              }
         "facets":
           "histo1":
             "date_histogram":

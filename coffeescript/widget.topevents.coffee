@@ -45,7 +45,7 @@ class TopEvents
       'facets':
         'byevent':
           'terms':
-            'script_field': '_fields.message'
+            'script_field': '_source.message'
             'count': 5
             'exclude' : @excludeMessages()
           'facet_filter':

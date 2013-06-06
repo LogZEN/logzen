@@ -9,7 +9,9 @@ class EventModel
   constructor: (data) ->
     @count = data.count
     @message = data.term
-    
+
+
+
 class TopEvents
   constructor: ->
     @excludeMessages = ko.observableArray []
@@ -89,6 +91,7 @@ class TopEvents
       success: (result) =>
         @events (new EventModel event for event in result.facets.byevent.terms)
         add_qtips()
+
 
 
 TopEventsView = new TopEvents

@@ -24,13 +24,16 @@ from logview.backend import backend
 from logview.authentication.auth import require
 
 
+
 class Api:
   _cp_config = {
     'tools.auth.on': True
   }
 
+
   def __init__(self):
     pass
+
 
   @cherrypy.tools.json_in()
   @cherrypy.tools.json_out()

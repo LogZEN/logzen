@@ -28,12 +28,15 @@ from logview.config import Config
 
 SESSION_KEY = Config().logview['sessionkey']
 
+
+
 def check_credentials(username, password):
   if Config().has_section(username):
     if Config().get(username, 'password') == hashlib.sha256(password).hexdigest():
       return None
 
   return u"Incorrect username or password."
+
 
 def check_auth(*args, **kwargs):
   get_parmas = urllib.quote(cherrypy.request.request_line.split()[1])
@@ -46,6 +49,7 @@ def check_auth(*args, **kwargs):
 
 cherrypy.tools.auth = cherrypy.Tool('before_handler', check_auth)
 
+
 def require(func = None):
   def decorate(func):
     if not hasattr(func, '_cp_config'):
@@ -55,6 +59,7 @@ def require(func = None):
     return func
 
   return decorate
+
 
 
 class AuthController(object):
@@ -80,6 +85,7 @@ class AuthController(object):
       cherrypy.session[SESSION_KEY] = cherrypy.request.login = username
       templates.globals['session_username'] = username
       raise cherrypy.HTTPRedirect(from_page or "/")
+
 
   def logout(self,
              from_page = "/"):

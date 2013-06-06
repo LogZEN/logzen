@@ -22,6 +22,7 @@ import pyes
 from logview.config import Config
 
 
+
 class ElasticSearchBackend:
     def __init__(self):
         servers = [value for key, value in Config().es if key.startswith('server_')]
@@ -41,16 +42,20 @@ class ElasticSearchBackend:
         self.__connection = pyes.ES(servers,
                                     basic_auth = auth)
 
+
     def query(self,
               query):
         return self.__connection.search_raw(query = query,
                                             indices = Config().es['index'],
                                             doc_types = Config().es['type'])
 
+
     def get(self,
             id):
         return self.__connection.get(id = id,
                                      index = Config().es['index'],
                                      doc_type = Config().es['type'])
+
+
 
 backend = ElasticSearchBackend()

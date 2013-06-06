@@ -5,7 +5,6 @@ This file is part of pyLogView. It is licensed under the terms of the
 GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-
 class TopHosts
   constructor: ->
     @rangeSelected = ko.observable 1
@@ -76,6 +75,8 @@ class TopHosts
 
         nv.utils.windowResize(chart1.update)
         nv.utils.windowResize(chart2.update)
+
+
 
 TopHostsView = new TopHosts
 TopHostsView.load()

@@ -1,3 +1,9 @@
+###
+ * Copyright 2012 Dustin Frisch <fooker@lab.sh>
+ *
+ * This file is part of pyLogView. It is licensed under the terms of the
+ * GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
+###
 
 map = (data, transform_key, transform_value) ->
   result = {}
@@ -71,7 +77,6 @@ cs.filter = (predicate, data) ->
         result[key] = value
     
     return result
-
 
 
 

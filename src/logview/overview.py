@@ -28,13 +28,16 @@ from logview.backend import backend
 from logview import templates
 
 
+
 class Overview:
   _cp_config = {
     'tools.auth.on': True
   }
 
+
   def __init__(self):
     pass
+
 
   #=============================================================================
   # dashboard
@@ -44,11 +47,13 @@ class Overview:
     template = templates.get_template('overview.html')
     return template.render(pagename = "overview")
 
+
   @cherrypy.tools.json_out()
   @require()
   def get_events_by_host(self):
     events_by_host = backend.event_count_by_host()
     return events_by_host
+
 
   @cherrypy.tools.json_out()
   @require()
@@ -63,6 +68,7 @@ class Overview:
 
     return data
 
+
   @cherrypy.tools.json_out()
   @require()
   def get_new_events(self,
@@ -74,6 +80,7 @@ class Overview:
       eventmap.append(event)
 
     return eventmap
+
 
   @cherrypy.tools.json_out()
   @require()
@@ -95,6 +102,7 @@ class Overview:
     data['count_severity'] = eventmap
     data['hosts'] = backend.get_hosts()
     return data
+
 
   @cherrypy.tools.json_out()
   @require()

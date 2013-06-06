@@ -27,6 +27,8 @@ countries = (
   'VU', 'WF', 'WS', 'YE', 'YT', 'RS', 'ZA', 'ZM', 'ME', 'ZW', 'A1', 'A2', 'O1',
   'AX', 'GG', 'IM', 'JE', 'BL', 'MF')
 
+
+
 def iptonum(ip):
   """
   Convert IP address string to 32-bit integer, or return None if IP is bad.
@@ -47,8 +49,12 @@ def iptonum(ip):
 
   return num
 
+
+
 class DatabaseError(Exception):
   pass
+
+
 
 class GeoIP(object):
   """
@@ -57,11 +63,13 @@ class GeoIP(object):
   _record_length = 3
   _country_start = 16776960
 
+
   def __init__(self, dbname = './src/logview/geoip/GeoIP.dat'):
     """
     Init GeoIP instance with given GeoIP country database file.
     """
     self._dbfile = open(dbname, 'rb')
+
 
   def country(self, ip):
     """
@@ -73,6 +81,7 @@ class GeoIP(object):
       return ''
 
     return countries[self._country_id(ipnum)]
+
 
   def _country_id(self, ipnum):
     """
@@ -94,11 +103,15 @@ class GeoIP(object):
 
     raise DatabaseError('GeoIP database corrupt: offset=%s' % offset)
 
+
+
 def country(ip, dbname = './src/logview/geoip/GeoIP.dat'):
   """
   Helper function that creates a GeoIP instance and calls country().
   """
   return GeoIP(dbname).country(ip)
+
+
 
 if __name__ == '__main__':
   import doctest

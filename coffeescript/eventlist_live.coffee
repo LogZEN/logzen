@@ -21,7 +21,8 @@ class EventModel
     @message = data._source.message
     @message_hl = evlist.markIP data._source.message 
     
-    
+
+
 class EventListModel
   constructor: ->
     @events = ko.observableArray []
@@ -69,8 +70,11 @@ class EventListModel
     ipv4_regex = /((([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0))/g
     msg.replace(ipv4_regex, '<span class="tooltip_ip">$1</span>');
 
+
+
 evlist = new EventListModel
 evlist.load()
+
 setInterval evlist.load, 5000
 
 ko.applyBindings evlist

@@ -46,7 +46,3 @@ class @Defaults
     "local7"
   ]
   
-  # Colors
-  
-  # Graphs
-

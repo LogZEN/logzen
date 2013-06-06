@@ -12,6 +12,7 @@ pivot = (key, value, data) ->
   return result
 
 
+
 class EventModel
   constructor: (data) ->
     @id = data._id
@@ -27,8 +28,9 @@ class EventModel
     @program = data._source.program
     @message = data._source.message
     @message_hl = evlist.markIP data._source.message 
-    
-    
+
+
+
 class EventListModel
   constructor: ->
     @events = ko.observableArray []
@@ -164,5 +166,7 @@ class EventListModel
           classes: 'ui-tooltip-dark ui-tooltip-shadow ui-tooltip-rounded'
 
 
+
+}
 evlist = new EventListModel
 ko.applyBindings evlist

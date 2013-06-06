@@ -16,6 +16,7 @@ class EventModel
     @message = data.message
 
 
+
 class EventView
   constructor: ->
     @event = ko.observable
@@ -32,6 +33,7 @@ class EventView
         @event (new EventModel result)
         @loading false
         
+
 
 view = new EventView
 view.loadEvent()

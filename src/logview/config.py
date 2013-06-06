@@ -26,8 +26,11 @@ DEFAULTS = {'backend.minconn': '1',
             'ui.searchengine': 'google'
             }
 
+
+
 class Config(object):
   __instance = None
+
 
   def __new__(cls, *args, **kwargs):
     if cls.__instance is None:
@@ -35,6 +38,7 @@ class Config(object):
       cls.__instance.__init()
 
     return cls.__instance
+
 
   def __init(self):
     self.__parser = SafeConfigParser(DEFAULTS)
@@ -47,6 +51,7 @@ class Config(object):
 
     if len(config_missing) is not 0:
       print "Warning: Missing configuration files: %s" % config_missing
+
 
   def __getattr__(self,
                   section):
@@ -64,9 +69,11 @@ class Config(object):
 
     return SectionWrapper()
 
+
   def has_section(self,
                   section):
     return self.__parser.has_section(section)
+
 
   def get(self,
           section,

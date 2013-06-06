@@ -21,5 +21,7 @@ import os
 
 import jinja2
 
+
+
 loader = jinja2.FileSystemLoader(os.path.join(os.getcwd(), 'templates'))
 templates = jinja2.Environment(loader = loader)

@@ -22,13 +22,16 @@ from logview.geoip import geoip
 from logview import templates
 
 
+
 class Events:
   _cp_config = {
     'tools.auth.on': True
   }
 
+
   def __init__(self):
     pass
+
 
   #=============================================================================
   # eventlist

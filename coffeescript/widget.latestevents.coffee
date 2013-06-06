@@ -13,7 +13,9 @@ class EventModel
     @host = data._source.host
     @program = data._source.program
     @message = data._source.message
-    
+
+
+
 class LatestEvents
   constructor: ->
     @events = ko.observableArray []
@@ -59,6 +61,7 @@ class LatestEvents
       dataType: 'json'
       success: (result) =>
         @events (new EventModel event for event in result.hits.hits)
+
 
 
 LatestEventsView = new LatestEvents

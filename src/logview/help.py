@@ -25,9 +25,11 @@ from logview.config import Config
 from logview import templates
 
 
+
 class Help:
   def __init__(self):
     pass
+
 
   #=============================================================================
   # about
@@ -36,12 +38,14 @@ class Help:
     template = templates.get_template('about.html')
     return template.render(pagename = "help")
 
+
   #=============================================================================
   # an information page shown for unconfigured installations
   #=============================================================================
   def unconfigured(self):
     template = templates.get_template('unconfigured.html')
     return template.render(pagename = "help")
+
 
   #=============================================================================
   # create user form

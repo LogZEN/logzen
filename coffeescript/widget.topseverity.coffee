@@ -80,5 +80,7 @@ class TopSeverity
 
           nv.utils.windowResize(chart1.update)
 
+
+
 TopSeverityView =  new TopSeverity
 ko.applyBindings TopSeverityView, $('#widget_topseverity').get(0)

@@ -32,6 +32,7 @@ from logview import templates
 from logview.config import Config
 
 
+
 class Tooltips:
   _cp_config = {
     'tools.auth.on': True
@@ -39,6 +40,7 @@ class Tooltips:
 
   def __init__(self):
     templates.globals['searchengine'] = Config().logview['ui.searchengine']
+
 
   #=============================================================================
   # event tooltip
@@ -58,6 +60,7 @@ class Tooltips:
     event['ago_time'] = humanize.naturaltime(datetime.now() - event['reported_time'])
 
     return template.render(event = event)
+
 
   #=============================================================================
   # ip address tooltip

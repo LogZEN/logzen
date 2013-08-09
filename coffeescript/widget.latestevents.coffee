@@ -16,6 +16,8 @@ class EventModel
     
 class LatestEvents
   constructor: ->
+    @loading = ko.observable false
+    
     @events = ko.observableArray []
     @severitySelected = ko.observable 7
     @severitySelectedLabel = ko.computed () =>
@@ -51,14 +53,21 @@ class LatestEvents
     LatestEventsView.load()
     
   load: =>
-    $.ajax
-      url: "/_api/query",
-      type: 'POST'
-      contentType: "application/json"
-      data: JSON.stringify @query()
-      dataType: 'json'
-      success: (result) =>
-        @events (new EventModel event for event in result.hits.hits)
+    console.log @loading()
+    if @loading() != true
+      $.ajax
+        url: "/_api/query",
+        type: 'POST'
+        contentType: "application/json"
+        data: JSON.stringify @query()
+        dataType: 'json'
+        beforeSend: () => 
+          @loading true
+        success: (result) =>
+          @events (new EventModel event for event in result.hits.hits)
+          @loading false
+        error: (jqXHR, status, error) =>
+          @loading false
 
 
 LatestEventsView = new LatestEvents

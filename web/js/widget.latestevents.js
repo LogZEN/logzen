@@ -35,6 +35,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
       this.update = __bind(this.update, this);
 
       var _this = this;
+      this.loading = ko.observable(false);
       this.events = ko.observableArray([]);
       this.severitySelected = ko.observable(7);
       this.severitySelectedLabel = ko.computed(function() {
@@ -92,26 +93,36 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
     LatestEvents.prototype.load = function() {
       var _this = this;
-      return $.ajax({
-        url: "/_api/query",
-        type: 'POST',
-        contentType: "application/json",
-        data: JSON.stringify(this.query()),
-        dataType: 'json',
-        success: function(result) {
-          var event;
-          return _this.events((function() {
-            var _i, _len, _ref, _results;
-            _ref = result.hits.hits;
-            _results = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              event = _ref[_i];
-              _results.push(new EventModel(event));
-            }
-            return _results;
-          })());
-        }
-      });
+      console.log(this.loading());
+      if (this.loading() !== true) {
+        return $.ajax({
+          url: "/_api/query",
+          type: 'POST',
+          contentType: "application/json",
+          data: JSON.stringify(this.query()),
+          dataType: 'json',
+          beforeSend: function() {
+            return _this.loading(true);
+          },
+          success: function(result) {
+            var event;
+            _this.events((function() {
+              var _i, _len, _ref, _results;
+              _ref = result.hits.hits;
+              _results = [];
+              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                event = _ref[_i];
+                _results.push(new EventModel(event));
+              }
+              return _results;
+            })());
+            return _this.loading(false);
+          },
+          error: function(jqXHR, status, error) {
+            return _this.loading(false);
+          }
+        });
+      }
     };
 
     return LatestEvents;

@@ -13,31 +13,62 @@
   </div>
   <!-- /ko -->
   
-  Showing events <span data-bind="text: page() * 50 + 1"></span> - <span data-bind="text: page() * 50 + 50"></span>
+  
   <div class="row-fluid">
-    <div class="span12">
-    	<div id="navi" class="btn-toolbar">
-      	<div class="btn-group">
-      		<a class="btn left q_tip" title="Newer" href="javascript:void(0);" data-bind="click: $parentContext.prevPage">Prev</a>
-      		<a class="btn right q_tip" title="Older" href="javascript:void(0);" data-bind="click: $parentContext.nextPage">Next</a>
-      	</div>
+    <div id="evlist_nav" class="span12">
+      <span id="eventcount">
+        Showing events <span data-bind="text: page() * 50 + 1"></span> - <span data-bind="text: page() * 50 + 50"></span>
+      </span>
+  	  <span class="btn-group">
+        <a class="btn btn-small left q_tip" title="Newer" href="javascript:void(0);" data-bind="click: prevPage">Prev</a>
+        <a class="btn btn-small right q_tip" title="Older" href="javascript:void(0);" data-bind="click: nextPage">Next</a>
+      </span>
+      <span class="btn-group">
+        <a class="btn btn-small q_tip active" title="Refresh" href="javascript:void(0);" data-toggle="button" data-bind="click: refreshPage, css: { 'btn-primary': refreshId() != -1 }">Refresh</a>
+<!--
+        <button class="btn btn-small dropdown-toggle" data-toggle="dropdown" data-bind="click: refreshPage, css: { 'btn-primary': refreshId() != -1 }">
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li>lala</li>
+        </ul>
+-->
       </div>
     </div>
   </div>
   
+  <!-- graph --
   <div class="row-fluid">
    	<div class="span12">
   	  <div id="timeSeries" style="width: 100%"><svg></svg></div>
    	</div>
   </div>
+  -->
 
+  <!-- freetext query -->
+  <div class="modal" id="widgetNumberError" data-bind="visible: filterMode() == 'freetext'">
+    <div class="modal-header">
+      <button type="button" class="close" data-bind="click: function (data, event) { filterMode('fields'); }">&times;</button>
+      <h3>Freetext query</h3>
+    </div>
+    <div class="modal-body">
+      <pre contenteditable="true" id="filter_freetext" class="textarea prettyjson" data-bind="html: freetextValueFormatted"></pre>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn btn-primary">Submit</a>
+      <a href="#" class="btn" data-bind="click: function (data, event) { filterMode('fields'); }">Close</a>
+    </div>
+  </div>
+  
+      
+  <!-- results and filters -->
   <div class="tab-pane active" id="tab1">  
   <div class="row-fluid">
     <form action="/_api/query" method="post" id="filterform" class="form-inline">
     <table class="events table-condensed">
       <thead>
         <tr>
-          <th class="column_menu"></th>
+          <th class="column_menu">&nbsp;</th>
           <th colspan="2">Time</th>
           <th colspan="2">Severity</th>
           <th colspan="2">Facility</th>
@@ -46,41 +77,31 @@
           <th colspan="2">Message</th>
         </tr>
         <tr>
-        
-          <!-- ko if: filterMode() == 'fields' -->
-            <th class="column_menu"><button type="button" class="close" data-bind="click: function (data, event) { filterMode('freetext'); }"><i class="icon-edit"></i></button></th>
-            <th class="input-col" id="column_time">
-              <input type="text" name="timereported" id="filter_time" placeholder="filter" readonly="readonly" size="5" />
-            </th>
-            <th class="clear-col"><span class="q_tip clear-addon btn" id="time" title="Clear this filter">&times;</span></th>
-            <th class="input-col" id="column_severity">
-              <input type="text" name="severity" id="filter_severity" class="filter" placeholder="filter" size="5" data-bind="value: filters.severity, valueUpdate: 'afterkeydown'" data-provide="typeahead" data-items="4" data-source='["emerge","alert","critical","error","warning","notice","info","debug"]' />
-            </th>
-            <th class="clear-col"><span class="q_tip clear-addon btn" id="severity" title="Clear this filter" data-bind="click: clearFilter('severity')">&times;</span></th>
-            <th class="input-col" id="column_facility">
-              <input type="text" name="facility" id="filter_facility" class="filter" placeholder="filter" size="5" data-bind="value: filters.facility, valueUpdate: 'afterkeydown'" />
-            </th>
-            <th class="clear-col"><span class="q_tip clear-addon btn" id="facility" title="Clear this filter" data-bind="click: clearFilter('facility')">&times;</span></th>
-            <th class="input-col" id="column_host">
-              <input type="text" name="fromhost" id="filter_fromhost" class="filter" placeholder="filter" size="5" data-bind="value: filters.host, valueUpdate: 'afterkeydown'" />
-            </th>
-            <th class="clear-col"><span class="q_tip clear-addon btn" id="fromhost" title="Clear this filter" data-bind="click: clearFilter('host')">&times;</span></th>
-            <th class="input-col" id="column_program">
-              <input type="text" name="program" id="filter_program" class="filter" placeholder="filter" size="5" data-bind="value: filters.program, valueUpdate: 'afterkeydown'" />
-            </th>
-            <th class="clear-col"><span class="q_tip clear-addon btn" id="program" title="Clear this filter" data-bind="click: clearFilter('program')">&times;</span></th>
-            <th class="input-col" id="column_message">
-              <input type="text" name="message" id="filter_message" class="filter" placeholder="filter" size="5" data-bind="value: filters.message, valueUpdate: 'afterkeydown'" />
-            </th>
-            <th class="clear-col"><span class="q_tip clear-addon btn" id="message" title="Clear this filter" data-bind="click: clearFilter('message')">&times;</span></th>
-          <!-- /ko -->
-          
-          <!-- ko if: filterMode() == 'freetext' -->
-            <th class="input-col" id="column_freetext" colspan="12">
-              <input type="text" name="freetext" id="filter_freetext" class="filter" placeholder="filter" size="5" data-bind="value: freetext" />
-            </th>
-            <th class="clear-col"><span class="q_tip clear-addon btn" id="freetext" title="Clear" data-bind="click: function (data, event) { freetext(''); }">&times;</span></th>
-          <!-- /ko --> 
+          <th class="column_menu"><button type="button" class="close" data-bind="click: function (data, event) { filterMode('freetext'); }"><i class="icon-edit"></i></button></th>
+          <th class="input-col" id="column_time">
+            <input type="text" name="timereported" id="filter_time" placeholder="filter" readonly="readonly" size="5" />
+          </th>
+          <th class="clear-col"><span class="q_tip clear-addon btn" id="time" title="Clear this filter">&times;</span></th>
+          <th class="input-col" id="column_severity">
+            <input type="text" name="severity" id="filter_severity" class="filter" placeholder="filter" size="5" data-bind="value: filters.severity, valueUpdate: 'afterkeydown'" data-provide="typeahead" data-items="4" data-source='["emerge","alert","critical","error","warning","notice","info","debug"]' />
+          </th>
+          <th class="clear-col"><span class="q_tip clear-addon btn" id="severity" title="Clear this filter" data-bind="click: clearFilter('severity')">&times;</span></th>
+          <th class="input-col" id="column_facility">
+            <input type="text" name="facility" id="filter_facility" class="filter" placeholder="filter" size="5" data-bind="value: filters.facility, valueUpdate: 'afterkeydown'" />
+          </th>
+          <th class="clear-col"><span class="q_tip clear-addon btn" id="facility" title="Clear this filter" data-bind="click: clearFilter('facility')">&times;</span></th>
+          <th class="input-col" id="column_host">
+            <input type="text" name="fromhost" id="filter_fromhost" class="filter" placeholder="filter" size="5" data-bind="value: filters.host, valueUpdate: 'afterkeydown'" />
+          </th>
+          <th class="clear-col"><span class="q_tip clear-addon btn" id="fromhost" title="Clear this filter" data-bind="click: clearFilter('host')">&times;</span></th>
+          <th class="input-col" id="column_program">
+            <input type="text" name="program" id="filter_program" class="filter" placeholder="filter" size="5" data-bind="value: filters.program, valueUpdate: 'afterkeydown'" />
+          </th>
+          <th class="clear-col"><span class="q_tip clear-addon btn" id="program" title="Clear this filter" data-bind="click: clearFilter('program')">&times;</span></th>
+          <th class="input-col" id="column_message">
+            <input type="text" name="message" id="filter_message" class="filter" placeholder="filter" size="5" data-bind="value: filters.message, valueUpdate: 'afterkeydown'" />
+          </th>
+          <th class="clear-col"><span class="q_tip clear-addon btn" id="message" title="Clear this filter" data-bind="click: clearFilter('message')">&times;</span></th>
         </tr>
         
       </thead>

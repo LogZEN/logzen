@@ -16,10 +16,27 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
     paths: {
       jquery: 'libs/jquery-2.0.3',
       knockout: 'libs/knockout-2.3.0',
+      ko_mapping: 'libs/knockout.mapping',
       pager: 'libs/pager-1.0.1.min',
       bootstrap: 'libs/bootstrap',
       vars: 'vars',
-      text: 'libs/text'
+      text: 'libs/text',
+      prettyjson: 'libs/pretty_json',
+      humanize: 'libs/jquery.humanize'
+    },
+    shim: {
+      'bootstrap': {
+        deps: ['jquery']
+      },
+      'humanize': {
+        deps: ['jquery']
+      },
+      'quickflip': {
+        deps: ['jquery']
+      },
+      'ko_mapping': {
+        deps: ['knockout']
+      }
     }
   });
 
@@ -40,7 +57,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
     };
   };
 
-  require(['jquery', 'knockout', 'pager', 'bootstrap'], function($, ko, pager) {
+  require(['jquery', 'knockout', 'pager', 'bootstrap', 'prettyjson'], function($, ko, pager) {
     var VM, vm;
     VM = (function() {
       function VM() {
@@ -98,7 +115,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
         return $.ajax({
           url: '/_config/get',
           type: 'POST',
-          data: 'section=logzen&option=configured',
+          data: 'key=configured',
           dataType: 'json',
           success: function(result) {
             return _this.configured(result.value.toLowerCase() === "true");

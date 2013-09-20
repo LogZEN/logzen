@@ -8,155 +8,151 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
 
 (function() {
-  var EventModel, TopEvents, TopEventsView,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  EventModel = (function() {
-    function EventModel(data) {
-      this.count = data.count;
-      this.message = data.term;
-    }
+  define(['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], function($, ko, pager, vars) {
+    var EventModel, TopEvents;
+    EventModel = (function() {
+      function EventModel(data) {
+        this.count = data.count;
+        this.message = data.term;
+      }
 
-    return EventModel;
+      return EventModel;
 
-  })();
-
-  TopEvents = (function() {
-    function TopEvents() {
-      this.load = __bind(this.load, this);
-      this.include = __bind(this.include, this);
-      this.exclude = __bind(this.exclude, this);
-      this.updateRange = __bind(this.updateRange, this);
-      this.updateSeverity = __bind(this.updateSeverity, this);
-      var _this = this;
-      this.excludeMessages = ko.observableArray([]);
-      this.events = ko.observableArray([]);
-      this.severitySelected = ko.observable(7);
-      this.severitySelectedLabel = ko.computed(function() {
-        switch (_this.severitySelected()) {
-          case 1:
-            return "Alert and above";
-          case 2:
-            return "Critical and above";
-          case 3:
-            return "Error and above";
-          case 4:
-            return "Warning and above";
-          case 5:
-            return "Notice and above";
-          case 6:
-            return "Info and above";
-          default:
-            return "All severities";
-        }
-      });
-      this.rangeSelected = ko.observable(1);
-      this.rangeSelectedLabel = ko.computed(function() {
-        switch (_this.rangeSelected()) {
-          case 1:
-            return 'in last day';
-          case 7:
-            return 'in last week';
-          case 30:
-            return 'in last month';
-          case 365:
-            return 'in last year';
-        }
-      });
-      this.query = ko.computed(function() {
-        var from, now;
-        now = new Date();
-        from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - _this.rangeSelected(), now.getHours(), now.getMinutes(), now.getSeconds(), 0);
-        return {
-          "query": {
-            "match_all": {}
-          },
-          "size": 0,
-          'facets': {
-            'byevent': {
-              'terms': {
-                'field': 'message',
-                "size": 5,
-                'exclude': _this.excludeMessages()
-              },
-              'facet_filter': {
-                'and': [
-                  {
-                    'range': {
-                      'severity': {
-                        'from': 0,
-                        'to': _this.severitySelected()
+    })();
+    TopEvents = (function() {
+      function TopEvents() {
+        this.load = __bind(this.load, this);
+        this.include = __bind(this.include, this);
+        this.exclude = __bind(this.exclude, this);
+        this.updateRange = __bind(this.updateRange, this);
+        this.updateSeverity = __bind(this.updateSeverity, this);
+        var _this = this;
+        this.excludeMessages = ko.observableArray([]);
+        this.events = ko.observableArray([]);
+        this.severitySelected = ko.observable(7);
+        this.severitySelectedLabel = ko.computed(function() {
+          switch (_this.severitySelected()) {
+            case 1:
+              return "Alert and above";
+            case 2:
+              return "Critical and above";
+            case 3:
+              return "Error and above";
+            case 4:
+              return "Warning and above";
+            case 5:
+              return "Notice and above";
+            case 6:
+              return "Info and above";
+            default:
+              return "All severities";
+          }
+        });
+        this.rangeSelected = ko.observable(1);
+        this.rangeSelectedLabel = ko.computed(function() {
+          switch (_this.rangeSelected()) {
+            case 1:
+              return 'in last day';
+            case 7:
+              return 'in last week';
+            case 30:
+              return 'in last month';
+            case 365:
+              return 'in last year';
+          }
+        });
+        this.query = ko.computed(function() {
+          var from, now;
+          now = new Date();
+          from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - _this.rangeSelected(), now.getHours(), now.getMinutes(), now.getSeconds(), 0);
+          return {
+            "query": {
+              "match_all": {}
+            },
+            "size": 0,
+            'facets': {
+              'byevent': {
+                'terms': {
+                  'field': 'message',
+                  "size": 5,
+                  'exclude': _this.excludeMessages()
+                },
+                'facet_filter': {
+                  'and': [
+                    {
+                      'range': {
+                        'severity': {
+                          'from': 0,
+                          'to': _this.severitySelected()
+                        }
+                      }
+                    }, {
+                      'range': {
+                        'time': {
+                          'from': from,
+                          'to': now
+                        }
                       }
                     }
-                  }, {
-                    'range': {
-                      'time': {
-                        'from': from,
-                        'to': now
-                      }
-                    }
-                  }
-                ]
+                  ]
+                }
               }
             }
+          };
+        });
+      }
+
+      TopEvents.prototype.updateSeverity = function(severity) {
+        this.severitySelected(severity);
+        return TopEventsView.load();
+      };
+
+      TopEvents.prototype.updateRange = function(range) {
+        this.rangeSelected(range);
+        return TopEventsView.load();
+      };
+
+      TopEvents.prototype.exclude = function(m) {
+        this.excludeMessages.push(m);
+        return TopEventsView.load();
+      };
+
+      TopEvents.prototype.include = function(m) {
+        this.excludeMessages.splice(this.excludeMessages.indexOf(m), 1);
+        return TopEventsView.load();
+      };
+
+      TopEvents.prototype.load = function() {
+        var _this = this;
+        return $.ajax({
+          url: "/_api/query",
+          type: 'POST',
+          contentType: "application/json",
+          data: JSON.stringify(this.query()),
+          dataType: 'json',
+          success: function(result) {
+            var event;
+            _this.events((function() {
+              var _i, _len, _ref, _results;
+              _ref = result.facets.byevent.terms;
+              _results = [];
+              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                event = _ref[_i];
+                _results.push(new EventModel(event));
+              }
+              return _results;
+            })());
+            return add_qtips();
           }
-        };
-      });
-    }
+        });
+      };
 
-    TopEvents.prototype.updateSeverity = function(severity) {
-      this.severitySelected(severity);
-      return TopEventsView.load();
-    };
+      return TopEvents;
 
-    TopEvents.prototype.updateRange = function(range) {
-      this.rangeSelected(range);
-      return TopEventsView.load();
-    };
-
-    TopEvents.prototype.exclude = function(m) {
-      this.excludeMessages.push(m);
-      return TopEventsView.load();
-    };
-
-    TopEvents.prototype.include = function(m) {
-      this.excludeMessages.splice(this.excludeMessages.indexOf(m), 1);
-      return TopEventsView.load();
-    };
-
-    TopEvents.prototype.load = function() {
-      var _this = this;
-      return $.ajax({
-        url: "/_api/query",
-        type: 'POST',
-        contentType: "application/json",
-        data: JSON.stringify(this.query()),
-        dataType: 'json',
-        success: function(result) {
-          var event;
-          _this.events((function() {
-            var _i, _len, _ref, _results;
-            _ref = result.facets.byevent.terms;
-            _results = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              event = _ref[_i];
-              _results.push(new EventModel(event));
-            }
-            return _results;
-          })());
-          return add_qtips();
-        }
-      });
-    };
-
+    })();
     return TopEvents;
-
-  })();
-
-  TopEventsView = new TopEvents;
-
-  TopEventsView.load();
-
-  ko.applyBindings(TopEventsView, $('#widget_topevents').get(0));
+  });
 
 }).call(this);

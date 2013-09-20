@@ -10,7 +10,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define(['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], function($, ko, pager, vars) {
+  define(['jquery', 'knockout', 'pager', 'vars', 'bootstrap', 'prettyjson'], function($, ko, pager, vars) {
     var EventListModel, EventModel, pivot;
     pivot = function(key, value, data) {
       var result;
@@ -48,30 +48,22 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
     })();
     EventListModel = (function() {
       function EventListModel() {
+        this.refreshPage = __bind(this.refreshPage, this);
         this.nextPage = __bind(this.nextPage, this);
         this.prevPage = __bind(this.prevPage, this);
         this.clearFilter = __bind(this.clearFilter, this);
         this.setFilter = __bind(this.setFilter, this);
+        this.loadEvents = __bind(this.loadEvents, this);
         var _this = this;
         this.events = ko.observableArray([]);
         this.hits = 0;
         this.loading = ko.observable(false);
         this.page = ko.observable(0);
         this.error = ko.observable(null);
+        this.refreshId = ko.observable(setInterval(this.loadEvents, 5000));
         this.filterMode = ko.observable("fields");
         this.freetextValue = ko.observable("");
-        this.freetext = ko.computed({
-          read: function() {
-            if (_this.filterMode() === 'fields' || (_this.filterMode() === 'freetext' && _this.freetextValue() !== '')) {
-              return "test";
-            } else if (_this.filterMode() === 'freetext') {
-              return _this.freetextValue();
-            }
-          },
-          write: function(value) {
-            return _this.freetextValue(value);
-          }
-        });
+        this.freetextValueFormatted = ko.observable("");
         this.filters = {
           'severity': ko.observable(""),
           'facility': ko.observable(""),
@@ -85,7 +77,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
           _results = [];
           for (name in _ref) {
             filter = _ref[name];
-            if (filter() !== "") {
+            if (filter() !== '') {
               _results.push({
                 'name': name,
                 'value': filter()
@@ -94,44 +86,67 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
           }
           return _results;
         });
-        this.query = ko.computed(function() {
-          return {
-            "query": {
-              "filtered": {
-                "query": {
-                  "match_all": {}
+        this.freetext = ko.computed({
+          read: function() {
+            var f, filter, first, _i, _len, _ref;
+            if (_this.filterMode() === 'fields') {
+              f = '';
+              if (_this.filledFilters().length > 0) {
+                first = 1;
+                _ref = _this.filledFilters();
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  filter = _ref[_i];
+                  if (first !== 1) {
+                    f = f + ',';
+                  }
+                  first = 0;
+                  f = f + '{ "prefix": { "' + filter['name'] + '": "' + filter['value'] + '" } }';
                 }
+                console.log(f);
+                f = ',\
+                "filter": {\
+                  "and": [ ' + f + '\
+                  ]\
+                }';
               }
-            },
-            "facets": {
-              "histo1": {
-                "date_histogram": {
-                  "field": "time",
-                  "interval": "day"
-                }
-              }
-            },
-            "from": _this.page() * 50,
-            "size": 50,
-            "sort": [
-              {
-                "time": {
-                  "order": "desc"
-                }
-              }
-            ]
-          };
+              f = '\
+            {\
+              "query": { \
+                "filtered": {\
+                  "query": {\
+                    "match_all" : {}\
+                  }' + f + '\
+                }\
+              },\
+              "from": ' + _this.page() * 50 + ',\
+              "size":  50 ,\
+              "sort": [{\
+                "time": {\
+                  "order": "desc"\
+                }\
+              }]\
+            }';
+              _this.freetextValue(f);
+              console.log(_this.freetextValue());
+              _this.freetextValueFormatted(pj(f));
+              return _this.loadEvents();
+            }
+          },
+          write: function(value) {
+            console.log(_this.freetextValue());
+            return _this.freetextValue(value.replace(/<\*>/g, ""));
+          }
         });
-        this.loadEvents = ko.computed(function() {
-          $('#tab1 a').click(function(e) {
-            e.preventDefault();
-            return _this.tab('show');
-          });
+      }
+
+      EventListModel.prototype.loadEvents = function() {
+        var _this = this;
+        if (this.filterMode() === 'fields') {
           return $.ajax({
             url: $('#filterform').attr('action'),
             type: 'POST',
             contentType: "application/json",
-            data: JSON.stringify(_this.query()),
+            data: this.freetextValue(),
             dataType: 'json',
             beforeSend: function() {
               return _this.loading(true);
@@ -160,8 +175,8 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
               return _this.events([]);
             }
           });
-        });
-      }
+        }
+      };
 
       EventListModel.prototype.setFilter = function(name) {
         var _this = this;
@@ -189,6 +204,15 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
         }
       };
 
+      EventListModel.prototype.refreshPage = function() {
+        if (this.refreshId() === -1) {
+          return this.refreshId(setInterval(this.loadEvents, 5000));
+        } else {
+          clearInterval(this.refreshId());
+          return this.refreshId(-1);
+        }
+      };
+
       EventListModel.prototype.timeSeries = function(data) {
         var chart;
         chart = nv.models.multiBarTimeSeriesChart().x(function(d) {
@@ -201,7 +225,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
         }).rotateLabels(-45);
         chart.yAxis.tickFormat(d3.format(',.0f'));
         chart.tooltip = function(key, x, y, e, graph) {
-          return "<h3>" + key + "</h3><p>" + y + " during " + x + "</p>";
+          return '<h3>#{key}</h3><p>#{y} during #{x}</p>';
         };
         d3.select('#timeSeries svg').datum([
           {
@@ -219,17 +243,33 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
           el = $(element);
           return el.bind('mouseenter', function() {
             return $.ajax({
-              url: '/tooltips/ip',
-              data: {
-                ip: el.text()
-              },
-              success: function(d) {
+              url: '/_tooltip/ip',
+              type: 'POST',
+              data: 'ip=' + el.text(),
+              dataType: 'json',
+              success: function(result) {
+                var html;
+                html = '\
+                <table>\
+                  <tr><td>IP Address</td><td>' + result.ip + '</td></tr>\
+                  <tr><td>DNS Name</td><td> ' + result.dns + '</td></tr>\
+              ';
+                if (result.aliaslist !== "") {
+                  html += '<tr><td>Aliases</td><td> ' + result.aliaslist + '</td></tr>';
+                }
+                if (result.addresslist !== "") {
+                  html += '<tr><td>Addresses</td><td> ' + result.addresslist + '</td></tr>';
+                }
+                html += '\
+                  <tr><td>Country</td><td>' + result.country + ' <img src="/img/flags/' + result.flagimg + '.gif" title="' + result.country + '" alt="' + result.country + '"/></td></tr>\
+                </table>\
+              ';
                 el.attr('data-toggle', 'tooltip');
-                el.attr('data-original-title', d);
+                el.attr('data-original-title', html);
                 el.tooltip({
                   content: "dynamic text",
                   html: true,
-                  trigger: 'click',
+                  trigger: 'hover',
                   container: 'body'
                 });
                 return el.tooltip('show');

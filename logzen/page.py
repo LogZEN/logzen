@@ -5,12 +5,12 @@ This file is part of LogZen.
 
 LogZen is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or 
+the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-LogZen is distributed in the hope that it will be useful, but WITHOUT 
+LogZen is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 for more details.
 
 You should have received a copy of the GNU General Public License
@@ -18,10 +18,13 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os
+import socket
+import string
 
 import cherrypy
 
-from logzen.config import Config
+from logzen.config import config
+from logzen.geoip import geoip
 from logzen.authentication.auth import require
 
 
@@ -40,28 +43,95 @@ class Page:
     return open(os.path.join('web', u'index.html'))
 
 
+  #
+  # get configuration
+  #
+
   @require()
   @cherrypy.tools.json_out()
-  def get_widget_config(self):
-    return [{
-             'id': 1,
-             'size': 8,
-             'widget': [ 'latestevents' ]
-             },
-             {
-             'id': 2,
-             'size': 4,
-             'widget': [ 'topevents', 'tophosts' ]
-             }
-             ]
+  def get_dashboard_layout(self):
+    return [{'size': 6,
+             'childs': ['x1',
+                        'x2',
+                        'x3'
+                        ]
+            },
+            {'size': 6,
+             'childs': ['x4',
+                        [{'size': 6,
+                          'childs': ['x5']
+                          },
+                         {'size': 6,
+                          'childs': ['x6']
+                          }],
+                        'x7'
+                        ]
+            }
+           ]
+
+
+  @require()
+  @cherrypy.tools.json_out()
+  def get_dashboard_config(self, name):
+    return {
+            'x1': {
+                   'type': 'latestevents'
+                   },
+            'x2': {
+                   'type': 'latestevents'
+                   },
+            'x3': {
+                   'type': 'latestevents'
+                   },
+            'x4': {
+                   'type': 'latestevents'
+                   },
+            'x5': {
+                   'type': 'latestevents'
+                   },
+            'x6': {
+                   'type': 'latestevents'
+                   },
+            'x7': {
+                   'type': 'latestevents'
+                   }
+            }[name]
+
+
 
 
   @cherrypy.tools.json_out()
   def get_config_option(self,
-                           section,
-                           option):
-    return {
-            'section': section,
-            'option': option,
-            'value': Config().get(section, option)
-            }
+                        key):
+    return {'key': key,
+            'value': config.system.logzen.configured}
+
+
+
+  #
+  # tooltip specific
+  #
+  @require()
+  @cherrypy.tools.json_out()
+  def get_ip_tooltip(self,
+                     ip):
+
+    data = {}
+    data['ip'] = ip
+
+    try:
+      name, aliaslist, addresslist = socket.gethostbyaddr(ip)
+      data['dns'] = name
+      data['aliaslist'] = string.join(aliaslist, "<br />")
+      data['addresslist'] = string.join(addresslist, "<br />")
+    except:
+      data['dns'] = "Unknown"
+      data['aliaslist'] = ""
+      data['addresslist'] = ""
+
+    data['country'] = geoip.country(ip)
+    data['flagimg'] = string.lower(data['country'])
+
+    return data
+
+

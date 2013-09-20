@@ -5,12 +5,12 @@ This file is part of LogZen.
 
 LogZen is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or 
+the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-LogZen is distributed in the hope that it will be useful, but WITHOUT 
+LogZen is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 for more details.
 
 You should have received a copy of the GNU General Public License
@@ -21,27 +21,27 @@ import cherrypy
 
 import hashlib
 
-from logzen.config import Config
+from logzen.config import config
 
 
-SESSION_KEY = Config().logzen['sessionkey']
+SESSION_KEY = config.system.logzen['sessionkey']
 
 
 
 def check_credentials(username, password):
   ''' Verify credentials for username and password
   '''
-  if Config().has_section(username):
-    if Config().get(username, 'password') == hashlib.sha256(password).hexdigest():
+  if username in config.users:
+    if config.users[username].password == hashlib.sha256(password).hexdigest():
       return None
 
   return u"Incorrect username or password."
 
 
 def check_auth(*args, **kwargs):
-  ''' Search the config for 'auth.require'. If found and not None, 
+  ''' Search the config for 'auth.require'. If found and not None,
       a login is required, meaning, a username must exist in SESSION_KEY
-      variable. If not, redirect to index page. 
+      variable. If not, redirect to index page.
   '''
   conditions = cherrypy.request.config.get('auth.require', None)
   if conditions is not None:

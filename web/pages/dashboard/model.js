@@ -8,54 +8,36 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
 
 (function() {
-  define(['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], function($, ko, pager, vars) {
-    var DashboardModel;
+  define(['jquery', 'knockout', 'ko_mapping', 'pager', 'vars', 'bootstrap'], function($, ko, mapping, pager, vars) {
+    var DashboardModel,
+      _this = this;
+    ko.bindingHandlers.widget = {
+      init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+        var childBindingContext, value;
+        value = ko.utils.unwrapObservable(valueAccessor());
+        ko.utils.setHtml(element, value.html);
+        childBindingContext = bindingContext.createChildContext(value.vm);
+        console.log(childBindingContext);
+        ko.applyBindingsToDescendants(childBindingContext, element);
+        return {
+          controlsDescendantBindings: true
+        };
+      }
+    };
     DashboardModel = (function() {
       function DashboardModel() {
         var _this = this;
-        this.loading = ko.observable(false);
+        this.widgetModels = ko.observableArray([]);
+        this.layout = mapping.fromJS([]);
         $.ajax({
-          url: '/_config/widget',
+          url: '/_config/dashboard/layout',
           dataType: 'json',
           success: function(result) {
-            return _this.loadWidgets(result);
+            console.log(result);
+            return mapping.fromJS(result, _this.layout);
           }
         });
       }
-
-      DashboardModel.prototype.loadWidgets = function(conf) {
-        var all, column, html, row, w, _i, _j, _len, _len1, _results;
-        all = 0;
-        html = "";
-        for (_i = 0, _len = conf.length; _i < _len; _i++) {
-          column = conf[_i];
-          all += column.size;
-          html += '<div class="span' + column.size + '" id="col' + column.id + '"></div>';
-        }
-        if (all === 12) {
-          $('#widgetcolumns').append(html);
-          _results = [];
-          for (_j = 0, _len1 = conf.length; _j < _len1; _j++) {
-            column = conf[_j];
-            row = 0;
-            _results.push((function() {
-              var _k, _len2, _ref, _results1;
-              _ref = column.widget;
-              _results1 = [];
-              for (_k = 0, _len2 = _ref.length; _k < _len2; _k++) {
-                w = _ref[_k];
-                row += 1;
-                $('#col' + column.id).append($("<div id='widget_" + w + column.id + row + "'>").load('/pages/widget/' + w + '/view.html'));
-                _results1.push(ko.applyBindings(requireVM('widget/' + w)($("#widget_" + w + column.id + row))));
-              }
-              return _results1;
-            })());
-          }
-          return _results;
-        } else {
-          return $('#widgetNumberError').modal('show');
-        }
-      };
 
       return DashboardModel;
 

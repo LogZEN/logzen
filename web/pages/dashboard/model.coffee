@@ -5,36 +5,44 @@ This file is part of LogZen. It is licensed under the terms of the
 GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars) ->
+
+define ['jquery', 'knockout', 'ko_mapping', 'pager', 'vars', 'bootstrap'], ($, ko, mapping, pager, vars) ->
+  ko.bindingHandlers.widget =
+		init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) =>
+			value = ko.utils.unwrapObservable valueAccessor()
+			
+			ko.utils.setHtml element, value.html
+			
+			childBindingContext = bindingContext.createChildContext value.vm 
+			console.log childBindingContext
+			ko.applyBindingsToDescendants childBindingContext, element
+			
+			controlsDescendantBindings: true
+
+	
   class DashboardModel
     constructor: ->
-      @loading = ko.observable false
-      
-      $.ajax
-        url: '/_config/widget'
+    	@widgetModels = ko.observableArray []
+    	
+    	@layout = mapping.fromJS []
+      	
+    	$.ajax
+        url: '/_config/dashboard/layout'
         dataType: 'json'
         success: (result) =>
-          @loadWidgets result
+        	console.log result
+        	
+        	mapping.fromJS result, @layout 
+        	 
+        	
+        	#for id, config of result
+        	#	require ["/pages/widget/#{config.type}/model.js", "text!/pages/widget/#{config.type}/view.html"], (vm, html) =>
+        	#	  vm = new vm()
+        	#	  @widgetModels.push ({ id: id, vm: vm, html: html })
 
+  
+  	    
 
-    loadWidgets: (conf) ->
-      all = 0
-      html = ""
-      for column in conf
-        all += column.size
-        html += '<div class="span' + column.size + '" id="col' + column.id + '"></div>'
-      
-      if all == 12
-        $('#widgetcolumns').append(html)
-        for column in conf
-          row = 0
-          for w in column.widget
-            row += 1
-            $('#col' + column.id).append($("<div id='widget_" + w + column.id + row + "'>").load('/pages/widget/' + w + '/view.html'))
-            ko.applyBindings requireVM('widget/' + w) $("#widget_" + w + column.id + row)
-      
-      else
-        $('#widgetNumberError').modal('show')
 
 
   DashboardModel

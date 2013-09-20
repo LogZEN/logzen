@@ -11,11 +11,22 @@ require.config
   paths:
     jquery:'libs/jquery-2.0.3'
     knockout:'libs/knockout-2.3.0'
+    ko_mapping: 'libs/knockout.mapping'
     pager:'libs/pager-1.0.1.min'
     bootstrap:'libs/bootstrap'
     vars: 'vars'
     text: 'libs/text'
-
+    prettyjson: 'libs/pretty_json'
+    humanize: 'libs/jquery.humanize'
+  shim:
+    'bootstrap':
+      deps: [ 'jquery' ]
+    'humanize':
+      deps: [ 'jquery' ]
+    'quickflip':
+      deps: [ 'jquery' ]
+    'ko_mapping':
+      deps: [ 'knockout' ]
 
 @requireVM = (module) ->
   (callback) ->
@@ -30,7 +41,7 @@ require.config
       callback()
 
 
-require ['jquery', 'knockout', 'pager', 'bootstrap'], ($, ko, pager) ->
+require ['jquery', 'knockout', 'pager', 'bootstrap', 'prettyjson'], ($, ko, pager) ->
 	class VM
     constructor: ->
       @loading = ko.observable false
@@ -46,7 +57,7 @@ require ['jquery', 'knockout', 'pager', 'bootstrap'], ($, ko, pager) ->
         id: +(new Date())
         title: ko.observable 'Eventlist'
       ]
-
+      
 
     # check whether the current user is logged in or not
     # redirect to login page, if not logged in
@@ -79,7 +90,7 @@ require ['jquery', 'knockout', 'pager', 'bootstrap'], ($, ko, pager) ->
       $.ajax
         url: '/_config/get'
         type: 'POST'
-        data: 'section=logzen&option=configured'
+        data: 'key=configured'
         dataType: 'json'
         success: (result) =>
           @configured result.value.toLowerCase() == "true"
@@ -95,6 +106,8 @@ require ['jquery', 'knockout', 'pager', 'bootstrap'], ($, ko, pager) ->
     	@evlists.push 
     		id: +(new Date())
     		title: ko.observable 'New Tab'
+
+
 
 
   vm = new VM

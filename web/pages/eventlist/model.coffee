@@ -5,7 +5,7 @@ This file is part of LogZen. It is licensed under the terms of the
 GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars) ->
+define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap', 'prettyjson'], ($, ko, pager, vars) ->
 	pivot = (key, value, data) ->
     result = {}
     result[data[key]] = data[value]
@@ -45,19 +45,12 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars
       
       @error = ko.observable null
       
-      @filterMode = ko.observable "fields"
+      @refreshId = ko.observable setInterval @loadEvents, 5000
       
+      @filterMode = ko.observable "fields"
       @freetextValue = ko.observable ""
-      @freetext = ko.computed 
-        read: () =>
-        	if @filterMode() == 'fields' or (@filterMode() == 'freetext' and @freetextValue() != '')
-        		"test"
-        	else if @filterMode() == 'freetext'
-        		@freetextValue()
-        		
-        write: (value) =>
-        	@freetextValue(value)
-        
+      @freetextValueFormatted = ko.observable ""
+
       @filters = 
         'severity': ko.observable ""
         'facility': ko.observable ""
@@ -66,36 +59,64 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars
         'message': ko.observable "" 
         
       @filledFilters = ko.computed () =>
-        for name, filter of @filters when filter() != ""
-          {'name': name, 'value': filter() }
+        for name, filter of @filters when filter() != ''
+          { 'name': name, 'value': filter() }
+
+      @freetext = ko.computed
+        read: () =>
+        	if @filterMode() == 'fields'
+        		f = ''
+        		if @filledFilters().length > 0
+            	first = 1
+            	for filter in @filledFilters()
+                if first != 1 
+                  f = f + ','
+                first = 0
+                f = f + '{ "prefix": { "' + filter['name'] + '": "' + filter['value'] + '" } }'
+            		console.log f
+              
+              f = ',
+                "filter": {
+                  "and": [ ' + f + '
+                  ]
+                }'
+            
+            f = '
+            {
+              "query": { 
+                "filtered": {
+                  "query": {
+                    "match_all" : {}
+                  }' + f + '
+                }
+              },
+              "from": ' + @page() * 50 + ',
+              "size":  50 ,
+              "sort": [{
+                "time": {
+                  "order": "desc"
+                }
+              }]
+            }'
+            
+            @freetextValue f
+            console.log @freetextValue()
+            @freetextValueFormatted pj f
+            @loadEvents()
+        		
+        write: (value) =>
+          console.log @freetextValue()	
+          @freetextValue value.replace(/<\*>/g, "");
         
-      @query = ko.computed () =>
-        "query": 
-          "filtered":
-            "query":
-              "match_all" : {}
-        "facets":
-          "histo1":
-            "date_histogram":
-              "field": "time"
-              "interval": "day"
-        "from": @page() * 50
-        "size": 50
-        "sort": [
-          "time": 
-            "order": "desc"
-        ]
+      
   
-      @loadEvents = ko.computed () =>
-        $('#tab1 a').click (e) =>
-          e.preventDefault()
-          @tab('show')
-          
+    loadEvents: () =>
+      if @filterMode() == 'fields'
         $.ajax
           url: $('#filterform').attr('action')
           type: 'POST'
           contentType: "application/json"
-          data: JSON.stringify @query()
+          data: @freetextValue()
           dataType: 'json'
           beforeSend: () => 
             @loading true
@@ -129,6 +150,14 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars
     nextPage: () =>
       if @page() * 50 + 50 < @hits
         @page(@page() + 1)
+    
+    
+    refreshPage: () =>
+    	if @refreshId() == -1
+        @refreshId setInterval @loadEvents, 5000	
+    	else
+        clearInterval @refreshId()
+        @refreshId -1
 
 
     timeSeries: (data) ->
@@ -144,10 +173,10 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars
         .tickFormat(d3.format(',.0f'))
         
       chart.tooltip = (key, x, y, e, graph) ->
-        "<h3>#{key}</h3><p>#{y} during #{x}</p>"
+        '<h3>#{key}</h3><p>#{y} during #{x}</p>'
           
       d3.select('#timeSeries svg')
-        .datum([{"key": "events", "values": data}])
+        .datum([{ "key": "events", "values": data }])
         .transition().duration(100).call(chart)
   
       nv.utils.windowResize(chart.update)
@@ -157,19 +186,38 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars
       $('.tooltip_ip').each (index, element) =>
         el = $(element)
         el.bind 'mouseenter', =>
+          
           $.ajax
-            url: '/tooltips/ip'
-            data: 
-              ip: el.text()
-            success: (d) ->
+            url: '/_tooltip/ip'
+            type: 'POST'
+            data: 'ip=' + el.text()
+            dataType: 'json'
+            success: (result) =>
+              html = '
+                <table>
+                  <tr><td>IP Address</td><td>' + result.ip + '</td></tr>
+                  <tr><td>DNS Name</td><td> ' + result.dns + '</td></tr>
+              '
+              if result.aliaslist != ""
+                html += '<tr><td>Aliases</td><td> ' + result.aliaslist + '</td></tr>'
+                
+              if result.addresslist != ""
+                html += '<tr><td>Addresses</td><td> ' + result.addresslist + '</td></tr>'
+                
+              html += '
+                  <tr><td>Country</td><td>' + result.country + ' <img src="/img/flags/' + result.flagimg + '.gif" title="' + result.country + '" alt="' + result.country + '"/></td></tr>
+                </table>
+              '
+              
               el.attr 'data-toggle', 'tooltip'
-              el.attr 'data-original-title', d
+              el.attr 'data-original-title', html
               el.tooltip
                 content: "dynamic text"
                 html: true
-                trigger: 'click'
+                trigger: 'hover'
                 container: 'body'
               el.tooltip 'show'
 
 
+  
   EventListModel

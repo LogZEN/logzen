@@ -10,7 +10,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define(['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], function($, ko, pager, vars) {
+  define(['jquery', 'knockout', 'pager', 'vars', 'bootstrap', 'humanize'], function($, ko, pager, vars) {
     var EventModel, LatestEvents;
     EventModel = (function() {
       function EventModel(data) {
@@ -27,10 +27,12 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
     })();
     LatestEvents = (function() {
       function LatestEvents() {
+        this.rotate = __bind(this.rotate, this);
         this.load = __bind(this.load, this);
         this.update = __bind(this.update, this);
         var _this = this;
         this.loading = ko.observable(false);
+        this.showBack = ko.observable(0);
         this.events = ko.observableArray([]);
         this.severitySelected = ko.observable(7);
         this.severitySelectedLabel = ko.computed(function() {
@@ -79,11 +81,12 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
             ]
           };
         });
+        this.load();
       }
 
       LatestEvents.prototype.update = function(severity) {
         this.severitySelected(severity);
-        return LatestEventsView.load();
+        return this.load();
       };
 
       LatestEvents.prototype.load = function() {
@@ -117,6 +120,14 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
               return _this.loading(false);
             }
           });
+        }
+      };
+
+      LatestEvents.prototype.rotate = function() {
+        if (this.showBack() === 1) {
+          return this.showBack(0);
+        } else {
+          return this.showBack(1);
         }
       };
 

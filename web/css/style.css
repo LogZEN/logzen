@@ -28,6 +28,35 @@
 }
 
 
+pre.textarea {
+  width:                98%;
+  height:               200px;
+  margin:               0 auto; 
+  padding:              4px;
+  overflow:             auto;
+  
+  border:               1px solid #CCCCCC;
+  border-radius:        3px;
+  box-shadow:           0 1px 1px rgba(0, 0, 0, 0.075) inset;
+  
+  line-height: 16px;
+  font-size: 12px;
+  transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
+}
+
+
+.row-fluid {
+  padding: 0px;
+  margin: 0px;
+}
+
+.w {
+  border: 1px solid #ff0000;  
+}
+
+.r {
+  border: 1px solid #0000ff;
+}
 
 
 /*
@@ -346,7 +375,7 @@ th.clear-col {
 /*
  * eventlist navigation
  */
-#navi {
+#evlist_nav {
   padding-bottom:          15px;
   padding-right:           10px;
   text-align:              right;
@@ -356,7 +385,6 @@ span#eventcount {
   color:                   #333333;
   font-size:               12px;
   text-decoration:         none;
-  padding-top:             -10px;
   padding-right:           12px;
   vertical-align:          middle;
 }
@@ -484,7 +512,7 @@ td.spacing {
 }
 
 .tooltip-inner {
-  background: #a00;
+  background: #555;
 }
 
 .tooltip-inner .tooltip_ip_table th,

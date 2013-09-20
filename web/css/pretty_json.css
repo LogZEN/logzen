@@ -1,0 +1,20 @@
+.prettyjson ul { margin: 0 0 0 .75em; list-style: none; }
+.prettyjson li { padding: 0; margin: 0;}
+.prettyjson li:after { content: ','; }
+.prettyjson li:last-child:after { content: ''; }
+
+.prettyjson span.object { font-weight: bold; }
+
+.prettyjson span.string, span.string a { color: green; }
+.prettyjson span.string:before { content: '"'; }
+.prettyjson span.string:after { content: '"'; }
+	
+.prettyjson span.number { color: blue; }
+
+.prettyjson span.null { color: red; }
+
+.prettyjson span.boolean { color: gray; }
+
+.prettyjson span.link a { color: green; text-decoration: underline; }
+
+.prettyjson textarea { font-family: monospace; font-size: 1.1em; width: 98%; height: 30%; }

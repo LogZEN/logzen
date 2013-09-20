@@ -5,7 +5,7 @@ This file is part of LogZen. It is licensed under the terms of the
 GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars) ->
+define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap', 'humanize'], ($, ko, pager, vars) ->
   class EventModel
     constructor: (data) ->
       @time = $.humanize("datetime", data._source.time)
@@ -19,6 +19,8 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars
   class LatestEvents
     constructor: ->
       @loading = ko.observable false
+      
+      @showBack = ko.observable 0   
       
       @events = ko.observableArray []
       @severitySelected = ko.observable 7
@@ -49,11 +51,13 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars
             "order": 
               "desc"
         ]
+        
+      @load()
 
 
     update: (severity) =>
       @severitySelected severity
-      LatestEventsView.load()
+      @load()
 
 
     load: =>
@@ -73,6 +77,12 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars
           error: (jqXHR, status, error) =>
             @loading false
 
+
+    rotate: =>
+    	if @showBack() == 1
+    		@showBack 0
+    	else
+    		@showBack 1
 
   LatestEvents
   

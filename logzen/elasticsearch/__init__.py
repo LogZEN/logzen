@@ -5,12 +5,12 @@ This file is part of LogZen.
 
 LogZen is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or 
+the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-LogZen is distributed in the hope that it will be useful, but WITHOUT 
+LogZen is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 for more details.
 
 You should have received a copy of the GNU General Public License
@@ -19,16 +19,16 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 
 import pyes
 
-from logzen.config import Config
+from logzen.config import config
 
 
 
 class ElasticSearch:
     def __init__(self):
-        servers = [value for key, value in Config().es if key.startswith('server_')]
+        servers = [value for key, value in config.system.es if key.startswith('server_')]
 
-        username = Config().es['username']
-        password = Config().es['password']
+        username = config.system.es['username']
+        password = config.system.es['password']
 
         if username and password:
             auth = {
@@ -45,13 +45,13 @@ class ElasticSearch:
     def query(self,
               query):
         return self.__connection.search_raw(query = query,
-                                            indices = Config().es['index'],
-                                            doc_types = Config().es['type'])
+                                            indices = config.system.es.index,
+                                            doc_types = config.system.es.type)
 
     def get(self,
             id):
         return self.__connection.get(id = id,
-                                     index = Config().es['index'],
-                                     doc_type = Config().es['type'])
+                                     index = config.system.es.index,
+                                     doc_type = config.system.es.type)
 
 es = ElasticSearch()

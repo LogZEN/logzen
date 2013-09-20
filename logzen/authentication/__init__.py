@@ -1,5 +1,5 @@
 '''
-Copyright 2013 Sven Reissmann <sven@0x80.io>
+Copyright 2012 Sven Reissmann <sven@0x80.io>
 
 This file is part of LogZen.
 

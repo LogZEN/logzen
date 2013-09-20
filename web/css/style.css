@@ -1,0 +1,542 @@
+/*
+ * Copyright 2012 Sven Reissmann <sven@0x80.io>
+ *
+ * This file is part of pyLogView. It is licensed under the terms of the 
+ * GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
+ */
+
+
+/*
+ * bootstrap additions
+ */
+
+.hover-nav {
+  margin:               0;
+}
+.hover-nav:hover .dropdown-menu {
+  display:              block;
+  margin-top:           0;
+}
+.hover-nav li a {
+  cursor:               default;
+}
+
+
+.pull-center {
+  margin:               0 auto;
+  float:                none;  
+}
+
+
+
+
+/*
+ * logviewer styles
+ */
+
+html,
+body {
+  background:             #fff;
+  overflow-x:             hidden;
+}
+
+
+/* main menu */
+.navbar {
+  box-shadow:             0px 3px 4px rgba(0, 0, 0, 0.4);
+}
+
+
+
+.brand {
+  position:               relative;
+  top:                    8px;
+  margin:                 0px;
+}
+
+.brand span {
+  padding:                6px 16px 8px 16px;
+  
+  background-color:       #909AAA;
+  background:             -webkit-gradient(linear, left bottom, left top, from(#025080), to(#809ACA));
+  background:             -moz-linear-gradient(center bottom, #025080, #809ACA);
+  border-bottom:          1px solid rgba(0, 0, 0, 0.4);
+  border-top:             1px solid rgba(255, 255, 255, 0.6);
+  border-radius:          10px;
+  box-shadow:             3px 3px 6px rgba(0, 0, 0, 0.4);
+  
+  font-size:              20px;
+  color:                  #ccc;
+}
+
+/* main content area */
+div#main {
+  margin-top:             60px;
+  padding:                0 15px;
+}
+
+/* tabs */
+div#main .nav-tabs {
+  padding-left:           10px;
+}
+
+.nav-tabs > li > span {
+  display: block;
+  border: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+  line-height: 20px;
+  padding-bottom: 6px;
+  padding-top: 8px;
+}
+.nav-tabs > li > span, 
+.nav-pills > li > span {
+    line-height: 16px;
+    margin-right: 2px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+.nav-tabs > .active > span {   
+  -moz-border-bottom-colors: none;
+  -moz-border-left-colors: none;
+  -moz-border-right-colors: none;
+  -moz-border-top-colors: none;
+  background-color: #FFFFFF;
+  border-color: #DDDDDD #DDDDDD transparent;
+  border-image: none;
+  border-style: solid;
+  border-width: 1px;
+  color: #555555;
+  cursor: default;
+}
+.nav-tabs > .active > span input {
+  width: 100px;
+  height: 20px;
+  margin: 0px;
+  padding: 1px 2px;
+  line-height: 5px;
+  
+  border: 0px;
+  box-shadow: none;
+  color: #555555;
+  font-size: 14px;
+}
+
+
+
+
+/*
+ * page and widget headings
+ */
+h1 {
+  padding:               0;
+  font-size:             14pt;
+}
+
+h2 {
+    padding:               10px 0 0 0;
+    font-size:             12pt;
+}
+
+h1.inline,
+h2.inline,
+h3.inline,
+h4.inline {
+    margin:                0;
+    padding:               0 0 20px 0;
+    display:               inline-block;
+}
+
+
+/*
+ * noscript warning
+ */
+#noscript {
+  position:              absolute;
+  top:                   35%;
+  left:                  50%;
+  width:                 400px;
+  
+  margin-left:           -200px;
+  padding:               20px;
+  
+  background:            #f9f9f9;
+    
+  border-color:          #333;
+  border-radius:         8px;
+  
+  box-shadow:            0 0 15px rgba(0, 0, 0, 0.40);
+  
+  text-align:            center;
+}
+
+#noscript h1 {
+  margin:                0px;
+  
+  color:                 #a22;
+  font-size:             16pt;
+}
+
+
+/*
+ * navigation
+ *
+li#navclock {
+  display:               inline;
+}
+
+/*
+ * severity colors
+ */
+.color_debug {
+  background:              #d3d7cf;
+}
+.color_info {
+  background:              #3465a4;
+}
+.color_notice {
+  background:              #4e9a06;
+}
+.color_warning {
+  background:              #edd400;
+}
+.color_error {
+  background:              #f57900;
+}
+.color_critical {
+  background:              #ef2929;
+}
+.color_emerge {
+  background:              #cc0000;
+}
+.color_alert {
+  background:              #a40000;
+}
+
+
+
+/*
+ * eventlist table
+ */
+table.events {
+  width:                  100%;
+  
+  border:                 1px #aaa solid;
+  border-collapse:        collapse;
+  
+  font-size:              10pt;
+  cursor:                 default;
+}
+
+table.events tr:first-child th {
+  border-top:             1px #aaa solid;
+}
+
+table.events th {
+  background-color:       #F6F6F6;
+  border-top:             1px #aaa solid;
+  border-bottom:          1px #999999 solid;
+  height:                 2em;
+}
+
+table.events tr:hover {
+    background-color:     #eee;
+}
+
+table.events td {
+  border-bottom:          1px #999999 dashed;
+  padding:                1px 8px;
+}
+
+table.events td a {
+  color:                  #000;
+  text-decoration:        none;
+}
+
+table.events td a:hover {
+  color:                  #39b;
+}
+
+table.events td.noresults {
+  line-height:            50px;
+  text-align:             center;
+}
+
+table.widget_table {
+  border:                 0px;
+}
+
+table.widget_table tr:last-child td {
+  border-bottom:          0px;
+}
+
+/*
+ * eventlist filter 
+ */
+th.input-col {
+  padding-right: 0px;
+}
+th.input-col input {
+    border-radius: 3px 0 0 3px;
+    margin: 0px auto;
+    height: 16px;
+    line-height: 16px;
+    font-size: 12px;
+    
+}
+th.clear-col {
+  width: 18px;
+  margin: 0px;
+  padding: 0px;
+  padding-right: 5px;
+  border: 0px;
+}
+.clear-addon {
+  background-color: #EEEEEE;
+  border: 1px solid #CCCCCC;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: normal;
+  height: 16px;
+  line-height: 16px;
+  min-width: 12px;
+  padding: 4px 5px;
+  text-align: center;
+  text-shadow: 0 1px 0 #FFFFFF;
+  width: 14px;
+  border-radius: 0 3px 3px 0;
+  margin-left: -1px;
+  vertical-align: top;
+}
+#column_time,
+#filter_time {
+  margin-right: 0px;
+  width: 130px;
+}
+#column_severity,
+#filter_severity {
+    margin-right: 0px;
+    width: 40px;
+}
+#column_facility,
+#filter_facility {
+    margin-right: 0px;
+    width: 40px;
+}
+#column_host,
+#filter_fromhost {
+    margin-right: 0px;
+    width: 100px;
+}
+#column_program,
+#filter_program {
+    margin-right: 0px;
+    width: 80px;
+}
+#filter_message,
+#filter_freetext {
+    margin-right: 0px;
+    width:100%;
+}
+.column_menu {
+    padding: 0px;
+    margin: 0px;
+    width: 35px;
+}
+
+/*
+ * eventlist navigation
+ */
+#navi {
+  padding-bottom:          15px;
+  padding-right:           10px;
+  text-align:              right;
+}
+
+span#eventcount {
+  color:                   #333333;
+  font-size:               12px;
+  text-decoration:         none;
+  padding-top:             -10px;
+  padding-right:           12px;
+  vertical-align:          middle;
+}
+
+
+
+
+/*
+ * d3
+ */
+.chart rect {
+  fill: steelblue;
+  stroke: white;
+}
+
+
+
+/*
+ * eventlist chart
+ */
+#chartdiv #zoombutton {
+    position:               absolute;
+    top:                    5px;
+    right:                  3px;
+    padding:                2px;
+    z-index:                99;
+
+    background-color:       #eee;
+    color:                  #999;
+
+    cursor:                 default;
+    font-size:              smaller;
+}
+
+/*
+ * eventlist loading icon
+ */
+#loading {
+  position:                absolute;
+  top:                     45%;
+  left:                    50%;
+
+  width:                   32px;
+  height:                  32px;
+
+  margin-left:             -16px;
+
+  background:              transparent;
+  background-image:        url('../img/ajax-loader.gif');
+}
+
+
+/*
+ * tooltips
+ */
+
+/* flot tooltips */
+#flotTip {
+  background:              #555;
+  color:                   #eee;
+  padding:                 3px;
+
+  border:                  1px solid #444;
+  border-radius:           6px;
+}
+
+
+
+/* event tooltips */
+#tooltip_event td,
+#tooltip_event th {
+  vertical-align:          top;
+  clear:                   both;
+  color:                   #eee;
+}
+#tooltip_event th {
+  padding-right:           15px;
+  white-space:             nowrap;
+}
+#tooltip_event td span#text {
+  display:                 none;
+}
+#tooltip_event td span#google_image,
+#tooltip_event td span#ixquick_image,
+#tooltip_event td span#link_image {
+  display:                 block;
+  width:                   16px;
+  height:                  16px;
+  
+  margin-left:             5px;
+  float:                   right;
+}
+#tooltip_event td span#google_image {
+  background-image:        url('/static/img/google.png');
+}
+#tooltip_event td span#google_image:hover {
+  background-image:        url('/static/img/google_hover.png');
+}
+#tooltip_event td span#ixquick_image {
+  background-image:        url('/static/img/ixquick.png');
+}
+#tooltip_event td span#ixquick_image:hover {
+  background-image:        url('/static/img/ixquick_hover.png');
+}
+#tooltip_event td span#link_image {
+  background-image:        url('/static/img/link.png');
+}
+#tooltip_event td span#link_image:hover {
+  background-image:        url('/static/img/link_hover.png');
+}
+td.spacing {
+  line-height:             2px;
+}
+
+
+
+
+/* ip address tooltips */
+.tooltip_ip {
+  color:                  #0088cc;
+  cursor:                 default;
+}
+.tooltip_ip:hover {
+  color:                  #005588;
+}
+
+.tooltip-inner {
+  background: #a00;
+}
+
+.tooltip-inner .tooltip_ip_table th,
+.tooltip-inner .tooltip_ip_table td {
+  padding: 2px 4px;
+  background-color: #000;
+  border: 0px;
+  text-align: left;
+}
+
+
+
+
+/*
+ * dashboard
+ */
+#dashboard {
+}
+
+.dashwidget {
+  background:                #fff;
+  
+  border:                    1px solid #ccc;
+  border-radius:             6px;
+  margin-bottom:             10px;
+}
+.dashpadded {
+  padding:                   5px 10px;
+}
+.row-fluid-padded {
+  padding-bottom:            20px;
+}
+
+table th.count,
+table td.count {
+  text-align:                right;
+  padding-left:              20px;
+}
+
+
+
+/*
+ * text-alignments
+ */
+.text-left {
+  text-align: left;
+}
+.text-center {
+  text-align: center;
+}
+.text-right {
+  text-align: right;
+}
+.text-justify {
+  text-align: justify;

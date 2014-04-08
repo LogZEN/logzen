@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import pyes
+from elasticsearch import Elasticsearch
+from elasticsearch.connection import Urllib3HttpConnection
 
 from logzen.config import config
-
 
 
 class ElasticSearch:
@@ -31,27 +31,24 @@ class ElasticSearch:
         password = config.system.es['password']
 
         if username and password:
-            auth = {
-                'username' : username,
-                'password' : password
-            }
+            auth = (username, password)
 
         else:
             auth = None
 
-        self.__connection = pyes.ES(servers,
-                                    basic_auth = auth)
+        self.__connection = Elasticsearch(servers,
+                                          connection_class=Urllib3HttpConnection,
+                                          http_auth=auth)
 
     def query(self,
               query):
-        return self.__connection.search_raw(query = query,
-                                            indices = config.system.es.index,
-                                            doc_types = config.system.es.type)
+        return self.__connection.search(body = query,
+                                        index = config.system.es.index)
+
 
     def get(self,
             id):
         return self.__connection.get(id = id,
-                                     index = config.system.es.index,
-                                     doc_type = config.system.es.type)
+                                     index = config.system.es.index)
 
 es = ElasticSearch()

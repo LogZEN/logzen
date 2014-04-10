@@ -37,7 +37,7 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap', 'prettyjson'], ($, k
   class EventListModel
     constructor: ->
       @events = ko.observableArray []
-      @hits = 0
+      @hits = ko.observable 0
       
       @loading = ko.observable false
       
@@ -103,13 +103,13 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap', 'prettyjson'], ($, k
             console.log @freetextValue()
             @freetextValueFormatted pj f
             @loadEvents()
-        		
+
         write: (value) =>
           console.log @freetextValue()	
           @freetextValue value.replace(/<\*>/g, "");
-        
-      
-  
+
+
+
     loadEvents: () =>
       if @filterMode() == 'fields'
         $.ajax
@@ -123,14 +123,14 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap', 'prettyjson'], ($, k
           success: (result) =>
             @loading false
             @error null
-            @hits = result.hits.total
+            @hits result.hits.total
             @events (new EventModel event for event in result.hits.hits)
             #@timeSeries result.facets.histo1.entries
             @addTooltips()
           error: (jqXHR, status, error) =>
             @loading false
             @error error
-            @hits = 0
+            @hits 0
             @events []
 
 
@@ -148,9 +148,14 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap', 'prettyjson'], ($, k
 
 
     nextPage: () =>
-      if @page() * 50 + 50 < @hits
+      if @page() * 50 + 50 < @hits()
         @page(@page() + 1)
-    
+
+    firstPage: () =>
+      @page(0)
+
+    lastPage: () =>
+      @page(Math.floor(@hits() / 50))
     
     refreshPage: () =>
     	if @refreshId() == -1

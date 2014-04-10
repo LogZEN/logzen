@@ -45,11 +45,6 @@ pre.textarea {
 }
 
 
-.row-fluid {
-  padding: 0px;
-  margin: 0px;
-}
-
 .w {
   border: 1px solid #ff0000;  
 }
@@ -57,6 +52,11 @@ pre.textarea {
 .r {
   border: 1px solid #0000ff;
 }
+
+
+
+
+
 
 
 /*
@@ -69,14 +69,95 @@ body {
   overflow-x:             hidden;
 }
 
-
-/* main menu */
-.navbar {
-  box-shadow:             0px 3px 4px rgba(0, 0, 0, 0.4);
+/*
+ * main content
+ */
+.main {
+  margin-top: 40px;
+  padding: 20px;
 }
 
 
+/*
+ * page and widget headings
+ */
+h1 {
+  padding: 0;
+  font-size: 16pt;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 15px;
+}
 
+h2 {
+  padding: 10px 0 0 0;
+  font-size: 14pt;
+}
+
+h3 {
+  font-size: 18px;
+  padding-top: 0px;
+  margin-top: 0px;
+}
+
+h3 .glyphicon {
+  font-size: 14px;
+}
+
+h1.inline,
+h2.inline,
+h3.inline,
+h4.inline {
+    margin:                0;
+    padding:               0 0 20px 0;
+    display:               inline-block;
+}
+
+/*
+ * links
+ */
+a {
+  transition: color 0.5s ease;
+  -webkit-transition: color 0.5s ease;
+  -moz-transition: color 0.5s ease;
+  -o-transition: color 0.5s ease;
+  -ms-transition: color 0.5s ease;
+}
+a:hover {
+  color: #0069ba
+}
+
+/* remove all styles that introduce spacing */
+.plain {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+
+/*
+ * navigation bar
+ */
+.navbar {
+  height: 44px;
+  min-height: 44px;
+  box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.4);
+}
+
+.navbar li a {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.navbar-brand {
+  padding: 12px;
+}
+
+.divider {
+  border-left-color: #111111;
+  border-right-color: #333333;
+}
+
+
+/*
 .brand {
   position:               relative;
   top:                    8px;
@@ -114,7 +195,7 @@ div#main .nav-tabs {
   border: 1px solid transparent;
   border-radius: 4px 4px 0 0;
   line-height: 20px;
-  padding-bottom: 6px;
+  padding-bottom: 10px;
   padding-top: 8px;
 }
 .nav-tabs > li > span, 
@@ -150,30 +231,6 @@ div#main .nav-tabs {
   font-size: 14px;
 }
 
-
-
-
-/*
- * page and widget headings
- */
-h1 {
-  padding:               0;
-  font-size:             14pt;
-}
-
-h2 {
-    padding:               10px 0 0 0;
-    font-size:             12pt;
-}
-
-h1.inline,
-h2.inline,
-h3.inline,
-h4.inline {
-    margin:                0;
-    padding:               0 0 20px 0;
-    display:               inline-block;
-}
 
 
 /*
@@ -243,9 +300,18 @@ li#navclock {
 
 
 
+
+
+
+
 /*
- * eventlist table
+ * eventlist
  */
+
+.eventlist {
+  margin: 12px 0;
+}
+
 table.events {
   width:                  100%;
   
@@ -303,7 +369,7 @@ table.widget_table tr:last-child td {
  */
 th.input-col {
   padding-right: 0px;
-}
+}/*
 th.input-col input {
     border-radius: 3px 0 0 3px;
     margin: 0px auto;
@@ -311,7 +377,7 @@ th.input-col input {
     line-height: 16px;
     font-size: 12px;
     
-}
+}*/
 th.clear-col {
   width: 18px;
   margin: 0px;
@@ -375,13 +441,12 @@ th.clear-col {
 /*
  * eventlist navigation
  */
-#evlist_nav {
+.evlist_nav {
   padding-bottom:          15px;
-  padding-right:           10px;
   text-align:              right;
 }
 
-span#eventcount {
+span.eventcount {
   color:                   #333333;
   font-size:               12px;
   text-decoration:         none;

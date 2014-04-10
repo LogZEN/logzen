@@ -49,6 +49,8 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
     EventListModel = (function() {
       function EventListModel() {
         this.refreshPage = __bind(this.refreshPage, this);
+        this.lastPage = __bind(this.lastPage, this);
+        this.firstPage = __bind(this.firstPage, this);
         this.nextPage = __bind(this.nextPage, this);
         this.prevPage = __bind(this.prevPage, this);
         this.clearFilter = __bind(this.clearFilter, this);
@@ -56,7 +58,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
         this.loadEvents = __bind(this.loadEvents, this);
         var _this = this;
         this.events = ko.observableArray([]);
-        this.hits = 0;
+        this.hits = ko.observable(0);
         this.loading = ko.observable(false);
         this.page = ko.observable(0);
         this.error = ko.observable(null);
@@ -155,7 +157,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
               var event;
               _this.loading(false);
               _this.error(null);
-              _this.hits = result.hits.total;
+              _this.hits(result.hits.total);
               _this.events((function() {
                 var _i, _len, _ref, _results;
                 _ref = result.hits.hits;
@@ -171,7 +173,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
             error: function(jqXHR, status, error) {
               _this.loading(false);
               _this.error(error);
-              _this.hits = 0;
+              _this.hits(0);
               return _this.events([]);
             }
           });
@@ -199,9 +201,17 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
       };
 
       EventListModel.prototype.nextPage = function() {
-        if (this.page() * 50 + 50 < this.hits) {
+        if (this.page() * 50 + 50 < this.hits()) {
           return this.page(this.page() + 1);
         }
+      };
+
+      EventListModel.prototype.firstPage = function() {
+        return this.page(0);
+      };
+
+      EventListModel.prototype.lastPage = function() {
+        return this.page(Math.floor(this.hits() / 50));
       };
 
       EventListModel.prototype.refreshPage = function() {

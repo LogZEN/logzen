@@ -1,11 +1,12 @@
-<div id="eventlist">
+<div class="eventlist">
 
   <div id="loading" data-bind="visible: loading"></div>
-  
+
+  <!-- error handling -->
   <!--  ko if: error -->
-  <div class="row-fluid">
-    <div class="span12">
-      <div class="alert alert-block alert-error">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="alert alert-block alert-danger">
         <strong>Error:</strong>
         <span data-bind="text: error"></span>
       </div>
@@ -13,31 +14,27 @@
   </div>
   <!-- /ko -->
   
-  
-  <div class="row-fluid">
-    <div id="evlist_nav" class="span12">
-      <span id="eventcount">
-        Showing events <span data-bind="text: page() * 50 + 1"></span> - <span data-bind="text: page() * 50 + 50"></span>
-      </span>
-  	  <span class="btn-group">
-        <a class="btn btn-small left q_tip" title="Newer" href="javascript:void(0);" data-bind="click: prevPage">Prev</a>
-        <a class="btn btn-small right q_tip" title="Older" href="javascript:void(0);" data-bind="click: nextPage">Next</a>
+
+  <!-- eventlist navigation -->
+  <div class="row">
+    <div class="evlist_nav col-md-12">
+      <span class="eventcount">
+        Showing events <span data-bind="text: hits() > 0 ? (page() * 50 + 1) : 0"></span> - <span data-bind="text: (hits() > page() * 50 + 50) ? (page() * 50 + 50) : hits()"></span>
       </span>
       <span class="btn-group">
-        <a class="btn btn-small q_tip active" title="Refresh" href="javascript:void(0);" data-toggle="button" data-bind="click: refreshPage, css: { 'btn-primary': refreshId() != -1 }">Refresh</a>
-<!--
-        <button class="btn btn-small dropdown-toggle" data-toggle="dropdown" data-bind="click: refreshPage, css: { 'btn-primary': refreshId() != -1 }">
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-          <li>lala</li>
-        </ul>
--->
-      </div>
+        <a class="btn btn-default btn-small left q_tip" title="Newest events" href="javascript:void(0);" data-bind="click: firstPage">First</a>
+        <a class="btn btn-default btn-small q_tip" title="Newer events" href="javascript:void(0);" data-bind="click: prevPage">Prev</a>
+        <a class="btn btn-default btn-small q_tip" title="Older events" href="javascript:void(0);" data-bind="click: nextPage">Next</a>
+        <a class="btn btn-default btn-small right q_tip" title="Oldest events" href="javascript:void(0);" data-bind="click: lastPage">Last</a>
+      </span>
+      <span class="btn-group">
+        <a class="btn btn-small q_tip active" title="Refresh" href="javascript:void(0);" data-toggle="button" data-bind="click: refreshPage, css: { 'btn-primary': refreshId() != -1, 'btn-default': refreshId() == -1 }">Refresh</a>
+      </span>
     </div>
   </div>
   
-  <!-- graph --
+  <!-- graph -->
+  <!--
   <div class="row-fluid">
    	<div class="span12">
   	  <div id="timeSeries" style="width: 100%"><svg></svg></div>
@@ -63,95 +60,107 @@
       
   <!-- results and filters -->
   <div class="tab-pane active" id="tab1">  
-  <div class="row-fluid">
-    <form action="/_api/query" method="post" id="filterform" class="form-inline">
-    <table class="events table-condensed">
-      <thead>
-        <tr>
-          <th class="column_menu">&nbsp;</th>
-          <th colspan="2">Time</th>
-          <th colspan="2">Severity</th>
-          <th colspan="2">Facility</th>
-          <th colspan="2">Host</th>
-          <th colspan="2">Program</th>
-          <th colspan="2">Message</th>
-        </tr>
-        <tr>
-          <th class="column_menu"><button type="button" class="close" data-bind="click: function (data, event) { filterMode('freetext'); }"><i class="icon-edit"></i></button></th>
-          <th class="input-col" id="column_time">
-            <input type="text" name="timereported" id="filter_time" placeholder="filter" readonly="readonly" size="5" />
-          </th>
-          <th class="clear-col"><span class="q_tip clear-addon btn" id="time" title="Clear this filter">&times;</span></th>
-          <th class="input-col" id="column_severity">
-            <input type="text" name="severity" id="filter_severity" class="filter" placeholder="filter" size="5" data-bind="value: filters.severity, valueUpdate: 'afterkeydown'" data-provide="typeahead" data-items="4" data-source='["emerge","alert","critical","error","warning","notice","info","debug"]' />
-          </th>
-          <th class="clear-col"><span class="q_tip clear-addon btn" id="severity" title="Clear this filter" data-bind="click: clearFilter('severity')">&times;</span></th>
-          <th class="input-col" id="column_facility">
-            <input type="text" name="facility" id="filter_facility" class="filter" placeholder="filter" size="5" data-bind="value: filters.facility, valueUpdate: 'afterkeydown'" />
-          </th>
-          <th class="clear-col"><span class="q_tip clear-addon btn" id="facility" title="Clear this filter" data-bind="click: clearFilter('facility')">&times;</span></th>
-          <th class="input-col" id="column_host">
-            <input type="text" name="fromhost" id="filter_fromhost" class="filter" placeholder="filter" size="5" data-bind="value: filters.host, valueUpdate: 'afterkeydown'" />
-          </th>
-          <th class="clear-col"><span class="q_tip clear-addon btn" id="fromhost" title="Clear this filter" data-bind="click: clearFilter('host')">&times;</span></th>
-          <th class="input-col" id="column_program">
-            <input type="text" name="program" id="filter_program" class="filter" placeholder="filter" size="5" data-bind="value: filters.program, valueUpdate: 'afterkeydown'" />
-          </th>
-          <th class="clear-col"><span class="q_tip clear-addon btn" id="program" title="Clear this filter" data-bind="click: clearFilter('program')">&times;</span></th>
-          <th class="input-col" id="column_message">
-            <input type="text" name="message" id="filter_message" class="filter" placeholder="filter" size="5" data-bind="value: filters.message, valueUpdate: 'afterkeydown'" />
-          </th>
-          <th class="clear-col"><span class="q_tip clear-addon btn" id="message" title="Clear this filter" data-bind="click: clearFilter('message')">&times;</span></th>
-        </tr>
-        
-      </thead>
-  
-      <tbody>
-      <!-- ko foreach: events -->
-    	  <tr>
-    	    <td class="column_menu">
-    	      <ul class="nav hover-nav" style="display:inline-block">
-    	        <li class="dropdown">
-    	        <a class="dropdown-toggle" href="#"><i class="icon-chevron-down"></i></a>
-    	          <ul class="dropdown-menu">
-    	            <li><a data-bind="attr: { href: detail_url}"><i class="icon-info-sign"></i> Display details</a></li>
-    	            <li><a href="{{searchengine}}' + encodeURIComponent() + '"><i class="icon-globe"></i> Search with {{searchengine_name}}</a></li>
-    	          </ul>
-    	        </li>
-    	      </ul>
-    	      <i class="icon-eye-open event_tooltip" title="<%_id%>"></i>
-    	    </td>
-    	    
-    	    <td colspan="2" data-bind="text: time"></td>
-    	    <td colspan="2"><a data-bind="text: severity_text, click: $parent.setFilter('severity'), css: {
-    		    color_emerge: severity == '0',
-    		    color_alert: severity == '1',
-    		    color_critical: severity == '2',
-    		    color_error: severity == '3',
-    		    color_warning: severity == '4',
-    		    color_notice: severity == '5',
-    		    color_info: severity == '6',
-    		    color_debug: severity == '7'
-    	    }" class="badge"></a></td>
-    	    <td colspan="2"><a data-bind="text: facility_text,  click: $parent.setFilter('facility')"></a></td>
-          <td colspan="2"><a data-bind="text: host,           click: $parent.setFilter('host')"></a></td>
-          <td colspan="2"><a data-bind="text: program,        click: $parent.setFilter('program')"></a></td>
-    	    <td colspan="2"><a data-bind="html: message_hl,     click: $parent.setFilter('message')"></a></td>
-    	  </tr>
-  	  <!-- /ko -->
-      
-      <!--  ko ifnot: events().length -->
-        <tr><td colspan="13" class="noresults">No Events</td></tr>
-  	  <!-- /ko -->
-      </tbody>
-      
-    </table>
-    </form>
+    <div class="row">
+      <div class="col-md-12">
+        <form action="/_api/query" method="post" id="filterform" class="form-inline">
+        <table class="events table-condensed">
+          <thead>
+            <tr>
+              <th class="column_menu">&nbsp;</th>
+              <th>Time</th>
+              <th>Severity</th>
+              <th>Facility</th>
+              <th>Host</th>
+              <th>Program</th>
+              <th>Message</th>
+            </tr>
+            <tr>
+              <th class="column_menu"><button type="button" class="close" data-bind="click: function (data, event) { filterMode('freetext'); }"><i class="fa fa-fw fa-edit"></i></button></th>
+
+              <th class="input-col" id="column_time">
+                <input type="text" name="timereported" id="filter_time" class="form-control input-sm" placeholder="" readonly="readonly" size="5" />
+              </th>
+
+              <th class="input-col" id="column_severity">
+                <div class="input-group">
+                  <input type="text" name="severity" id="filter_severity" class="form-control input-sm filter" placeholder="filter" size="5" data-bind="value: filters.severity, valueUpdate: 'afterkeydown'" data-provide="typeahead" data-items="4" data-source='["emerge","alert","critical","error","warning","notice","info","debug"]' />
+                  <span class="input-group-addon"><i class="fa fa-fw fa-undo q_tip" id="severity" title="Clear this filter" data-bind="click: clearFilter('severity')"></i></span>
+                </div>
+              </th>
+
+              <th class="input-col" id="column_facility">
+                <div class="input-group">
+                  <input type="text" name="facility" id="filter_facility" class="form-control input-sm filter" placeholder="filter" size="5" data-bind="value: filters.facility, valueUpdate: 'afterkeydown'" />
+                  <span class="input-group-addon"><i class="fa fa-fw fa-undo q_tip" id="facility" title="Clear this filter" data-bind="click: clearFilter('facility')"></i></span>
+                </div>
+              </th>
+
+              <th class="input-col" id="column_host">
+                <div class="input-group">
+                  <input type="text" name="fromhost" id="filter_fromhost" class="form-control input-sm filter" placeholder="filter" size="5" data-bind="value: filters.host, valueUpdate: 'afterkeydown'" />
+                  <span class="input-group-addon"><i class="fa fa-fw fa-undo q_tip" id="host" title="Clear this filter" data-bind="click: clearFilter('host')"></i></span>
+                </div>
+              </th>
+
+              <th class="input-col" id="column_program">
+                <div class="input-group">
+                  <input type="text" name="program" id="filter_program" class="form-control input-sm filter" placeholder="filter" size="5" data-bind="value: filters.program, valueUpdate: 'afterkeydown'" />
+                  <span class="input-group-addon"><i class="fa fa-fw fa-undo q_tip" id="program" title="Clear this filter" data-bind="click: clearFilter('program')"></i></span>
+                </div>
+              </th>
+
+              <th class="input-col" id="column_message">
+                <div class="input-group">
+                  <input type="text" name="message" id="filter_message" class="form-control input-sm filter" placeholder="filter" size="5" data-bind="value: filters.message, valueUpdate: 'afterkeydown'" />
+                  <span class="input-group-addon"><i class="fa fa-fw fa-undo q_tip" id="message" title="Clear this filter" data-bind="click: clearFilter('message')"></i></span>
+                </div>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+          <!-- ko foreach: events -->
+            <tr>
+              <td class="column_menu">
+                <ul class="nav hover-nav" style="display:inline-block">
+                  <li class="dropdown">
+                  <a class="dropdown-toggle plain" href="#"><i class="fa fa-fw fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                      <li><a data-bind="attr: { href: detail_url}"><i class="fa fa-fw fa-info-circle"></i> Display details</a></li>
+                      <li><a href="{{searchengine}}' + encodeURIComponent() + '"><i class="icon-globe"></i> Search with {{searchengine_name}}</a></li>
+                    </ul>
+                  </li>
+                </ul>
+                <i class="icon-eye-open event_tooltip" title="<%_id%>"></i>
+              </td>
+
+              <td data-bind="text: time"></td>
+              <td><a data-bind="text: severity_text, click: $parent.setFilter('severity'), css: {
+                color_emerge: severity == '0',
+                color_alert: severity == '1',
+                color_critical: severity == '2',
+                color_error: severity == '3',
+                color_warning: severity == '4',
+                color_notice: severity == '5',
+                color_info: severity == '6',
+                color_debug: severity == '7'
+              }" class="badge"></a></td>
+              <td><a data-bind="text: facility_text,  click: $parent.setFilter('facility')"></a></td>
+              <td><a data-bind="text: host,           click: $parent.setFilter('host')"></a></td>
+              <td><a data-bind="text: program,        click: $parent.setFilter('program')"></a></td>
+              <td><a data-bind="html: message_hl,     click: $parent.setFilter('message')"></a></td>
+            </tr>
+          <!-- /ko -->
+
+          <!--  ko ifnot: events().length -->
+            <tr><td colspan="13" class="noresults">No Events</td></tr>
+          <!-- /ko -->
+          </tbody>
+
+        </table>
+        </form>
+      </div>
+    </div>
   </div>
-
-
-    <div class="tab-pane" id="tab2">...</div>
-  </div>
-
   
 </div>

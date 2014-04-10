@@ -1,46 +1,63 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<html lang="en">
 <head>
   <title>LogZen</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="pragma" content="no-cache">
   
   <script type="text/javascript" src="js/libs/require.js" data-main="js/main.js"></script>
 
-  <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="css/bootstrap.css">
-  <link rel="stylesheet" href="css/bootstrap-responsive.css">
-  <link rel="stylesheet" href="css/pager.css">
-  <link rel="stylesheet" href="css/pretty_json.css">
-  <link rel="stylesheet" href="css/flip.css">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" type="text/css" href="css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
+  <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="css/pager.css">
+  <link rel="stylesheet" type="text/css" href="css/pretty_json.css">
+  <link rel="stylesheet" type="text/css" href="css/flip.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 
 <body>
   <noscript>
-    <div class="modal-backdrop"></div>
-    <div class="modal">
-      <div class="modal-header">
-        <button type="button" class="close">&times;</button>
-        <h3>Javascript required</h3>
-      </div>
-      <div class="modal-body"> 
-          This Website does not work without Javascript.<br />
-          Please activate Javascript in your browser or move along.
-      </div>
-      <div class="modal-footer">
-        <a target="_blank" href="http://www.enable-javascript.com" class="btn btn-primary">Need Help? - Klick here</a>
+    <div class="modal" style="display: block;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Javascript required</h4>
+          </div>
+          <div class="modal-body">
+            <p>
+              This Website does not work without Javascript.<br>
+              Please activate Javascript in your browser or move along.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <a target="_blank" href="http://www.enable-javascript.com" class="btn btn-primary">Need Help? - Klick here</a>
+          </div>
+        </div>
       </div>
     </div>
   </noscript>
   
-  
   <!-- main menu -->
-  <div id="menu" class="navbar navbar-fixed-top navbar-inverse">
-    <div class="navbar-inner">
-      <div class="container">
-        <a class="brand" href="#"><span>LogZen</span></a>
-        
+  <header class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#mainmenu">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">logzen</a>
+      </div>
+
+      <div class="collapse navbar-collapse navbar-inverse " id="mainmenu">
         <ul class="nav navbar-nav pull-right" data-bind="visible: ui_displayMainMenu">
           <!-- ko foreach: $__page__.children -->
             <!-- ko if: ($data.getId() !== '?' && $data.getId() !== 'system') -->
@@ -75,7 +92,7 @@
         </ul>
       </div>
     </div>
-  </div>
+  </header>
 
 
   <!-- page content -->
@@ -89,18 +106,19 @@
           <li data-bind="css: {active: $page.child('tab_eventlist_' + id)().isVisible}">
             <!-- ko ifnot: $page.child('tab_eventlist_' + id)().isVisible -->
               <a data-bind="page-href: 'tab_eventlist_' + id">
-              <!-- ko text: title -->
-              <!-- /ko -->
-              <button type="button" class="close" data-bind="click: $root.remove_evlist" style="padding-left: 5px; font-size: .8em;">&times;</button>
+                <!-- ko text: title --><!-- /ko -->
+                <i class="fa fa-fw fa-times q_tip" title="Close Tab" data-bind="click: $root.remove_evlist"></i>
               </a>
             <!-- /ko -->
             <!-- ko if: $page.child('tab_eventlist_' + id)().isVisible -->  
-              <span><input type="text" data-bind="value: title, page-href: 'tab_eventlist_' + id" style="z-index:99" /></span>
-              <!--  button type="button" class="close" data-bind="click: $root.remove_evlist" style="padding-left: 5px; font-size: .8em;">&times;</button -->
+              <span>
+                <input type="text" data-bind="value: title, page-href: 'tab_eventlist_' + id" style="z-index:99" />
+                <i class="fa fa-fw fa-times q_tip" title="Close Tab" data-bind="click: $root.remove_evlist"></i>
+              </span>
             <!-- /ko -->
           </li>
           <!-- /ko -->
-          <li><a type="button" class="close" data-bind="click: add_evlist">+</a></li>
+          <li><a data-bind="click: add_evlist"><i class="fa fa-fw fa-plus q_tip" title="New Tab"></i></a></li>
         </ul>
         
         <!-- ko foreach: evlists -->

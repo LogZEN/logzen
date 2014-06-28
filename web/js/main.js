@@ -22,7 +22,8 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
       vars: 'vars',
       text: 'libs/text',
       prettyjson: 'libs/pretty_json',
-      humanize: 'libs/jquery.humanize'
+      humanize: 'libs/jquery.humanize',
+      gridster: 'libs/jquery.gridster'
     },
     shim: {
       'bootstrap': {
@@ -32,6 +33,9 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
         deps: ['jquery']
       },
       'quickflip': {
+        deps: ['jquery']
+      },
+      'gridster': {
         deps: ['jquery']
       },
       'ko_mapping': {
@@ -57,7 +61,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
     };
   };
 
-  require(['jquery', 'knockout', 'pager', 'bootstrap', 'prettyjson'], function($, ko, pager) {
+  require(['jquery', 'knockout', 'pager', 'bootstrap', 'prettyjson', 'gridster'], function($, ko, pager) {
     var VM, vm;
     VM = (function() {
       function VM() {

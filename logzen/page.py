@@ -50,23 +50,17 @@ class Page:
   @require()
   @cherrypy.tools.json_out()
   def get_dashboard_layout(self):
-    return [{'size': 6,
-             'childs': ['x1',
-                        'x2',
-                        'x3'
-                        ]
-            },
-            {'size': 6,
-             'childs': ['x4',
-                        [{'size': 6,
-                          'childs': ['x5']
-                          },
-                         {'size': 6,
-                          'childs': ['x6']
-                          }],
-                        'x7'
-                        ]
-            }
+    return [{"col":1,"row":1,"size_x":2,"size_y":2, "wid": "x1"},
+            {"col":2,"row":1,"size_x":1,"size_y":2, "wid": "x1"},
+            {"col":3,"row":1,"size_x":1,"size_y":1, "wid": "x1"},
+            {"col":4,"row":1,"size_x":3,"size_y":1, "wid": "x2"},
+            {"col":1,"row":2,"size_x":2,"size_y":2, "wid": "x1"},
+            {"col":2,"row":2,"size_x":1,"size_y":1, "wid": "x3"},
+            {"col":3,"row":2,"size_x":1,"size_y":1, "wid": "x1"},
+            {"col":4,"row":2,"size_x":1,"size_y":1, "wid": "x2"},
+            {"col":2,"row":3,"size_x":1,"size_y":1, "wid": "x1"},
+            {"col":3,"row":3,"size_x":1,"size_y":1, "wid": "x3"},
+            {"col":6,"row":3,"size_x":2,"size_y":1, "wid": "x2"}
            ]
 
 

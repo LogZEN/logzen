@@ -8,7 +8,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
 
 (function() {
-  define(['jquery', 'knockout', 'ko_mapping', 'pager', 'vars', 'bootstrap'], function($, ko, mapping, pager, vars) {
+  define(['jquery', 'knockout', 'ko_mapping', 'pager', 'vars', 'bootstrap', 'gridster'], function($, ko, mapping, pager, vars) {
     var DashboardModel,
       _this = this;
     ko.bindingHandlers.widget = {
@@ -26,15 +26,46 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
     };
     DashboardModel = (function() {
       function DashboardModel() {
-        var _this = this;
-        this.widgetModels = ko.observableArray([]);
-        this.layout = mapping.fromJS([]);
+        var g,
+          _this = this;
+        this.widgetModels = [];
+        this.layout = ko.observableArray([]);
+        g = $(".gridster ul").gridster({
+          widget_margins: [10, 10],
+          widget_base_dimensions: [160, 160]
+        }).data('gridster');
         $.ajax({
           url: '/_config/dashboard/layout',
           dataType: 'json',
           success: function(result) {
-            console.log(result);
-            return mapping.fromJS(result, _this.layout);
+            var r, _i, _len, _results;
+            _results = [];
+            for (_i = 0, _len = result.length; _i < _len; _i++) {
+              r = result[_i];
+              _results.push($.ajax({
+                url: "/_config/dashboard/config?name=" + r.wid,
+                dataType: 'json',
+                success: function(result) {
+                  console.log(result);
+                  return require(["/pages/widget/" + result.type + "/model.js", "text!/pages/widget/" + result.type + "/view.html"], function(vm, html) {
+                    console.log(r.wid);
+                    vm = new vm();
+                    _this.layout.push({
+                      id: r.wid,
+                      layout: r,
+                      vm: vm,
+                      html: html
+                    });
+                    _this.widgetModels[r.wid] = {
+                      vm: vm,
+                      html: html
+                    };
+                    return g.add_widget('<li class="new" data-bind="template: {name: \'template_widget\', data: \'' + r.wid + '\'}"></li>', 2, 1);
+                  });
+                }
+              }));
+            }
+            return _results;
           }
         });
       }

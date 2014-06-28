@@ -18,12 +18,15 @@ require.config
     text: 'libs/text'
     prettyjson: 'libs/pretty_json'
     humanize: 'libs/jquery.humanize'
+    gridster: 'libs/jquery.gridster'
   shim:
     'bootstrap':
       deps: [ 'jquery' ]
     'humanize':
       deps: [ 'jquery' ]
     'quickflip':
+      deps: [ 'jquery' ]
+    'gridster':
       deps: [ 'jquery' ]
     'ko_mapping':
       deps: [ 'knockout' ]
@@ -41,7 +44,7 @@ require.config
       callback()
 
 
-require ['jquery', 'knockout', 'pager', 'bootstrap', 'prettyjson'], ($, ko, pager) ->
+require ['jquery', 'knockout', 'pager', 'bootstrap', 'prettyjson', 'gridster'], ($, ko, pager) ->
 	class VM
     constructor: ->
       @loading = ko.observable false

@@ -5,10 +5,7 @@
   </div>
   <div class="modal-body">
     <p>
-      Unable to load dashboard widgets. 
-      Please make sure your configuration is correct. <br />
-      The number of columns is 12. When adding up the sizes 
-      of all widget columns, this is the number you should get.
+      Unable to load dashboard widgets.
     </p>
   </div>
   <div class="modal-footer">
@@ -16,28 +13,15 @@
   </div>
 </div>
 
-<script type="text/html" id="template_widget">
-  <!-- div class="w" data-bind="text: $data"></div -->
+<script type="text/html" id="template_widget"><pre data-bind="text: ko.toJSON($data, null, 2)"></pre>
+  <div class="w" data-bind="text: $data.wid"></div>
   <div data-bind="widget: { vm: vm, html: html }"></div>
 </script>
 
-<script type="text/html" id="template_row">
-  <div class="row-fluid" data-bind="template: { name: 'template_span', foreach: $data }">
+<div id="dashboard">
+  <div class="gridster">
+    <ul style="width:100%;">
+      <!-- li data-bind="template: {name: 'template_widget'}, attr: {'data-row': layout.row, 'data-col': layout.col, 'data-sizex': layout.size_x, 'data-sizey': layout.size_y}" class="dashwidget">sdfsdfs</li -->
+    </ul>
   </div>
-</script>
-
-<script type="text/html" id="template_span">
-  <div class="span6" data-bind="foreach: childs"> <!-- Use size here! -->
-    <!-- ko if: Array.isArray($data) -->
-      <div data-bind="template: {name: 'template_row'}"></div>
-    <!-- /ko -->
-    
-    <!-- ko ifnot: Array.isArray($data) -->
-      <div data-bind="template: {name: 'template_widget'}"></div>
-    <!-- /ko -->
-  </div>
-</script>
-
-<div id="dashboard">    
-	<div data-bind="template: { name: 'template_row', data: layout }"></div>
 </div>

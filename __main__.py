@@ -37,9 +37,8 @@ if __name__ == '__main__':
   dispatcher.connect('api_query', '/_api/query', Api(), action = 'query')
   dispatcher.connect('api_get', '/_api/get', Api(), action = 'get')
 
-  dispatcher.connect('config_widget', '/_config/get', Page(), action = 'get_config_option')
-  dispatcher.connect('config_layout', '/_config/dashboard/layout', Page(), action = 'get_dashboard_layout')
-  dispatcher.connect('config_config', '/_config/dashboard/config', Page(), action = 'get_dashboard_config')
+  dispatcher.connect('config_widget', '/_config', Page(), action = 'get_config')
+  dispatcher.connect('config_layout', '/_config/dashboard', Page(), action = 'get_dashboard')
 
   dispatcher.connect('login', '/_auth/login', AuthController(), action = 'login')
   dispatcher.connect('logout', '/_auth/logout', AuthController(), action = 'logout')

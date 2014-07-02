@@ -594,15 +594,12 @@ td.spacing {
 /*
  * dashboard
  */
-#dashboard {
-}
 
+.panel {
+  box-shadow:                0 0 2px rgba(0, 0, 0, 0.15);
+}
 .dashwidget {
   background:                #fff;
-  
-  border:                    1px solid #ccc;
-  border-radius:             6px;
-  margin-bottom:             10px;
 }
 .dashpadded {
   padding:                   5px 10px;

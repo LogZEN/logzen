@@ -10,20 +10,23 @@ require.config
   baseUrl: '/js'
   paths:
     jquery:'libs/jquery-2.0.3'
-    knockout:'libs/knockout-2.3.0'
-    ko_mapping: 'libs/knockout.mapping'
+    knockout:'libs/knockout-3.1.0-debug'
+    ko_mapping: 'libs/knockout.mapping-2.4.1-debug'
     pager:'libs/pager-1.0.1.min'
     bootstrap:'libs/bootstrap'
     vars: 'vars'
     text: 'libs/text'
     prettyjson: 'libs/pretty_json'
     humanize: 'libs/jquery.humanize'
+    gridster: 'libs/jquery.gridster'
   shim:
     'bootstrap':
       deps: [ 'jquery' ]
     'humanize':
       deps: [ 'jquery' ]
     'quickflip':
+      deps: [ 'jquery' ]
+    'gridster':
       deps: [ 'jquery' ]
     'ko_mapping':
       deps: [ 'knockout' ]
@@ -42,7 +45,7 @@ require.config
 
 
 require ['jquery', 'knockout', 'pager', 'bootstrap', 'prettyjson'], ($, ko, pager) ->
-	class VM
+  class VM
     constructor: ->
       @loading = ko.observable false
       
@@ -88,8 +91,8 @@ require ['jquery', 'knockout', 'pager', 'bootstrap', 'prettyjson'], ($, ko, page
     # check whether initial configuration has been done
     checkInitialConf: ->
       $.ajax
-        url: '/_config/get'
-        type: 'POST'
+        url: '/_config'
+        type: 'GET'
         data: 'key=configured'
         dataType: 'json'
         success: (result) =>
@@ -98,14 +101,14 @@ require ['jquery', 'knockout', 'pager', 'bootstrap', 'prettyjson'], ($, ko, page
       
     # add a new tab to the eventlist page
     remove_evlist: (evlist) =>
-    	@evlists.remove evlist
+      @evlists.remove evlist
 
 
     # remove a tab from the eventlist page
     add_evlist: () =>
-    	@evlists.push 
-    		id: +(new Date())
-    		title: ko.observable 'New Tab'
+      @evlists.push
+        id: +(new Date())
+        title: ko.observable 'New Tab'
 
 
 
@@ -117,11 +120,10 @@ require ['jquery', 'knockout', 'pager', 'bootstrap', 'prettyjson'], ($, ko, page
   vm.checkInitialConf()
   
   pager.onBindingError.add( 
-  	(event) ->
+    (event) ->
       console.log event               # DEBUG
       page = event.page
       $(page.element).empty().append('<div class="alert"> Error Loading Page</div>')
   )
   
   pager.start()
-  

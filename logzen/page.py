@@ -43,68 +43,29 @@ class Page:
     return open(os.path.join('web', u'index.html'))
 
 
-  #
-  # get configuration
-  #
-
   @require()
   @cherrypy.tools.json_out()
-  def get_dashboard_layout(self):
-    return [{'size': 6,
-             'childs': ['x1',
-                        'x2',
-                        'x3'
-                        ]
-            },
-            {'size': 6,
-             'childs': ['x4',
-                        [{'size': 6,
-                          'childs': ['x5']
-                          },
-                         {'size': 6,
-                          'childs': ['x6']
-                          }],
-                        'x7'
-                        ]
-            }
+  def get_dashboard(self):
+    return [{"col": 1, "row": 1, "size_x": 2, "size_y": 2, "type": "latestevents", "title": "c11", "config": {}},
+            {"col": 2, "row": 1, "size_x": 1, "size_y": 2, "type": "latestevents", "title": "c21", "config": {}},
+            {"col": 3, "row": 1, "size_x": 1, "size_y": 1, "type": "latestevents", "title": "c31", "config": {}},
+            {"col": 4, "row": 1, "size_x": 3, "size_y": 1, "type": "latestevents", "title": "c41", "config": {}},
+            {"col": 1, "row": 2, "size_x": 2, "size_y": 2, "type": "latestevents", "title": "c12", "config": {}},
+            {"col": 2, "row": 2, "size_x": 1, "size_y": 1, "type": "latestevents", "title": "c22", "config": {}},
+            {"col": 3, "row": 2, "size_x": 1, "size_y": 1, "type": "latestevents", "title": "c32", "config": {}},
+            {"col": 4, "row": 2, "size_x": 1, "size_y": 1, "type": "latestevents", "title": "c42", "config": {}},
+            {"col": 2, "row": 3, "size_x": 1, "size_y": 1, "type": "latestevents", "title": "c23", "config": {}},
+            {"col": 3, "row": 3, "size_x": 1, "size_y": 1, "type": "latestevents", "title": "c33", "config": {}},
+            {"col": 6, "row": 3, "size_x": 2, "size_y": 1, "type": "latestevents", "title": "c63", "config": {}}
            ]
 
 
-  @require()
-  @cherrypy.tools.json_out()
-  def get_dashboard_config(self, name):
-    return {
-            'x1': {
-                   'type': 'latestevents'
-                   },
-            'x2': {
-                   'type': 'latestevents'
-                   },
-            'x3': {
-                   'type': 'latestevents'
-                   },
-            'x4': {
-                   'type': 'latestevents'
-                   },
-            'x5': {
-                   'type': 'latestevents'
-                   },
-            'x6': {
-                   'type': 'latestevents'
-                   },
-            'x7': {
-                   'type': 'latestevents'
-                   }
-            }[name]
-
-
-
 
   @cherrypy.tools.json_out()
-  def get_config_option(self,
-                        key):
+  def get_config(self,
+                 key):
     return {'key': key,
-            'value': config.system.logzen.configured}
+            'value': config.system.logzen[key]}
 
 
 

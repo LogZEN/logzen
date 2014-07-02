@@ -17,7 +17,8 @@
   <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="css/pager.css">
   <link rel="stylesheet" type="text/css" href="css/pretty_json.css">
-  <link rel="stylesheet" type="text/css" href="css/flip.css">
+  <link rel="stylesheet" type="text/css" href="css/jquery.gridster.min.css">
+  <link rel="stylesheet" type="text/css" href="css/flipper.css">
   <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 
@@ -97,7 +98,7 @@
 
   <!-- page content -->
   <div id="main">
-      <div data-bind="page: {id: 'dashboard', title: 'Dashboard', sourceOnShow: requireHTML('dashboard'), withOnShow: requireVM('dashboard'), role: 'start', guard: isLoggedIn}"></div>
+      <div data-bind="page: {id: 'dashboard', title: 'Dashboard', sourceOnShow: requireHTML('dashboard'), withOnShow: requireVM('dashboard'), role: 'start', guard: isLoggedIn}" style="overflow: hidden"></div>
       
       <div data-bind="page: {id: 'events', title: 'Events', guard: isLoggedIn}">
         <!-- tabs menu -->

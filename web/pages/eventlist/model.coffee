@@ -13,6 +13,7 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap', 'prettyjson'], ($, k
     return result
 
 
+  # model used for an event in the eventlist
   class EventModel
     constructor: (data) ->
       @id = data._id
@@ -27,11 +28,19 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap', 'prettyjson'], ($, k
       @host = data._source.host
       @program = data._source.program
       @message = data._source.message
-      @message_hl = @markIP data._source.message 
-      
+      @message_hl = @markIP data._source.message
+
     markIP: (msg) ->
       ipv4_regex = /((([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0))/g
       msg.replace(ipv4_regex, '<span class="tooltip_ip">$1</span>');
+
+
+  # model used for a detailed event
+  class DetailEventModel extends EventModel
+    constructor: (data) ->
+      super data
+      @whatever = 0
+
 
 
   class EventListModel
@@ -105,7 +114,7 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap', 'prettyjson'], ($, k
             @loadEvents()
 
         write: (value) =>
-          console.log @freetextValue()	
+          console.log @freetextValue()
           @freetextValue value.replace(/<\*>/g, "");
 
 
@@ -137,7 +146,6 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap', 'prettyjson'], ($, k
     setFilter: (name) =>
       (el) => @filters[name] el[name]
 
-
     clearFilter: (name) =>
       () => @filters[name] ""
 
@@ -145,7 +153,6 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap', 'prettyjson'], ($, k
     prevPage: () =>
       if @page() > 0
         @page(@page() - 1)
-
 
     nextPage: () =>
       if @page() * 50 + 50 < @hits()

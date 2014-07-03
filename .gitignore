@@ -2,3 +2,6 @@
 .pydevproject
 *.pyc
 .idea
+/web/pages/*.js
+/web/js/*.js
+!/web/js/libs

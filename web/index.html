@@ -98,7 +98,7 @@
 
   <!-- page content -->
   <div id="main">
-      <div data-bind="page: {id: 'dashboard', title: 'Dashboard', sourceOnShow: requireHTML('dashboard'), withOnShow: requireVM('dashboard'), role: 'start', guard: isLoggedIn}"></div>
+      <div data-bind="page: {id: 'dashboard', title: 'Dashboard', sourceOnShow: requireHTML('dashboard'), withOnShow: requireVM('dashboard'), role: 'start', guard: isLoggedIn}" style="overflow: hidden"></div>
       
       <div data-bind="page: {id: 'events', title: 'Events', guard: isLoggedIn}">
         <!-- tabs menu -->

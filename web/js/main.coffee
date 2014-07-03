@@ -6,7 +6,6 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
 require.config 
-  urlArgs: 'v=' + new Date()
   baseUrl: '/js'
   paths:
     jquery:'libs/jquery-2.0.3'
@@ -44,11 +43,11 @@ require.config
       callback()
 
 
-require ['jquery', 'knockout', 'pager', 'bootstrap', 'prettyjson'], ($, ko, pager) ->
-  class VM
+require ['jquery', 'knockout', 'pager', 'utils', 'bootstrap', 'prettyjson'], ($, ko, pager, utils) ->
+  class Main extends utils.LoadingModel
     constructor: ->
-      @loading = ko.observable false
-      
+      pager.extendWithPage @
+
       @configured = ko.observable false
       
       @ui_displayMainMenu = ko.computed =>
@@ -113,17 +112,11 @@ require ['jquery', 'knockout', 'pager', 'bootstrap', 'prettyjson'], ($, ko, page
 
 
 
-  vm = new VM
-  pager.extendWithPage vm
-  ko.applyBindings vm
+  main = new Main
+
+  ko.applyBindings main
   
-  vm.checkInitialConf()
-  
-  pager.onBindingError.add( 
-    (event) ->
-      console.log event               # DEBUG
-      page = event.page
-      $(page.element).empty().append('<div class="alert"> Error Loading Page</div>')
-  )
+  main.checkInitialConf()
+
   
   pager.start()

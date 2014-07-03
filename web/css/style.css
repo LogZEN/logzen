@@ -499,6 +499,8 @@ span.eventcount {
 
   background:              transparent;
   background-image:        url('../img/ajax-loader.gif');
+
+  z-index: 1000;
 }
 
 

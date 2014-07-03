@@ -5,231 +5,100 @@ This file is part of LogZen. It is licensed under the terms of the
 GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap', 'prettyjson'], ($, ko, pager, vars) ->
-	pivot = (key, value, data) ->
-    result = {}
-    result[data[key]] = data[value]
-    
-    return result
-
-
-  # model used for an event in the eventlist
-  class EventModel
-    constructor: (data) ->
-      @id = data._id
-      @time = data._source.time
-      @facility = data._source.facility
-      @facility_text = ko.computed () ->
-        vars.facility[data._source.facility]
-      @severity = data._source.severity
-      @severity_text = ko.computed () ->
-        vars.severity[data._source.severity]
-      @detail_url = "/event/" + data._id
-      @host = data._source.host
-      @program = data._source.program
-      @message = data._source.message
-      @message_hl = @markIP data._source.message
-
-    markIP: (msg) ->
-      ipv4_regex = /((([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0))/g
-      msg.replace(ipv4_regex, '<span class="tooltip_ip">$1</span>');
-
-
-  # model used for a detailed event
-  class DetailEventModel extends EventModel
-    constructor: (data) ->
-      super data
-      @whatever = 0
-
-
-
-  class EventListModel
+define ['jquery', 'knockout', 'events', 'bootstrap', 'prettyjson'], ($, ko, events) ->
+  class Model extends events.EventListModel
     constructor: ->
-      @events = ko.observableArray []
-      @hits = ko.observable 0
-      
-      @loading = ko.observable false
-      
-      @page = ko.observable 0
-      
-      @error = ko.observable null
-      
-      @refreshId = ko.observable setInterval @loadEvents, 5000
-      
-      @filterMode = ko.observable "fields"
-      @freetextValue = ko.observable ""
-      @freetextValueFormatted = ko.observable ""
+      @page =
+        current: ko.observable 0
+        size: ko.observable 50
 
-      @filters = 
-        'severity': ko.observable ""
-        'facility': ko.observable ""
-        'host': ko.observable ""
-        'program': ko.observable ""
-        'message': ko.observable "" 
-        
-      @filledFilters = ko.computed () =>
-        for name, filter of @filters when filter() != ''
-          { 'name': name, 'value': filter() }
+      @filters =
+        severity: ko.observable ''
+        facility: ko.observable ''
+        host: ko.observable ''
+        program: ko.observable ''
+        message: ko.observable ''
 
-      @freetext = ko.computed
-        read: () =>
-        	if @filterMode() == 'fields'
-        		f = ''
-        		if @filledFilters().length > 0
-            	first = 1
-            	for filter in @filledFilters()
-                if first != 1 
-                  f = f + ','
-                first = 0
-                f = f + '{ "prefix": { "' + filter['name'] + '": "' + filter['value'] + '" } }'
-            		console.log f
-              
-              f = ',
-                "filter": {
-                  "and": [ ' + f + '
-                  ]
-                }'
-            
-            f = '
-            {
-              "query": { 
-                "filtered": {
-                  "query": {
-                    "match_all" : {}
-                  }' + f + '
-                }
-              },
-              "from": ' + @page() * 50 + ',
-              "size":  50 ,
-              "sort": [{
-                "time": {
-                  "order": "desc"
-                }
-              }]
-            }'
-            
-            @freetextValue f
-            console.log @freetextValue()
-            @freetextValueFormatted pj f
-            @loadEvents()
+      @query = ko.computed () =>
+        filter:
+          bool:
+            must: for name, filter of @filters when filter() != ''
+              term: (
+                term = {}
+                term[name] = filter()
+                term
+              )
+        from: @page.current() * @page.size()
+        size: @page.size()
+        sort:
+          time:
+            order: 'desc'
 
-        write: (value) =>
-          console.log @freetextValue()
-          @freetextValue value.replace(/<\*>/g, "");
+      super()
 
+      # Extend the page submodel with a page count after initializing the base as the computed depends on it
+      @page.count = ko.computed () => @hits() // @page.size()
+      @page.next  = () => @page.current Math.min(@page.current() + 1, @page.count())
+      @page.prev  = () => @page.current Math.max(@page.current() - 1, 0)
+      @page.first = () => @page.current 0
+      @page.last  = () => @page.current @page.count()
+      @page.crop  = () => @page.current Math.max(0, Math.min(@page.current(), @page.count()))
 
+    done: () ->
+      super()
+      # Ensure the current page is in bound after updating
+      @page.crop()
 
-    loadEvents: () =>
-      if @filterMode() == 'fields'
-        $.ajax
-          url: $('#filterform').attr('action')
-          type: 'POST'
-          contentType: "application/json"
-          data: @freetextValue()
-          dataType: 'json'
-          beforeSend: () => 
-            @loading true
-          success: (result) =>
-            @loading false
-            @error null
-            @hits result.hits.total
-            @events (new EventModel event for event in result.hits.hits)
-            #@timeSeries result.facets.histo1.entries
-            @addTooltips()
-          error: (jqXHR, status, error) =>
-            @loading false
-            @error error
-            @hits 0
-            @events []
+    fail: () ->
+      super()
+      # Ensure the current page is in bound after updating
+      @page.crop()
 
-
-    setFilter: (name) =>
+    ### A monade returning a function to set a filter.
+    #
+    # The returned function accepts a string value and updates the filter observable with the passed name.
+    ###
+    setFilter: (name) ->
       (el) => @filters[name] el[name]
 
-    clearFilter: (name) =>
-      () => @filters[name] ""
+    ### A monade returning a function to clear a filter.
+    #
+    # The returned function clears the filter observable with the passed name.
+    ###
+    clearFilter: (name) ->
+      () => @filters[name] ''
 
+    ### Move to next page
+    #
+    # Does nothing if the current page is already the last one.
+    ###
+    pageNext: () ->
+      if @page.current() < @page.count()
+        @page.current @page.current() + 1
 
-    prevPage: () =>
-      if @page() > 0
-        @page(@page() - 1)
+    ### Move to previous page
+    #
+    # Does nothing if the current page is already the first one.
+    ###
+    pagePrev: () ->
+      if @page.current() > 0
+        @page.current @page.current() - 1
 
-    nextPage: () =>
-      if @page() * 50 + 50 < @hits()
-        @page(@page() + 1)
+    ### Move to first page
+    ###
+    pageFirst: () ->
+      @page.current 0
 
-    firstPage: () =>
-      @page(0)
+    ### Move to last page
+    ###
+    pageLast: () ->
+      @page.current @page.count()
 
-    lastPage: () =>
-      @page(Math.floor(@hits() / 50))
-    
-    refreshPage: () =>
-    	if @refreshId() == -1
-        @refreshId setInterval @loadEvents, 5000	
-    	else
-        clearInterval @refreshId()
-        @refreshId -1
+    ### Ensures the current page is in bounds.
+    #
+    # Updates the curent page it is not between 0 and the page count. The current page value is ensured to be in borders
+    # by moving to the next closest page.
+    ###
+    pageSanetize: () ->
+      @page.current Math.max(0, Math.min(@page.current(), @page.count()))
 
-
-    timeSeries: (data) ->
-      chart = nv.models.multiBarTimeSeriesChart()
-        .x((d) -> d.time)
-        .y((d) -> d.count)
-        
-      chart.xAxis
-        .tickFormat((d) -> d3.time.format('%x') new Date(d))
-        .rotateLabels(-45)
-        
-      chart.yAxis
-        .tickFormat(d3.format(',.0f'))
-        
-      chart.tooltip = (key, x, y, e, graph) ->
-        '<h3>#{key}</h3><p>#{y} during #{x}</p>'
-          
-      d3.select('#timeSeries svg')
-        .datum([{ "key": "events", "values": data }])
-        .transition().duration(100).call(chart)
-  
-      nv.utils.windowResize(chart.update)
-  
-  
-    addTooltips: -> 
-      $('.tooltip_ip').each (index, element) =>
-        el = $(element)
-        el.bind 'mouseenter', =>
-          
-          $.ajax
-            url: '/_tooltip/ip'
-            type: 'POST'
-            data: 'ip=' + el.text()
-            dataType: 'json'
-            success: (result) =>
-              html = '
-                <table>
-                  <tr><td>IP Address</td><td>' + result.ip + '</td></tr>
-                  <tr><td>DNS Name</td><td> ' + result.dns + '</td></tr>
-              '
-              if result.aliaslist != ""
-                html += '<tr><td>Aliases</td><td> ' + result.aliaslist + '</td></tr>'
-                
-              if result.addresslist != ""
-                html += '<tr><td>Addresses</td><td> ' + result.addresslist + '</td></tr>'
-                
-              html += '
-                  <tr><td>Country</td><td>' + result.country + ' <img src="/img/flags/' + result.flagimg + '.gif" title="' + result.country + '" alt="' + result.country + '"/></td></tr>
-                </table>
-              '
-              
-              el.attr 'data-toggle', 'tooltip'
-              el.attr 'data-original-title', html
-              el.tooltip
-                content: "dynamic text"
-                html: true
-                trigger: 'hover'
-                container: 'body'
-              el.tooltip 'show'
-
-
-  
-  EventListModel

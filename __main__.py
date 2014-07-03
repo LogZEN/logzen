@@ -50,6 +50,7 @@ if __name__ == '__main__':
   config = {
     '/': {
       'request.dispatch': dispatcher,
+      'tools.caching.on': False,
       'tools.sessions.on': True,
       'tools.staticdir.on': True,
       'tools.staticdir.section': '/',

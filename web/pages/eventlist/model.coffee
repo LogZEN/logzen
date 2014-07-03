@@ -44,13 +44,13 @@ define ['jquery', 'knockout', 'events', 'bootstrap', 'prettyjson'], ($, ko, even
       @page.last  = () => @page.current @page.count()
       @page.crop  = () => @page.current Math.max(0, Math.min(@page.current(), @page.count()))
 
-    done: () ->
-      super()
+    done: (result) ->
+      super(result)
       # Ensure the current page is in bound after updating
       @page.crop()
 
-    fail: () ->
-      super()
+    fail: (error) ->
+      super(error)
       # Ensure the current page is in bound after updating
       @page.crop()
 

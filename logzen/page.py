@@ -40,7 +40,7 @@ class Page:
 
 
   def index(self):
-    return open(os.path.join('web', u'index.html'))
+    return open(os.path.join('web', 'build', 'index.html'))
 
 
   @require()

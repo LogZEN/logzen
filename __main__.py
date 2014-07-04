@@ -55,7 +55,7 @@ if __name__ == '__main__':
       'tools.staticdir.on': True,
       'tools.staticdir.section': '/',
       'tools.staticdir.root': os.getcwd(),
-      'tools.staticdir.dir': 'web',
+      'tools.staticdir.dir': 'web/build',
     }
   }
   cherrypy.config.update('config/cherrypy.conf')

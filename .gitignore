@@ -1,7 +1,13 @@
+*.pyc
+
 .project
 .pydevproject
-*.pyc
+
 .idea
-/web/pages/**/*.js
-/web/js/*.js
-!/web/js/libs
+*.iml
+
+/web/build
+/web/bower_components
+/web/node_modules
+/web/src/*.js
+

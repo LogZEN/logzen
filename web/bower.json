@@ -1,0 +1,63 @@
+{
+  "name": "logzen",
+  "version": "0.1.0",
+  "authors": [
+    "Sven Reissmann <sven@0x80.io>",
+    "Dustin Frisch <fooker@lab.sh"
+  ],
+  "license": "GPLv3",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "bootstrap": "~3.2.0",
+    "normalize-css": "~3.0.1",
+    "font-awesome": "~4.1.0",
+    "requirejs": "~2.1.14",
+    "pagerjs": "~1.0.1",
+    "gridster": "~0.5.2",
+    "knockoutjs": "~3.1.0",
+    "requirejs-text": "~2.0.12"
+  },
+  "overrides": {
+    "knockoutjs": {
+      "main": [
+        "dist/knockout.debug.js"
+      ]
+    },
+    "bootstrap": {
+      "main": [
+        "dist/css/bootstrap.css",
+        "dist/css/bootstrap-theme.css",
+        "dist/fonts/*",
+        "dist/js/bootstrap.js"
+      ]
+    },
+    "pagerjs": {
+      "main": [
+        "dist/pager.css",
+        "dist/pager.min.js"
+      ]
+    },
+    "requirejs": {
+      "main": [
+        "require.js"
+      ]
+    },
+    "requirejs-text": {
+      "main": [
+        "text.js"
+      ]
+    },
+    "gridster": {
+      "main": [
+        "dist/jquery.gridster.css",
+        "dist/jquery.gridster.js"
+      ]
+    }
+  }
+}

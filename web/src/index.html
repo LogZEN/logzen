@@ -78,25 +78,33 @@
           <li class="divider-vertical"></li>
           
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">More<b class="caret"></b></a>
+            <a href="#"
+               class="dropdown-toggle"
+               data-toggle="dropdown">
+              More
+              <b class="caret"></b>
+            </a>
             <ul class="dropdown-menu">
-              <li><a data-bind="page-href: 'system/help', text: 'Help'"></a></li>
-              <li><a data-bind="page-href: 'system/about', text: 'About'"></a></li>
+              <li><a data-bind="page-href: 'system/help'">Help</a></li>
+              <li><a data-bind="page-href: 'system/about'">About</a></li>
               <li class="divider"></li>
-              <li><a data-bind="page-href: 'system/adduser', text: 'Add User'"></a></li>
+              <li><a data-bind="page-href: 'system/adduser'">Add User</a></li>
               <li class="divider"></li>
-              <li><a data-bind="text: 'Logout', click: logout"></a></li>
+              <li><a data-bind="click: logout">Logout</a></li>
             </ul>
           </li>
-          <li class="divider-vertical navbar-text"></li>
-          <li class="navbar-text" id="navclock"></li>
+          <li class="divider-vertical"></li>
+          <li class="navbar-text"
+              data-bind="text: '00:00'">
+          </li>
         </ul>
         
-        <ul class="nav navbar-nav pull-right" data-bind="visible: ! ui_displayMainMenu">
-          <li><a data-bind="page-href: 'system/login', text: 'Login'"></a></li>
+        <ul class="nav navbar-nav nav-right"
+            data-bind="visible: ! ui_displayMainMenu">
+          <li><a data-bind="page-href: 'system/login'">Login</a></li>
           <li class="divider-vertical navbar-text"></li>
-          <li><a data-bind="page-href: 'system/help', text: 'Help'"></a></li>
-          <li><a data-bind="page-href: 'system/about', text: 'About'"></a></li>
+          <li><a data-bind="page-href: 'system/help'">Help</a></li>
+          <li><a data-bind="page-href: 'system/about'">About</a></li>
         </ul>
       </div>
     </div>

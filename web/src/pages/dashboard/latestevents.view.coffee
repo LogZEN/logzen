@@ -6,5 +6,6 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
 
-define ['jquery', 'knockout', 'pager', 'api'], ($, ko, pager, api) ->
+define ['jquery', 'knockout', 'api'],
+       ($, ko, api) ->
   null

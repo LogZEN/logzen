@@ -6,20 +6,21 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
 
-define ['jquery', 'knockout', 'gridster'], ($, ko, gridster) ->
+define ['jquery', 'knockout', 'gridster'], \
+       ($, ko, gridster) ->
   ko.bindingHandlers.gridster =
-    init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) =>
-      value = ko.utils.unwrapObservable valueAccessor()
+    init: (e, value, allBindingsAccessor, viewModel, bindingContext) ->
+      value = ko.utils.unwrapObservable value()
 
       # Build template li element and remove nodes from current element
-      template = $('<li>');
-      for n in (c for c in ko.virtualElements.childNodes element) when n?
+      template = $('<li>')
+      for n in (c for c in ko.virtualElements.childNodes e) when n?
         template.append ko.cleanNode n
 
       # Build ul element and make root element gridster compatible
-      list = $('<ul style="list-style: none outside none">');
-      $(element).append list
-      $(element).addClass 'gridster'
+      list = $('<ul style="list-style: none outside none">')
+      $(e).append list
+      $(e).addClass 'gridster'
 
       # Create the gridster instance
       gridster = $(list)
@@ -30,7 +31,7 @@ define ['jquery', 'knockout', 'gridster'], ($, ko, gridster) ->
       elements = {}
 
       # Helper function for adding a gridster widget
-      addWidget = (widget) =>
+      addWidget = (widget) ->
         # Add the widget to gridster using a clone from our template
         e = gridster.add_widget $(template).clone(),
                                 ko.utils.unwrapObservable widget.coords?.size_x,
@@ -43,11 +44,11 @@ define ['jquery', 'knockout', 'gridster'], ($, ko, gridster) ->
         elements[widget] = e
 
         # Apply bindings to the created elements
-        widgetBindingContext = bindingContext.createChildContext ko.utils.unwrapObservable widget
+        widgetBindingContext = bindingContext.createChildContext widget
         ko.applyBindingsToDescendants widgetBindingContext, e
 
       # Helper function for deleting a gridster widget
-      deleteWidget = (widget) =>
+      deleteWidget = (widget) ->
         # Get the DOM element for this widget
         e = elements[widget]
 
@@ -61,28 +62,27 @@ define ['jquery', 'knockout', 'gridster'], ($, ko, gridster) ->
       addWidget widget for widget in ko.utils.unwrapObservable value.widgets
 
       # Watch the widget list for changes
-      value.widgets.subscribe (changes) =>
-          for change in changes
-            switch change.status
-              when 'added' then addWidget change.value
-              when 'deleted' then deleteWidget change.value
-              else  console.log 'Unhandled change status:', change
-        , null, 'arrayChange'
+      value.widgets.subscribe (changes) ->
+        for change in changes
+          switch change.status
+            when 'added' then addWidget change.value
+            when 'deleted' then deleteWidget change.value
+            else  console.log 'Unhandled change status:', change
+      , null, 'arrayChange'
 
     controlsDescendantBindings: true
 
 
   ko.bindingHandlers.require =
-    update: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) =>
-      value = ko.utils.unwrapObservable valueAccessor()
+    update: (e, value, allBindingsAccessor, viewModel, bindingContext) ->
+      value = ko.utils.unwrapObservable value()
 
-      require ["#{value}.js",
-               "text!#{value}.html"], (vm, html) =>
-        ko.utils.setHtml element, html
+      require ["#{value}.js", "text!#{value}.html"], (vm, html) ->
+        ko.utils.setHtml e, html
 
         if vm?
           childBindingContext = bindingContext.createChildContext vm()
-          ko.applyBindingsToDescendants childBindingContext, element
+          ko.applyBindingsToDescendants childBindingContext, e
 
       controlsDescendantBindings: true
 

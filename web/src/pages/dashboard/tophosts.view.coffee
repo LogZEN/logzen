@@ -5,7 +5,8 @@ This file is part of LogZen. It is licensed under the terms of the
 GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars) ->
+define ['jquery', 'knockout'], \
+       ($, ko) ->
   class TopHosts
     constructor: ->
       @rangeSelected = ko.observable 1
@@ -14,12 +15,17 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars
           when 1 then 'last day'
           when 7 then 'last week'
           when 30 then 'last month'
-          when 365 then 'last year' 
+          when 365 then 'last year'
   
       @qry = ko.computed () =>
         now = new Date()
-        from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - @rangeSelected(), 
-          now.getHours(), now.getMinutes(), now.getSeconds(), 0)
+        from = new Date(now.getFullYear(),
+                        now.getMonth(),
+                        now.getDate() - @rangeSelected(),
+                        now.getHours(),
+                        now.getMinutes(),
+                        now.getSeconds(),
+                        0)
         
         'query':
           'match_all': {}
@@ -32,8 +38,8 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars
             'facet_filter':
               'range':
                 'time' :
-                   'from': from
-                   'to': now
+                  'from': from
+                  'to': now
   
   
     updateRange: (range) =>
@@ -48,35 +54,43 @@ define ['jquery', 'knockout', 'pager', 'vars', 'bootstrap'], ($, ko, pager, vars
         type: 'POST'
         contentType: 'application/json'
         data: JSON.stringify @qry()
-        success: (result) =>
+        success: (result) ->
           if result.facets.byhost.terms.length
-            data = ({label: next['term'], value: next['count']} for next in result.facets.byhost.terms)
+            data = (for next in result.facets.byhost.terms
+              label: next['term']
+              value: next['count']
+            )
           else
-            data = [{label: 0, value: 0}]
+            data = [
+              label: 0
+              value: 0
+            ]
             
           chart_data = [{key: 'events', values: data}]
   
           chart1 = nv.models.pieChart()
-            .x((d) -> d.label)
-            .y((d) -> d.value)
-            .showLabels(true);
+          .x (d) -> d.label
+          .y (d) -> d.value
+          .showLabels true
   
-          d3.select('#events_by_host svg')
-            .datum(chart_data)
-            .transition().duration(200)
-            .call(chart1);
+          d3.select '#events_by_host svg'
+          .datum chart_data
+          .transition()
+          .duration 200
+          .call chart1
   
           chart2 = nv.models.discreteBarChart()
-            .x((d) -> d.label)
-            .y((d) -> d.value)
-            .staggerLabels(true)
-  
+          .x (d) -> d.label
+          .y (d) -> d.value
+          .staggerLabels true
+
           d3.select('#top_hosts svg')
-            .datum(chart_data)
-            .transition().duration(200)
-            .call(chart2)
+          .datum chart_data
+          .transition()
+          .duration 200
+          .call chart2
   
-          nv.utils.windowResize(chart1.update)
-          nv.utils.windowResize(chart2.update)
+          nv.utils.windowResize chart1.update
+          nv.utils.windowResize chart2.update
   
   TopHosts

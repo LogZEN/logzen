@@ -5,11 +5,11 @@
  * GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-define ['knockout', 'utils'], (ko, utils) ->
-  ### Syslog severity names.
+define ['knockout', 'utils'], \
+       (ko, utils) ->
+  # Syslog severity names.
   #
   # The name index to string mapping according to RFC 3164.
-  ###
   severity: [
     "emerge",
     "alert",
@@ -21,10 +21,9 @@ define ['knockout', 'utils'], (ko, utils) ->
     "debug"
   ]
 
-  ### Syslog facility names.
+  # Syslog facility names.
   #
   # The name index to string mapping according to RFC 3164.
-  ###
   facility: [
     "kern",
     "user",
@@ -52,12 +51,17 @@ define ['knockout', 'utils'], (ko, utils) ->
     "local7"
   ]
 
-  ### The model used for an event received from the API.
+  # The model used for an event received from the API.
   #
-  # The event class maps an event received from the API and extends the model using some helping properties.
-  ###
+  # The event class maps an event received from the API and extends the model
+  # using some helping properties.
   EventModel: class EventModel
-    ipv4_regex = /((([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0)\.(([1-9][0-9]{0,2})|0))/g
+    ipv4_regex = ///
+      (([1-9][0-9]{0,2})|0)\.
+      (([1-9][0-9]{0,2})|0)\.
+      (([1-9][0-9]{0,2})|0)\.
+      (([1-9][0-9]{0,2})|0)
+    ///g
 
     constructor: (data) ->
       @id = data._id
@@ -80,11 +84,11 @@ define ['knockout', 'utils'], (ko, utils) ->
       msg.replace ipv4_regex, '<span class="tooltip_ip">$1</span>'
 
 
-  ### A base class for sending queries to the API.
+  # A base class for sending queries to the API.
   #
-  # A elasticsearch query is send to the API and the result is received. The 'query' observable is watched to build the
-  # request against the API and executed every time the observable changes.
-  ###
+  # A elasticsearch query is send to the API and the result is received. The
+  # 'query' observable is watched to build the request against the API and
+  # executed every time the observable changes.
   QueryModel: class QueryModel extends utils.IntervalRequestingModel
     constructor: () ->
       @request = ko.computed () => [
@@ -98,15 +102,16 @@ define ['knockout', 'utils'], (ko, utils) ->
       super()
 
 
-  ### A base class for event lists received from the API.
+  # A base class for event lists received from the API.
   #
-  # The event list is requested from the API and updated after the 'filter' observable has changed or after an optional
-  # timeout specified in the 'interval' observable. The result of the request is transformed into a list of 'EventModel'
-  # instances and stored in the 'events' array observable. In addition to that, the overal hit count is stored in the
-  # 'hits' observable.
+  # The event list is requested from the API and updated after the 'filter'
+  # observable has changed or after an optional timeout specified in the
+  # 'interval' observable. The result of the request is transformed into a list
+  # of 'EventModel' instances and stored in the 'events' array observable. In
+  # addition to that, the overal hit count is stored in the 'hits' observable.
   #
-  # The whole result of the request is stored in the 'result' observable as returned by the API.
-  ###
+  # The whole result of the request is stored in the 'result' observable as
+  # returned by the API.
   EventListModel: class EventListModel extends QueryModel
     constructor: () ->
       @events = ko.observableArray []

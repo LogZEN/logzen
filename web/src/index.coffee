@@ -5,7 +5,7 @@ This file is part of LogZen. It is licensed under the terms of the
 GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-require.config 
+require.config
   baseUrl: '/'
   paths:
     jquery:'libs/jquery/dist/jquery'
@@ -38,7 +38,8 @@ require.config
       callback()
 
 
-require ['jquery', 'knockout', 'pager', 'utils', 'bootstrap'], ($, ko, pager, utils) ->
+require ['jquery', 'knockout', 'pager', 'utils', 'bootstrap'], \
+        ($, ko, pager, utils) ->
   class Main extends utils.LoadingModel
     constructor: ->
       pager.extendWithPage @
@@ -67,7 +68,7 @@ require ['jquery', 'knockout', 'pager', 'utils', 'bootstrap'], ($, ko, pager, ut
         success: (result) =>
           if result.success == true
             @username result.username
-            callback();
+            callback()
           else
             window.location.href = "/#system/login";
         error: (jqXHR, status, error) =>
@@ -80,7 +81,7 @@ require ['jquery', 'knockout', 'pager', 'utils', 'bootstrap'], ($, ko, pager, ut
       $.ajax
         url: '/_auth/logout'
         dataType: 'json'
-        success: (result) =>
+        success: (result) ->
           window.location.href = "/";
 
 

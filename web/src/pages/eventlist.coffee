@@ -5,7 +5,8 @@ This file is part of LogZen. It is licensed under the terms of the
 GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-define ['jquery', 'knockout', 'api', 'bootstrap'], ($, ko, api) ->
+define ['jquery', 'knockout', 'api', 'bootstrap'], \
+       ($, ko, api) ->
   class Model extends api.EventListModel
     constructor: ->
       # Pagination submodel
@@ -39,41 +40,42 @@ define ['jquery', 'knockout', 'api', 'bootstrap'], ($, ko, api) ->
 
       super()
 
-      # Extend the pagination submodel with a page count after initializing the base as the computed depends on it
+      # Extend the pagination submodel with a page count after initializing the
+      # base as the computed depends on it
       @page.count = ko.computed () => @hits() // @page.size()
-      @page.next  = () => @page.current Math.min(@page.current() + 1, @page.count())
-      @page.prev  = () => @page.current Math.max(@page.current() - 1, 0)
+      @page.next  = () => @page.current Math.min(@page.current() + 1,
+                                                 @page.count())
+      @page.prev  = () => @page.current Math.max(@page.current() - 1,
+                                                 0)
       @page.first = () => @page.current 0
       @page.last  = () => @page.current @page.count()
-      @page.crop  = () => @page.current Math.max(0, Math.min(@page.current(), @page.count()))
+      @page.crop  = () => @page.current Math.min(@page.count(),
+                                                 Math.min(@page.current(), 0))
 
 
-    ### Ensure the current page is in bound after updating.
-    ###
+    # Ensure the current page is in bound after updating.
     done: (result) ->
       super(result)
       # Ensure the current page is in bound after updating
       @page.crop()
 
 
-    ### Ensure the current page is in bound after updating.
-    ###
+    # Ensure the current page is in bound after updating.
     fail: (error) ->
       super(error)
       @page.crop()
 
 
-    ### A monade returning a function to set a filter.
+    # A monade returning a function to set a filter.
     #
-    # The returned function accepts a string value and updates the filter observable with the passed name.
-    ###
+    # The returned function accepts a string value and updates the filter
+    # observable with the passed name.
     setFilter: (name) ->
       (el) => @filters[name] el[name]
 
 
-    ### A monade returning a function to clear a filter.
+    # A monade returning a function to clear a filter.
     #
     # The returned function clears the filter observable with the passed name.
-    ###
     clearFilter: (name) ->
       () => @filters[name] ''

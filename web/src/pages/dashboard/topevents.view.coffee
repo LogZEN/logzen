@@ -6,12 +6,12 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
 
-define ['jquery', 'knockout', 'pager', 'api'], ($, ko, pager, api) ->
+define ['jquery', 'knockout', 'api'], \
+       ($, ko, api) ->
   class EventModel
     constructor: (data) ->
       @count = data.count
       @message = data.term
-  
   
   class TopEvents
     constructor: ->
@@ -35,12 +35,17 @@ define ['jquery', 'knockout', 'pager', 'api'], ($, ko, pager, api) ->
           when 1 then 'in last day'
           when 7 then 'in last week'
           when 30 then 'in last month'
-          when 365 then 'in last year' 
+          when 365 then 'in last year'
           
       @query = ko.computed () =>
         now = new Date()
-        from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - @rangeSelected(), 
-          now.getHours(), now.getMinutes(), now.getSeconds(), 0)
+        from = new Date(now.getFullYear(),
+                        now.getMonth(),
+                        now.getDate() - @rangeSelected(),
+                        now.getHours(),
+                        now.getMinutes(),
+                        now.getSeconds(),
+                        0)
           
         "query":
           "match_all": {}
@@ -96,7 +101,9 @@ define ['jquery', 'knockout', 'pager', 'api'], ($, ko, pager, api) ->
         data: JSON.stringify @query()
         dataType: 'json'
         success: (result) =>
-          @events (new EventModel event for event in result.facets.byevent.terms)
+          @events (for event in result.facets.byevent.terms
+            new EventModel event
+          )
           add_qtips()
   
   

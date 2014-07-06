@@ -5,7 +5,8 @@ This file is part of LogZen. It is licensed under the terms of the
 GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-define ['jquery', 'knockout', 'pager', 'bootstrap'], ($, ko, pager) ->
+define ['jquery', 'knockout'], \
+       ($, ko) ->
   class LoginModel
     constructor: ->
       @username = ko.observable ""

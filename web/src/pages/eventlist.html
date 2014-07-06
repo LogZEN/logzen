@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+
 <div class="eventlist">
 
   <!-- Loading handling -->
@@ -150,7 +152,7 @@
 
               <th class="input-col" id="column_severity">
                 <div class="input-group">
-                  <input type="text" name="severity" id="filter_severity" class="form-control input-sm filter" placeholder="filter" size="5" data-bind="value: filters.severity, valueUpdate: 'afterkeydown'" data-provide="typeahead" data-items="4" data-source='["emerge","alert","critical","error","warning","notice","info","debug"]' />
+                  <input type="text" name="severity" id="filter_severity" class="form-control input-sm filter" placeholder="filter" size="5" data-bind="value: filters.severity, valueUpdate: 'afterkeydown'" data-provide="typeahead" data-items="4" data-source="['emerge','alert','critical','error','warning','notice','info','debug']" />
                   <span class="input-group-addon"><i class="fa fa-fw fa-undo q_tip" id="severity" title="Clear this filter" data-bind="click: clearFilter('severity')"></i></span>
                 </div>
               </th>

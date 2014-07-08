@@ -40,7 +40,7 @@
     "pagerjs": {
       "main": [
         "dist/pager.css",
-        "dist/pager.min.js"
+        "pager.js"
       ]
     },
     "requirejs": {

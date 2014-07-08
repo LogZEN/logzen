@@ -6,11 +6,12 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
 require.config
+  urlArgs: 'v=' + new Date()
   baseUrl: '/'
   paths:
     jquery:'libs/jquery/dist/jquery'
     knockout:'libs/knockoutjs/dist/knockout.debug'
-    pager:'libs/pagerjs/dist/pager.min'
+    pager:'libs/pagerjs/pager'
     bootstrap:'libs/bootstrap/dist/js/bootstrap'
     text: 'libs/requirejs-text/text'
     gridster: 'libs/gridster/dist/jquery.gridster'
@@ -28,7 +29,7 @@ require.config
 @requireVM = (module) ->
   (callback) ->
     require ["/pages/#{module}.js"], (vm) ->
-      callback new vm
+      callback new vm()
 
 
 @requireHTML = (module) ->
@@ -53,12 +54,6 @@ require ['jquery', 'knockout', 'pager', 'utils', 'bootstrap'], \
         
       @username = ko.observable ""
       
-      @evlists = ko.observableArray [
-        id: +(new Date())
-        title: ko.observable 'Eventlist'
-      ]
-      
-
     # check whether the current user is logged in or not
     # redirect to login page, if not logged in
     isLoggedIn: (page, route, callback) =>
@@ -94,18 +89,6 @@ require ['jquery', 'knockout', 'pager', 'utils', 'bootstrap'], \
         dataType: 'json'
         success: (result) =>
           @configured result.value.toLowerCase() == "true"
-
-      
-    # add a new tab to the eventlist page
-    remove_evlist: (evlist) =>
-      @evlists.remove evlist
-
-
-    # remove a tab from the eventlist page
-    add_evlist: () =>
-      @evlists.push
-        id: +(new Date())
-        title: ko.observable 'New Tab'
 
 
 

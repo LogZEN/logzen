@@ -10,7 +10,7 @@ define ['knockout', 'utils'], \
   # Syslog severity names.
   #
   # The name index to string mapping according to RFC 3164.
-  severity: [
+  severity = [
     "emerge",
     "alert",
     "critical",
@@ -24,7 +24,7 @@ define ['knockout', 'utils'], \
   # Syslog facility names.
   #
   # The name index to string mapping according to RFC 3164.
-  facility: [
+  facility = [
     "kern",
     "user",
     "mail",
@@ -55,7 +55,7 @@ define ['knockout', 'utils'], \
   #
   # The event class maps an event received from the API and extends the model
   # using some helping properties.
-  EventModel: class EventModel
+  class EventModel
     ipv4_regex = ///
       (([1-9][0-9]{0,2})|0)\.
       (([1-9][0-9]{0,2})|0)\.
@@ -89,7 +89,7 @@ define ['knockout', 'utils'], \
   # A elasticsearch query is send to the API and the result is received. The
   # 'query' observable is watched to build the request against the API and
   # executed every time the observable changes.
-  QueryModel: class QueryModel extends utils.IntervalRequestingModel
+  class QueryModel extends utils.IntervalRequestingModel
     constructor: () ->
       @request = ko.computed () => [
               '/_api/query'
@@ -112,7 +112,7 @@ define ['knockout', 'utils'], \
   #
   # The whole result of the request is stored in the 'result' observable as
   # returned by the API.
-  EventListModel: class EventListModel extends QueryModel
+  class EventListModel extends QueryModel
     constructor: () ->
       @events = ko.observableArray []
       @hits = ko.observable 0
@@ -126,3 +126,12 @@ define ['knockout', 'utils'], \
     fail: () ->
       @events []
       @hits 0
+
+
+  return {
+    severity: severity
+    facility: facility
+    EventModel: EventModel
+    QueryModel: QueryModel
+    EventListModel: EventListModel
+  }

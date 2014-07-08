@@ -113,45 +113,41 @@
 
   <!-- page content -->
   <div id="main">
-      <div data-bind="page: {id: 'dashboard', title: 'Dashboard', sourceOnShow: requireHTML('dashboard'), withOnShow: requireVM('dashboard'), role: 'start', guard: isLoggedIn}" style="overflow: hidden"></div>
+      <div data-bind="page: { id: 'dashboard',
+                              title: 'Dashboard',
+                              sourceOnShow: requireHTML('dashboard'),
+                              withOnShow: requireVM('dashboard'),
+                              role: 'start',
+                              guard: isLoggedIn }"
+           style="overflow: hidden;"></div>
       
-      <div data-bind="page: {id: 'events', title: 'Events', guard: isLoggedIn}">
-        <!-- tabs menu -->
-        <ul class="nav nav-tabs">
-          <!-- ko foreach: evlists -->
-          <li data-bind="css: {active: $page.child('tab_eventlist_' + id)().isVisible}">
-            <!-- ko ifnot: $page.child('tab_eventlist_' + id)().isVisible -->
-              <a data-bind="page-href: 'tab_eventlist_' + id">
-                <!-- ko text: title --><!-- /ko -->
-                <i class="fa fa-fw fa-times q_tip" title="Close Tab" data-bind="click: $root.remove_evlist"></i>
-              </a>
-            <!-- /ko -->
-            <!-- ko if: $page.child('tab_eventlist_' + id)().isVisible -->  
-              <span>
-                <input type="text" data-bind="value: title, page-href: 'tab_eventlist_' + id" style="z-index:99" />
-                <i class="fa fa-fw fa-times q_tip" title="Close Tab" data-bind="click: $root.remove_evlist"></i>
-              </span>
-            <!-- /ko -->
-          </li>
-          <!-- /ko -->
-          <li><a data-bind="click: add_evlist"><i class="fa fa-fw fa-plus q_tip" title="New Tab"></i></a></li>
-        </ul>
-        
-        <!-- ko foreach: evlists -->
-        <div data-bind="page: {id: 'tab_eventlist_' + id, title: 'Events', sourceCache: true, sourceOnShow: requireHTML('eventlist'), withOnShow: requireVM('eventlist'), role: 'start'}"></div>
-        <!-- /ko -->
-      </div>
+      <div data-bind="page: { id: 'events',
+                              title: 'Events',
+                              sourceOnShow: requireHTML('events'),
+                              withOnShow: requireVM('events'),
+                              guard: isLoggedIn}"></div>
       
-      <!-- other pages -->
-      <div data-bind="page: {id: 'system'}">
-        <div data-bind="page: {id: 'help', title: 'Help', sourceOnShow: requireHTML('help')}"></div>
-        <div data-bind="page: {id: 'about', title: 'About', sourceOnShow: requireHTML('about')}"></div>
-        <div data-bind="page: {id: 'adduser', title: 'Add User', sourceOnShow: requireHTML('adduser')}"></div>
-        <div data-bind="page: {id: '?', title: 'page not found', sourceOnShow: '404.html' }"></div>
-        
-        <div data-bind="page: {id: 'login', title: 'Login', sourceOnShow: requireHTML('login'), withOnShow: requireVM('login') }"></div>
+      <!-- Other pages -->
+      <div data-bind="page: { id: 'system' }">
+        <div data-bind="page: { id: 'help',
+                                title: 'Help',
+                                sourceOnShow: requireHTML('help') }"></div>
+        <div data-bind="page: { id: 'about',
+                                title: 'About',
+                                sourceOnShow: requireHTML('about') }"></div>
+        <div data-bind="page: { id: 'adduser',
+                                title: 'Add User',
+                                sourceOnShow: requireHTML('adduser') }"></div>
+        <div data-bind="page: { id: 'login',
+                                title: 'Login',
+                                sourceOnShow: requireHTML('login'),
+                                withOnShow: requireVM('login') }"></div>
       </div>
-      <div data-bind="page: {id: '?', title: 'page not found', sourceOnShow: '404.html' }"></div>
+
+      <!-- Catch all page for incorrect URLs -->
+      <div data-bind="page: { id: '?',
+                              title: 'Page not found',
+                              sourceOnShow: '404.html' }"></div>
   </div>
   
 </body>

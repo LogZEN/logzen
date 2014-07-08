@@ -5,10 +5,14 @@ This file is part of LogZen. It is licensed under the terms of the
 GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-define ['jquery', 'knockout', 'api', 'bootstrap'], \
+define ['jquery', 'knockout', 'api'], \
        ($, ko, api) ->
-  class Model extends api.EventListModel
-    constructor: ->
+  class TabModel extends api.EventListModel
+    constructor: (id = null) ->
+      @id = id ? "#{Math.round Math.random() * Math.pow 2, 16}"
+
+      @title = ko.observable 'New Tab'
+
       # Pagination submodel
       @page =
         current: ko.observable 0
@@ -79,3 +83,17 @@ define ['jquery', 'knockout', 'api', 'bootstrap'], \
     # The returned function clears the filter observable with the passed name.
     clearFilter: (name) ->
       () => @filters[name] ''
+
+
+  class PageModel
+    constructor: () ->
+      @tabs = ko.observableArray [
+        new TabModel()
+      ]
+
+    add: () =>
+      @tabs.push new TabModel()
+
+    remove: (tab) =>
+      @tabs.remove tab
+

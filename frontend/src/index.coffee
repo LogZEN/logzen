@@ -26,6 +26,8 @@ require.config
       deps: [ 'jquery' ]
     ko_mapping:
       deps: [ 'knockout' ]
+    fermata:
+      exports: 'fermata'
 
 
 @requireVM = (module) ->
@@ -41,45 +43,63 @@ require.config
       callback()
 
 
-require ['jquery', 'knockout', 'pager', 'utils', 'bootstrap'], \
-        ($, ko, pager, utils, fermata) ->
+require ['jquery', 'knockout', 'pager', 'api', 'utils', 'bootstrap'], \
+        ($, ko, pager, api, utils) ->
   class Main extends utils.LoadingModel
     constructor: ->
       pager.extendWithPage @
       pager.onBindingError.add (event) ->
         console.error event.error
 
-      @configured = ko.observable false
-      
+      @user = ko.observable null
+
       @ui_displayMainMenu = ko.computed =>
         @configured() == true and @username() != ""
-        
-      @username = ko.observable ""
-      
+
+
     # check whether the current user is logged in or not
     # redirect to login page, if not logged in
-    isLoggedIn: (page, route, callback) =>
-      $.ajax
-        url: '/_auth/getlogin'
-        dataType: 'json'
-        success: (result) =>
-          if result.success == true
-            @username result.username
-            callback()
+#    isLoggedIn: (page, route, callback) =>
+#      $.ajax
+#        url: '/_auth/getlogin'
+#        dataType: 'json'
+#        success: (result) =>
+#          if result.success == true
+#            @username result.username
+#            callback()
+#          else
+#            window.location.href = "/#system/login";
+#        error: (jqXHR, status, error) =>
+#          @error error
+#          window.location.href = "/#system/login";
+
+
+    authenticated: () ->
+      return @user() == null
+
+
+    login: (username, password) ->
+      api.token.post
+        username: username
+        password: password,
+        (err, res) ->
+          if err?
+            console.error 'Login failed', err
+
           else
-            window.location.href = "/#system/login";
-        error: (jqXHR, status, error) =>
-          @error error
-          window.location.href = "/#system/login";
+            console.trace 'User logged in', res
+
+            # Update the user model
+            ko.mapping.fromJS res, @user
 
 
-    # logout
-    logout: ->
-      $.ajax
-        url: '/_auth/logout'
-        dataType: 'json'
-        success: (result) ->
-          window.location.href = "/";
+    logout: () ->
+      api.token.delete (err, res) ->
+        # Get rid of the user model
+        @user null
+
+        # Redirect to the login page
+        window.location.href = "/";
 
 
     # check whether initial configuration has been done

@@ -98,7 +98,7 @@ class Signer():
 
 
 
-TOKEN_HEADER = 'X-Auth'
+TOKEN_COOKIE = 'X-Auth'
 
 
 
@@ -111,15 +111,18 @@ def before_request_hook(db, signer, logger):
     # Ensure the user extension exists
     bottle.request.user = None
 
+    # Get the token from the request
+    token = bottle.request.get_cookie(TOKEN_COOKIE)
+
     # Check if the token is included in the request
-    if TOKEN_HEADER not in bottle.request.headers:
+    if token is None:
         logger.debug('No token found - unauthorized')
 
         # Nothing to do, if the token is missing
         return
 
-    # Verify the token passed in the request and extract the username
-    username = signer.verify(bottle.request.headers[TOKEN_HEADER])
+    # Verify the token and extract the username
+    username = signer.verify(token)
     if username is None:
         raise bottle.HTTPError(401, 'Invalid token')
 
@@ -144,15 +147,20 @@ def after_request_hook(signer, logger):
     if bottle.request.user is None:
         logger.debug('No user entry attached to request - unauthorized')
 
-        return
+        # Delete the token on the client
+        bottle.response.delete_cookie(TOKEN_COOKIE)
 
-    # Get the username from the request
-    username = bottle.request.user.username
+    else:
+        # Get the username from the request
+        username = bottle.request.user.username
 
-    logger.debug('Token generated for username: %s', username)
+        logger.debug('Token generated for username: %s', username)
 
-    # Generate the token by signing the username and pass it in the response
-    bottle.response.headers[TOKEN_HEADER] = signer.sign(username)
+        # Generate the token by signing the username
+        token = signer.sign(username)
+
+        # Pass the token to the client
+        bottle.response.set_cookie(TOKEN_COOKIE, token)
 
 
 

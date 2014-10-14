@@ -24,11 +24,11 @@ import bottle
 
 @route('/')
 def index():
-    bottle.static_file('index.html',
-                       'frontend/build')
+    return bottle.static_file('index.html',
+                              'frontend/build')
 
 
 @route('/<path:path>')
 def static(path):
-    bottle.static_file(path,
-                       'frontend/build')
+    return bottle.static_file(path,
+                              'frontend/build')

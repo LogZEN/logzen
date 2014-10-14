@@ -16,15 +16,17 @@ require.config
     text: 'libs/requirejs-text/text'
     gridster: 'libs/gridster/dist/jquery.gridster'
     humanize: 'libs/jquery.humanize'
+    fermata: 'libs/fermata/fermata'
   shim:
-    'bootstrap':
+    bootstrap:
       deps: [ 'jquery' ]
-    'humanize':
+    humanize:
       deps: [ 'jquery' ]
-    'gridster':
+    ridster:
       deps: [ 'jquery' ]
-    'ko_mapping':
+    ko_mapping:
       deps: [ 'knockout' ]
+
 
 @requireVM = (module) ->
   (callback) ->
@@ -40,7 +42,7 @@ require.config
 
 
 require ['jquery', 'knockout', 'pager', 'utils', 'bootstrap'], \
-        ($, ko, pager, utils) ->
+        ($, ko, pager, utils, fermata) ->
   class Main extends utils.LoadingModel
     constructor: ->
       pager.extendWithPage @

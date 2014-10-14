@@ -23,9 +23,9 @@ import string
 
 import cherrypy
 
-from logzen.config import config
+from logzen.xconfig import config
 from logzen.geoip import geoip
-from logzen.authentication.auth import require
+from logzen.xauthentication.auth import require
 
 
 

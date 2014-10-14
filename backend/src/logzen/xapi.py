@@ -20,7 +20,7 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 import cherrypy
 
 from logzen.elasticsearch import es
-from logzen.authentication.auth import require
+from logzen.xauthentication.auth import require
 
 
 

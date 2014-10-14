@@ -59,18 +59,15 @@ build in a *build* folder.
 
 To prepare the environment, all npm packages must be installed. This should be
 done after each change on the *package.json* file. To do so, execute:
-
 >  npm install
 
 To install the required frontend dependencies, the following command should be
 executed:
-
 > ./node_modules/bower/bin/bower install
 
 After executing the command above, all requirements for the build process are
 installed. The next step is to build the application and populate the 'build'
 folder using the following command:
-
 >  ./node_modules/gulp/bin/gulp.js
 
 
@@ -79,11 +76,9 @@ Development
 During development, a watch mode can be used to rebuild all changed files and
 keep the build directory populated with the latest changes. To start this watch
 mode, the following command can be used:
-
 > ./node_modules/gulp/bin/gulp.js watch
 
 To change the frontend dependencies, the following command should be used:
-
 > ./node_modules/bower/bin/bower --help
 
 The build executes a lint checks for the following file types:

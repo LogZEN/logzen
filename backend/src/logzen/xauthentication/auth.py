@@ -21,7 +21,7 @@ import cherrypy
 
 import hashlib
 
-from logzen.config import config
+from logzen.xconfig import config
 
 
 SESSION_KEY = config.system.logzen['sessionkey']

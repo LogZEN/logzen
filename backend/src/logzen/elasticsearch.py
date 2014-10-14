@@ -17,13 +17,16 @@ You should have received a copy of the GNU General Public License
 along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from require import *
+
 from elasticsearch import Elasticsearch
 from elasticsearch.connection import Urllib3HttpConnection
 
-from logzen.config import config
+from logzen.xconfig import config
 
 
-class ElasticSearch:
+@export()
+class Connection:
     def __init__(self):
         servers = [value for key, value in config.system.es if key.startswith('server_')]
 
@@ -50,5 +53,3 @@ class ElasticSearch:
             id):
         return self.__connection.get(id = id,
                                      index = config.system.es.index)
-
-es = ElasticSearch()

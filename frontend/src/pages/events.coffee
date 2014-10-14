@@ -5,9 +5,9 @@ This file is part of LogZen. It is licensed under the terms of the
 GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-define ['jquery', 'knockout', 'api'], \
-       ($, ko, api) ->
-  class TabModel extends api.EventListModel
+define ['jquery', 'knockout', 'model'], \
+       ($, ko, model) ->
+  class TabModel extends model.EventListModel
     constructor: (id = null) ->
       @id = id ? "#{Math.round Math.random() * Math.pow 2, 16}"
 

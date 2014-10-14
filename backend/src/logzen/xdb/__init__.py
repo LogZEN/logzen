@@ -25,13 +25,13 @@ import sqlite3
 
 class Db(object):
   def connect(self):
-    if os.path.isfile('config/configuration.db') is not True:
-      self.__connection = sqlite3.connect('config/configuration.db')
+    if os.path.isfile('config/configuration.xdb') is not True:
+      self.__connection = sqlite3.connect('config/configuration.xdb')
       self.__cursor = self.__connection.cursor()
       self.create()
 
     else:
-      self.__connection = sqlite3.connect('config/configuration.db')
+      self.__connection = sqlite3.connect('config/configuration.xdb')
       self.__cursor = self.__connection.cursor()
 
 

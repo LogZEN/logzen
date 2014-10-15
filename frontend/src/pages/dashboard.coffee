@@ -7,7 +7,7 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 
 
 define ['jquery', 'knockout', 'gridster'], \
-       ($, ko, gridster) ->
+       ($, ko) ->
   ko.bindingHandlers.gridster =
     init: (e, value, allBindingsAccessor, viewModel, bindingContext) ->
       value = ko.utils.unwrapObservable value()

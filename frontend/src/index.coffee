@@ -6,120 +6,86 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
 require.config
-  urlArgs: 'v=' + new Date()
+#  urlArgs: 'v=' + new Date()
   baseUrl: '/'
   paths:
-    jquery:'libs/jquery/dist/jquery'
-    knockout:'libs/knockoutjs/dist/knockout.debug'
-    pager:'libs/pagerjs/pager'
-    bootstrap:'libs/bootstrap/dist/js/bootstrap'
-    text: 'libs/requirejs-text/text'
-    gridster: 'libs/gridster/dist/jquery.gridster'
-    humanize: 'libs/jquery.humanize'
-    fermata: 'libs/fermata/fermata'
+    'jquery':'libs/jquery/dist/jquery'
+    'knockout':'libs/knockoutjs/dist/knockout.debug'
+    'pager':'libs/pagerjs/pager'
+    'bootstrap':'libs/bootstrap/dist/js/bootstrap'
+    'require.text': 'libs/requirejs-text/text'
+    'jquery.gridster': 'libs/gridster/dist/jquery.gridster'
+    'jquery.humanize': 'libs/jquery.humanize'
   shim:
-    bootstrap:
+    'bootstrap':
       deps: [ 'jquery' ]
-    humanize:
+    'jquery.humanize':
       deps: [ 'jquery' ]
-    ridster:
+    'jquery.gridster':
       deps: [ 'jquery' ]
-    ko_mapping:
-      deps: [ 'knockout' ]
-    fermata:
-      exports: 'fermata'
 
 
-@requireVM = (module) ->
+@requireVM = (module, root) ->
   (callback) ->
     require ["/pages/#{module}.js"], (vm) ->
-      callback new vm()
+      callback new vm root
 
 
 @requireHTML = (module) ->
   (page, callback) ->
-    require ["text!/pages/#{module}.html"], (html) ->
+    require ["require.text!/pages/#{module}.html"], (html) ->
       $(page.element).html html
       callback()
 
 
-require ['jquery', 'knockout', 'pager', 'api', 'utils', 'bootstrap'], \
+define ['jquery', 'knockout', 'pager', 'api', 'utils', 'bootstrap'], \
         ($, ko, pager, api, utils) ->
+
   class Main extends utils.LoadingModel
     constructor: ->
-      pager.extendWithPage @
-      pager.onBindingError.add (event) ->
-        console.error event.error
-
       @user = ko.observable null
 
-      @ui_displayMainMenu = ko.computed =>
-        @configured() == true and @username() != ""
-
-
-    # check whether the current user is logged in or not
-    # redirect to login page, if not logged in
-#    isLoggedIn: (page, route, callback) =>
-#      $.ajax
-#        url: '/_auth/getlogin'
-#        dataType: 'json'
-#        success: (result) =>
-#          if result.success == true
-#            @username result.username
-#            callback()
-#          else
-#            window.location.href = "/#system/login";
-#        error: (jqXHR, status, error) =>
-#          @error error
-#          window.location.href = "/#system/login";
-
-
-    authenticated: () ->
-      return @user() == null
+      @authenticated = ko.computed () =>
+        @user() != null
 
 
     login: (username, password) ->
-      api.token.post
+      document.cookie = 'logzen.auth=;'
+
+      api('token').post
         username: username
-        password: password,
-        (err, res) ->
-          if err?
-            console.error 'Login failed', err
+        password: password
 
-          else
-            console.trace 'User logged in', res
+      .error (err) =>
+        console.error 'Login failed', err
 
-            # Update the user model
-            ko.mapping.fromJS res, @user
+      .done (res) =>
+        console.log 'User logged in', res
+
+        # Update the user information
+        @user res
+
+        # Redirect to the dashboard
+        pager.navigate 'dashboard'
 
 
     logout: () ->
-      api.token.delete (err, res) ->
+      api('token').delete()
+      .then () =>
         # Get rid of the user model
         @user null
 
         # Redirect to the login page
-        window.location.href = "/";
-
-
-    # check whether initial configuration has been done
-    checkInitialConf: ->
-      $.ajax
-        url: '/_config'
-        type: 'GET'
-        data: 'key=configured'
-        dataType: 'json'
-        success: (result) =>
-          @configured result.value.toLowerCase() == "true"
-
+        pager.navigate 'system/login'
 
 
 
   main = new Main
 
-  ko.applyBindings main
-  
-  main.checkInitialConf()
-
-  
+  pager.extendWithPage main
+  pager.onBindingError.add console.error
   pager.start()
+
+  ko.applyBindings main
+
+  return main

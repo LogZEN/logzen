@@ -21,8 +21,7 @@
     "pagerjs": "~1.0.1",
     "gridster": "~0.5.2",
     "knockoutjs": "~3.1.0",
-    "requirejs-text": "~2.0.12",
-    "fermata": "0.10.1"
+    "requirejs-text": "~2.0.12"
   },
   "overrides": {
     "knockoutjs": {

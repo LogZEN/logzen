@@ -98,7 +98,7 @@ class Signer():
 
 
 
-TOKEN_COOKIE = 'X-Auth'
+TOKEN_COOKIE = 'logzen.auth'
 
 
 

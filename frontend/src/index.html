@@ -65,19 +65,19 @@
         </a>
       </div>
 
-      <div class="collapse navbar-collapse" id="mainmenu">
-        <ul class="nav navbar-nav pull-right" data-bind="visible: ui_displayMainMenu">
-          <!-- ko foreach: $__page__.children -->
-            <!-- ko if: ($data.getId() !== '?' && $data.getId() !== 'system') -->
-              <li data-bind="css: {active: isVisible}">
-                <a data-bind="page-href: $data, text: val('title')"></a>
-              </li>
+      <div class="collapse navbar-collapse" id="mainmenu"><ul class="nav navbar-nav pull-right">
+          <!-- ko if: authenticated -->
+            <!-- ko foreach: $__page__.children -->
+              <!-- ko if: ($data.getId() !== '?' && $data.getId() !== 'system') -->
+                <li data-bind="css: {active: isVisible}">
+                  <a data-bind="page-href: $data, text: val('title')"></a>
+                </li>
+              <!-- /ko -->
             <!-- /ko -->
-          <!-- /ko -->
-          
-          <li class="divider-vertical"></li>
-          
-          <li class="dropdown">
+
+            <li class="divider-vertical"></li>
+
+            <li class="dropdown">
             <a href="#"
                class="dropdown-toggle"
                data-toggle="dropdown">
@@ -92,19 +92,19 @@
               <li class="divider"></li>
               <li><a data-bind="click: logout">Logout</a></li>
             </ul>
-          </li>
-          <li class="divider-vertical"></li>
-          <li class="navbar-text"
+            </li>
+            <li class="divider-vertical"></li>
+            <li class="navbar-text"
               data-bind="text: '00:00'">
-          </li>
-        </ul>
-        
-        <ul class="nav navbar-nav nav-right"
-            data-bind="visible: ! ui_displayMainMenu">
-          <li><a data-bind="page-href: 'system/login'">Login</a></li>
-          <li class="divider-vertical navbar-text"></li>
-          <li><a data-bind="page-href: 'system/help'">Help</a></li>
-          <li><a data-bind="page-href: 'system/about'">About</a></li>
+            </li>
+          <!-- /ko -->
+
+          <!-- ko ifnot: authenticated -->
+            <li><a data-bind="page-href: 'system/login'">Login</a></li>
+            <li class="divider-vertical navbar-text"></li>
+            <li><a data-bind="page-href: 'system/help'">Help</a></li>
+            <li><a data-bind="page-href: 'system/about'">About</a></li>
+          <!-- /ko -->
         </ul>
       </div>
     </div>
@@ -117,16 +117,14 @@
                               title: 'Dashboard',
                               sourceOnShow: requireHTML('dashboard'),
                               withOnShow: requireVM('dashboard'),
-                              role: 'start',
-                              guard: isLoggedIn }"
+                              role: 'start' }"
            style="overflow: hidden;"></div>
       
       <div data-bind="page: { id: 'events',
                               title: 'Events',
                               sourceOnShow: requireHTML('events'),
-                              withOnShow: requireVM('events'),
-                              guard: isLoggedIn}"></div>
-      
+                              withOnShow: requireVM('events') }"></div>
+
       <!-- Other pages -->
       <div data-bind="page: { id: 'system' }">
         <div data-bind="page: { id: 'help',

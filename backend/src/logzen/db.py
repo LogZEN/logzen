@@ -19,8 +19,6 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 
 from require import *
 
-from logzen.util import signature
-
 import sqlalchemy
 import sqlalchemy.orm
 import sqlalchemy.ext.declarative

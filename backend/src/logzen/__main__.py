@@ -29,6 +29,7 @@ import logzen.web.api.dashboard
 import logzen.web.api.streams
 
 from logzen.users import User
+from logzen.streams import Stream, Mask
 
 
 
@@ -44,6 +45,17 @@ def main(app,
         admin = User(username='admin',
                      password='admin')
         session.add(admin)
+
+    if session \
+        .query(Stream) \
+        .count() < 1:
+        stream = Stream(name = 'everything')
+
+        mask = Mask(title = 'Everything',
+                    query = { 'match_all' : {}})
+        stream.masks.append(mask)
+
+        session.add(mask, stream)
 
     session.commit()
 

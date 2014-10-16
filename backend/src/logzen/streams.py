@@ -93,7 +93,7 @@ class Streams(object):
         self.__session = session
 
 
-    def __getitem__(self, name):
+    def getStream(self, name):
         try:
             return self.__session \
                     .query(Stream) \
@@ -104,9 +104,9 @@ class Streams(object):
             raise KeyError(name)
 
 
-    def __iter__(self):
+    def getStreams(self):
         return iter(self.__session.query(Stream))
 
 
-    def create(self, name):
+    def createStream(self, name):
         self.__session.add(Stream(name=name))

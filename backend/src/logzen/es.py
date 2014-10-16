@@ -21,17 +21,22 @@ from require import *
 
 from elasticsearch import Elasticsearch
 from elasticsearch.connection import Urllib3HttpConnection
+from elasticsearch.serializer import JSONSerializer
 
-from logzen.xconfig import config
+# from logzen.xconfig import config
+
 
 
 @export()
 class Connection:
-    def __init__(self):
-        servers = [value for key, value in config.system.es if key.startswith('server_')]
+    logger = require('logzen.util:Logger')
 
-        username = config.system.es['username']
-        password = config.system.es['password']
+
+    def __init__(self):
+        servers = ['localhost'] #[value for key, value in config.system.es if key.startswith('server_')]
+
+        username = None #config.system.es['username']
+        password = None #config.system.es['password']
 
         if username and password:
             auth = (username, password)
@@ -45,11 +50,14 @@ class Connection:
 
     def query(self,
               query):
-        return self.__connection.search(body = query,
-                                        index = config.system.es.index)
+        self.logger.debug('Execute query: %s',
+                          JSONSerializer().dumps(query))
+
+        return self.__connection.search(body=query,
+                                        index='syslog') #config.system.es.index)
 
 
     def get(self,
             id):
-        return self.__connection.get(id = id,
-                                     index = config.system.es.index)
+        return self.__connection.get(id=id,
+                                     index='syslog') #config.system.es.index)

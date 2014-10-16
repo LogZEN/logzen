@@ -5,44 +5,35 @@
  * GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-define ['knockout', 'jquery'], \
-       (ko, $) ->
+define ['jquery', 'knockout', 'api'], \
+       ($, ko, api) ->
   # A helper base class for models providing loading and error support.
   #
   # The class provides a 'loading' observable indicating the current state and
-  # an 'error' observable containing an occured error, if any. To set the
-  # loading flag, the 'loader' method can be called which returns a jQuery
-  # 'deferred' object which will handle completion by clearing the 'loading'
-  # observable. If the returned deferred does not complete successfully, the
-  # 'loading' flag is reset and the 'error' observable is updated with the
-  # passed error message.
+  # an 'error' observable containing an occured error, if any.
   #
-  # To wrap AJAX request in a loading block, the 'ajax' method can be used in
-  # the same way the jQuery 'ajax' method can be used.
+  # To wrap AJAX request in a loading block, the 'ajax' method can be used. It
+  # takes a request executor function which executes the request call. The
+  # function is called with the API instance used to do the request and must
+  # return the result of that API call.
   LoadingModel: class LoadingModel
     constructor: () ->
       @loading = ko.observable false
       @error = ko.observable null
 
-    loader: () ->
-      $.Deferred () =>
-        @error null
-        @loading true
-      .done () =>
+
+    ajax: (request) ->
+      @error null
+      @loading true
+
+      request(api)
+      .done (result) =>
         @error null
         @loading false
-      .fail (error) =>
+      .fail (_, status, error) =>
         @error error
         @loading false
 
-    ajax: (url, settings) ->
-      s = @loader()
-
-      $.ajax url, settings
-      .done (result) -> s.resolve result
-      .fail (_, status, error) -> s.reject error
-
-      return s.promise()
 
 
   # A helper base class for models doing simple AJAX requests.
@@ -75,8 +66,10 @@ define ['knockout', 'jquery'], \
       @execute()
 
     execute: () ->
-      [url, settings] = ko.unwrap @request
-      @ajax url, settings
+      # Get the request executor
+      request = ko.unwrap @request
+
+      @ajax request
       .fail (_, status, error) =>
         @result null
         if @fail?

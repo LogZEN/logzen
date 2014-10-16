@@ -26,17 +26,17 @@ from logzen.web.api import resource
 
 
 dashboard = {
-    uuid.uuid4(): {'col': 1, 'row': 1, 'size_x': 2, 'size_y': 2, 'type': 'latestevents', 'title': 'c11', 'config': {}},
-    uuid.uuid4(): {'col': 2, 'row': 1, 'size_x': 1, 'size_y': 2, 'type': 'latestevents', 'title': 'c21', 'config': {}},
-    uuid.uuid4(): {'col': 3, 'row': 1, 'size_x': 1, 'size_y': 1, 'type': 'latestevents', 'title': 'c31', 'config': {}},
-    uuid.uuid4(): {'col': 4, 'row': 1, 'size_x': 3, 'size_y': 1, 'type': 'latestevents', 'title': 'c41', 'config': {}},
-    uuid.uuid4(): {'col': 1, 'row': 2, 'size_x': 2, 'size_y': 2, 'type': 'latestevents', 'title': 'c12', 'config': {}},
-    uuid.uuid4(): {'col': 2, 'row': 2, 'size_x': 1, 'size_y': 1, 'type': 'latestevents', 'title': 'c22', 'config': {}},
-    uuid.uuid4(): {'col': 3, 'row': 2, 'size_x': 1, 'size_y': 1, 'type': 'latestevents', 'title': 'c32', 'config': {}},
-    uuid.uuid4(): {'col': 4, 'row': 2, 'size_x': 1, 'size_y': 1, 'type': 'latestevents', 'title': 'c42', 'config': {}},
-    uuid.uuid4(): {'col': 2, 'row': 3, 'size_x': 1, 'size_y': 1, 'type': 'latestevents', 'title': 'c23', 'config': {}},
-    uuid.uuid4(): {'col': 3, 'row': 3, 'size_x': 1, 'size_y': 1, 'type': 'latestevents', 'title': 'c33', 'config': {}},
-    uuid.uuid4(): {'col': 6, 'row': 3, 'size_x': 2, 'size_y': 1, 'type': 'latestevents', 'title': 'c63', 'config': {}}
+    str(uuid.uuid4()): {'col': 1, 'row': 1, 'size_x': 2, 'size_y': 2, 'type': 'latestevents', 'title': 'c11', 'config': {}},
+    str(uuid.uuid4()): {'col': 2, 'row': 1, 'size_x': 1, 'size_y': 2, 'type': 'latestevents', 'title': 'c21', 'config': {}},
+    str(uuid.uuid4()): {'col': 3, 'row': 1, 'size_x': 1, 'size_y': 1, 'type': 'latestevents', 'title': 'c31', 'config': {}},
+    str(uuid.uuid4()): {'col': 4, 'row': 1, 'size_x': 3, 'size_y': 1, 'type': 'latestevents', 'title': 'c41', 'config': {}},
+    str(uuid.uuid4()): {'col': 1, 'row': 2, 'size_x': 2, 'size_y': 2, 'type': 'latestevents', 'title': 'c12', 'config': {}},
+    str(uuid.uuid4()): {'col': 2, 'row': 2, 'size_x': 1, 'size_y': 1, 'type': 'latestevents', 'title': 'c22', 'config': {}},
+    str(uuid.uuid4()): {'col': 3, 'row': 2, 'size_x': 1, 'size_y': 1, 'type': 'latestevents', 'title': 'c32', 'config': {}},
+    str(uuid.uuid4()): {'col': 4, 'row': 2, 'size_x': 1, 'size_y': 1, 'type': 'latestevents', 'title': 'c42', 'config': {}},
+    str(uuid.uuid4()): {'col': 2, 'row': 3, 'size_x': 1, 'size_y': 1, 'type': 'latestevents', 'title': 'c23', 'config': {}},
+    str(uuid.uuid4()): {'col': 3, 'row': 3, 'size_x': 1, 'size_y': 1, 'type': 'latestevents', 'title': 'c33', 'config': {}},
+    str(uuid.uuid4()): {'col': 6, 'row': 3, 'size_x': 2, 'size_y': 1, 'type': 'latestevents', 'title': 'c63', 'config': {}}
 }
 
 

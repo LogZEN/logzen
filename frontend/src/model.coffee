@@ -5,8 +5,8 @@
  * GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
-define ['knockout', 'utils'], \
-       (ko, utils) ->
+define ['knockout', 'api', 'utils'], \
+       (ko, api, utils) ->
   # Syslog severity names.
   #
   # The name index to string mapping according to RFC 3164.
@@ -91,13 +91,10 @@ define ['knockout', 'utils'], \
   # executed every time the observable changes.
   class QueryModel extends utils.IntervalRequestingModel
     constructor: () ->
-      @request = ko.computed () => [
-              '/_api/query'
-              method: 'POST'
-              contentType: 'application/json'
-              dataType: 'json'
-              data: ko.toJSON @query
-            ]
+      @request = ko.computed () =>
+        (api) =>
+          api 'streams/everything'
+          .post @query
 
       super()
 

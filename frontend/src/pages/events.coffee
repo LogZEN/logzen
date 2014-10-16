@@ -27,20 +27,22 @@ define ['jquery', 'knockout', 'model'], \
         message: ko.observable ''
 
       # The query as required by the base model
-      @query = ko.computed () =>
-        filter:
-          bool:
-            must: for name, filter of @filters when filter() != ''
-              term: (
-                term = {}
-                term[name] = filter()
-                term
-              )
-        from: @page.current() * @page.size()
-        size: @page.size()
-        sort:
-          time:
-            order: 'desc'
+      @query =
+        'match_all' : {}
+#      ko.computed () =>
+#        filter:
+#          bool:
+#            must: for name, filter of @filters when filter() != ''
+#              term: (
+#                term = {}
+#                term[name] = filter()
+#                term
+#              )
+#        from: @page.current() * @page.size()
+#        size: @page.size()
+#        sort:
+#          time:
+#            order: 'desc'
 
       super()
 

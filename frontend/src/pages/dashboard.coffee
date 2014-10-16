@@ -6,8 +6,8 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
 
-define ['jquery', 'knockout', 'gridster'], \
-       ($, ko) ->
+define ['jquery', 'knockout', 'api', 'jquery.gridster'], \
+       ($, ko, api) ->
   ko.bindingHandlers.gridster =
     init: (e, value, allBindingsAccessor, viewModel, bindingContext) ->
       value = ko.utils.unwrapObservable value()
@@ -87,16 +87,19 @@ define ['jquery', 'knockout', 'gridster'], \
       controlsDescendantBindings: true
 
 
+
   class WidgetModel
-    constructor: (r) ->
-      @title = ko.observable r.title
-      @type = ko.observable r.type
+    constructor: (id, config) ->
+      @id = id
+
+      @title = ko.observable config.title
+      @type = ko.observable config.type
 
       @coords =
-        col: ko.observable r.col
-        row: ko.observable r.row
-        size_x: ko.observable r.size_x
-        size_y: ko.observable r.size_y
+        col: ko.observable config.col
+        row: ko.observable config.row
+        size_x: ko.observable config.size_x
+        size_y: ko.observable config.size_y
 
       @configuring = ko.observable false
 
@@ -107,19 +110,20 @@ define ['jquery', 'knockout', 'gridster'], \
       @configuring true
 
 
+
   class DashboardModel
     constructor: ->
       @widgets = ko.observableArray []
 
       @gridster = null
 
-      $.ajax
-        url: '/_config/dashboard'
-        dataType: 'json'
-        success: (result) =>
-          console.log result
+      api('dashboard').get()
+      .done (result) =>
+        console.log result
 
-          for r in result
-            @widgets.push new WidgetModel r
+        for id, config of result
+          @widgets.push new WidgetModel id, config
 
-  DashboardModel
+
+
+  return DashboardModel

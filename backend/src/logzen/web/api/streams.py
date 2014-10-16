@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
 along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from require import *
+
 import bottle
 
 from logzen.streams import Streams
 from logzen.web.api import resource, restricted
-
 
 
 @resource('/streams', 'GET')
@@ -58,21 +59,31 @@ def get(name,
 
 
 @resource('/streams/<name>', 'POST')
-@restricted()
+@require(es='logzen.es:Connection')
+# @restricted()
 def query(name,
-          db):
+          db,
+          es):
     streams = Streams(db)
 
     try:
-        stream = streams(name)
+        stream = streams.getStream(name)
 
     except KeyError:
         raise bottle.HTTPError(404, 'Stream not found: %s' % name)
 
-    return {'and': [
-        {'or': [mask.query
-                for mask
-                in stream.masks
-                if mask.active]},
-        bottle.request.body
-    ]}
+    query = {
+        'filter': {
+            'and': [
+                bottle.request.json,
+                {
+                    'or': [mask.query
+                           for mask
+                           in stream.masks
+                           if mask.active]
+                }
+            ]
+        }
+    }
+
+    return es.query(query)

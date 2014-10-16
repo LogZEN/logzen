@@ -25,7 +25,8 @@ from logzen.streams import Streams
 from logzen.web.api import resource, restricted
 
 
-@resource('/streams', 'GET')
+@resource('/streams', 'GET',
+          arg_session='db')
 @restricted()
 def list(db):
     streams = Streams(db)
@@ -36,7 +37,8 @@ def list(db):
             in streams]
 
 
-@resource('/streams/<name>', 'GET')
+@resource('/streams/<name>', 'GET',
+          arg_session='db')
 @restricted()
 def get(name,
         db):
@@ -58,7 +60,8 @@ def get(name,
     return stream.query(bottle.request.body)
 
 
-@resource('/streams/<name>', 'POST')
+@resource('/streams/<name>', 'POST',
+          arg_session='db')
 @require(es='logzen.es:Connection')
 # @restricted()
 def query(name,

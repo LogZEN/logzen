@@ -51,7 +51,7 @@ def Sessions(engine):
     return session
 
 
-def session():
+def session(arg=None):
     @require(sessions='logzen.db:Sessions')
     def wrapper(func,
                 sessions):
@@ -61,8 +61,8 @@ def session():
             session = sessions()
 
             # Pass the session to the wrapped function as an keyword argument
-            if 'db' in signature(func).parameters:
-                kwargs['db'] = session
+            if arg is not None:
+                kwargs[arg] = session
 
             # Call the wrapped function
             try:

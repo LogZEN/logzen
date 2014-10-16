@@ -22,8 +22,6 @@ from require import *
 from logzen.db import session
 from logzen.users import Users
 
-from logzen.util import signature
-
 import bottle
 
 import itsdangerous
@@ -49,7 +47,10 @@ def Api(app):
 
 
 def resource(path,
-             methods='GET'):
+             methods='GET',
+             arg_request=None,
+             arg_response=None,
+             arg_session=None):
     @require(api='logzen.web.api:Api',
              logger='logzen.util:Logger')
     def extender(func,
@@ -58,16 +59,16 @@ def resource(path,
                      path, methods, func)
 
         # Wrap the function into the session decorator
-        func = session()(func)
+        func = session(arg_session)(func)
 
         # Inject the request and response object
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            if 'request' in signature(func).parameters:
-                kwargs['request'] = bottle.request
+            if arg_request is not None:
+                kwargs[arg_request] = bottle.request
 
-            if 'response' in signature(func).parameters:
-                kwargs['response'] = bottle.response
+            if arg_response is not None:
+                kwargs[arg_response] = bottle.response
 
             # Call the decorated function
             return func(*args,
@@ -103,7 +104,7 @@ TOKEN_COOKIE = 'logzen.auth'
 
 @require(signer='logzen.web.api:Signer',
          logger='logzen.util:Logger')
-@session()
+@session(arg='db')
 def before_request_hook(db, signer, logger):
     users = Users(db)
 
@@ -171,7 +172,9 @@ def auth_hook(api):
 
 
 
-@resource('/token', 'POST')
+@resource('/token', 'POST',
+          arg_session='db',
+          arg_request='request')
 def login(request,
           db):
     users = Users(db)
@@ -196,7 +199,7 @@ def logout(request):
 
 
 
-def restricted():
+def restricted(arg=None):
     def wrapper(func):
         @functools.wraps(func)
         def wrapped(*args, **kwargs):
@@ -205,8 +208,8 @@ def restricted():
                 raise bottle.HTTPError(401, 'Authentication required')
 
             # Inject the user into the wrapped function
-            if 'user' in signature(func).parameters:
-                kwargs['user'] = bottle.request.user
+            if arg is not None:
+                kwargs[arg] = bottle.request.user
 
             # Call the decorated function
             return func(*args,

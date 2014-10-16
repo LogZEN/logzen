@@ -22,12 +22,13 @@ from require import *
 from logzen.db import session
 from logzen.users import Users
 
+from logzen.util import signature
+
 import bottle
 
 import itsdangerous
 
 import functools
-import inspect
 
 
 
@@ -62,12 +63,10 @@ def resource(path,
         # Inject the request and response object
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            signature = inspect.signature(func)
-
-            if 'request' in signature.parameters:
+            if 'request' in signature(func).parameters:
                 kwargs['request'] = bottle.request
 
-            if 'response' in signature.parameters:
+            if 'response' in signature(func).parameters:
                 kwargs['response'] = bottle.response
 
             # Call the decorated function
@@ -206,8 +205,7 @@ def restricted():
                 raise bottle.HTTPError(401, 'Authentication required')
 
             # Inject the user into the wrapped function
-            signature = inspect.signature(func)
-            if 'user' in signature.parameters:
+            if 'user' in signature(func).parameters:
                 kwargs['user'] = bottle.request.user
 
             # Call the decorated function

@@ -19,12 +19,13 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 
 from require import *
 
+from logzen.util import signature
+
 import sqlalchemy
 import sqlalchemy.orm
 import sqlalchemy.ext.declarative
 
 import functools
-import inspect
 
 
 Entity = sqlalchemy.ext.declarative.declarative_base()
@@ -60,8 +61,7 @@ def session():
             session = sessions()
 
             # Pass the session to the wrapped function as an keyword argument
-            signature = inspect.signature(func)
-            if 'db' in signature.parameters:
+            if 'db' in signature(func).parameters:
                 kwargs['db'] = session
 
             # Call the wrapped function

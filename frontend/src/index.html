@@ -67,31 +67,26 @@
 
       <div class="collapse navbar-collapse" id="mainmenu"><ul class="nav navbar-nav pull-right">
           <!-- ko if: authenticated -->
-            <!-- ko foreach: $__page__.children -->
-              <!-- ko if: ($data.getId() !== '?' && $data.getId() !== 'system') -->
-                <li data-bind="css: {active: isVisible}">
-                  <a data-bind="page-href: $data, text: val('title')"></a>
-                </li>
-              <!-- /ko -->
-            <!-- /ko -->
+          <li><a data-bind="page-href: 'dashboard'">Dashboard</a></li>
+          <li><a data-bind="page-href: 'events'">Events</a></li>
 
             <li class="divider-vertical"></li>
 
             <li class="dropdown">
-            <a href="#"
-               class="dropdown-toggle"
-               data-toggle="dropdown">
-              More
-              <b class="caret"></b>
-            </a>
-            <ul class="dropdown-menu">
-              <li><a data-bind="page-href: 'system/help'">Help</a></li>
-              <li><a data-bind="page-href: 'system/about'">About</a></li>
-              <li class="divider"></li>
-              <li><a data-bind="page-href: 'system/adduser'">Add User</a></li>
-              <li class="divider"></li>
-              <li><a data-bind="click: logout">Logout</a></li>
-            </ul>
+              <a href="#"
+                 class="dropdown-toggle"
+                 data-toggle="dropdown">
+                More
+                <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a data-bind="page-href: 'system/help'">Help</a></li>
+                <li><a data-bind="page-href: 'system/about'">About</a></li>
+                <li class="divider"></li>
+                <li><a data-bind="page-href: 'system/adduser'">Add User</a></li>
+                <li class="divider"></li>
+                <li><a data-bind="click: logout">Logout</a></li>
+              </ul>
             </li>
             <li class="divider-vertical"></li>
             <li class="navbar-text"
@@ -117,13 +112,15 @@
                               title: 'Dashboard',
                               sourceOnShow: requireHTML('dashboard'),
                               withOnShow: requireVM('dashboard'),
-                              role: 'start' }"
+                              role: 'start',
+                              guard: guard }"
            style="overflow: hidden;"></div>
       
       <div data-bind="page: { id: 'events',
                               title: 'Events',
                               sourceOnShow: requireHTML('events'),
-                              withOnShow: requireVM('events') }"></div>
+                              withOnShow: requireVM('events'),
+                              guard: guard }"></div>
 
       <!-- Other pages -->
       <div data-bind="page: { id: 'system' }">
@@ -135,7 +132,8 @@
                                 sourceOnShow: requireHTML('about') }"></div>
         <div data-bind="page: { id: 'adduser',
                                 title: 'Add User',
-                                sourceOnShow: requireHTML('adduser') }"></div>
+                                sourceOnShow: requireHTML('adduser'),
+                                guard: guard }"></div>
         <div data-bind="page: { id: 'login',
                                 title: 'Login',
                                 sourceOnShow: requireHTML('login'),

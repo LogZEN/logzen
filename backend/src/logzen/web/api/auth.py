@@ -94,7 +94,8 @@ class AuthPlugin():
                 self.logger.debug('No user entry attached to request - unauthorized')
 
                 # Delete the token on the client
-                bottle.response.delete_cookie(TOKEN_COOKIE)
+                bottle.response.delete_cookie(TOKEN_COOKIE,
+                                              path='/api/v1')
 
             else:
                 # Generate the token by signing the username
@@ -122,81 +123,6 @@ def install(api,
 
 
 
-
-
-
-# @require(signer='logzen.web.api.auth:Signer',
-#          logger='logzen.util:Logger')
-# def before_request_hook(signer, logger):
-#     users = Users(db)
-#
-#     # Ensure the user extension exists
-#     bottle.request.user = None
-#
-#     # Get the token from the request
-#     token = bottle.request.get_cookie(TOKEN_COOKIE)
-#
-#     # Check if the token is included in the request
-#     if token is None:
-#         logger.debug('No token found - unauthorized')
-#
-#         # Nothing to do, if the token is missing
-#         return
-#
-#     # Verify the token and extract the username
-#     username = signer.verify(token)
-#     if username is None:
-#         raise bottle.HTTPError(401, 'Invalid token')
-#
-#     logger.debug('Token validated with username: %s', username)
-#
-#     # Get the user object for the username
-#     user = users.getUser(username=username)
-#     if user is None:
-#         raise bottle.HTTPError(401, 'User does not exist: ' + username)
-#
-#     logger.debug('User entry found: %s', user)
-#
-#     # Inject the user into the request
-#     bottle.request.user = user
-#
-#
-#
-# @require(signer='logzen.web.api.auth:Signer',
-#          logger='logzen.util:Logger')
-# def after_request_hook(signer, logger):
-#     # Nothing to do if the request does not contain a user
-#     if bottle.request.user is None:
-#         logger.debug('No user entry attached to request - unauthorized')
-#
-#         # Delete the token on the client
-#         bottle.response.delete_cookie(TOKEN_COOKIE)
-#
-#     else:
-#         # Get the username from the request
-#         username = bottle.request.user.username
-#
-#         logger.debug('Token generated for username: %s', username)
-#
-#         # Generate the token by signing the username
-#         token = signer.sign(username)
-#
-#         # Pass the token to the client
-#         bottle.response.set_cookie(name=TOKEN_COOKIE,
-#                                    value=token,
-#                                    path='/api/v1',
-#                                    max_age=TOKEN_DURATION)
-#
-#
-#
-# @extend('logzen.web.api:Api')
-# def auth_plugin(api):
-#     # Add the token managing hooks to the API application
-#     api.add_hook('before_request', before_request_hook)
-#     api.add_hook('after_request', after_request_hook)
-
-
-
 @resource('/token', 'POST')
 @require(request='logzen.web.api:Request',
          users='logzen.users:Users')
@@ -209,9 +135,6 @@ def login(request,
 
     # Set the user to the request - letting the after-request hook do the signing
     setattr(bottle.local, 'user', user)
-
-    # Return the users data
-    return {'username': user.username}
 
 
 

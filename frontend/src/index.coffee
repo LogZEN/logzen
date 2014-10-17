@@ -48,10 +48,20 @@ define ['jquery', 'knockout', 'pager', 'api', 'utils', 'bootstrap'], \
       @authenticated = ko.computed () =>
         @user() != null
 
+      # Try to fetch user information or redirect to login page
+      api('user').get()
+      .error (err) =>
+        pager.navigate 'system/login'
+
+      .done (res) =>
+        # Update the user information
+        @user res
+
+        # Redirect to the dashboard
+        pager.navigate 'dashboard'
+
 
     login: (username, password) ->
-      #document.cookie = 'logzen.auth=;'
-
       api('token').post
         username: username
         password: password
@@ -62,11 +72,14 @@ define ['jquery', 'knockout', 'pager', 'api', 'utils', 'bootstrap'], \
       .done (res) =>
         console.log 'User logged in', res
 
-        # Update the user information
-        @user res
+        # Fetch the user information
+        api('user').get()
+        .done (res) =>
+          # Update the user information
+          @user res
 
-        # Redirect to the dashboard
-        pager.navigate 'dashboard'
+          # Redirect to the dashboard
+          pager.navigate 'dashboard'
 
 
     logout: () ->
@@ -77,6 +90,18 @@ define ['jquery', 'knockout', 'pager', 'api', 'utils', 'bootstrap'], \
 
         # Redirect to the login page
         pager.navigate 'system/login'
+
+
+    guard: (page, route, callback) ->
+      # Check if the user is authenticated
+      if page.viewModel.authenticated()
+        # Allow to access the page
+        callback()
+
+      else
+        # Redirect to the login page
+        pager.navigate 'system/login'
+
 
 
 

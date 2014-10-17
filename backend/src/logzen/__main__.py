@@ -18,44 +18,39 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 
-from require import *
+from require import require, singleton
 
 import logzen.users
 import logzen.streams
 
 import logzen.web.frontend
 import logzen.web.api
+import logzen.web.api.db
+import logzen.web.api.auth
 import logzen.web.api.dashboard
 import logzen.web.api.streams
 
 from logzen.users import User
-from logzen.streams import Stream, Mask
+from logzen.streams import Stream
 
 
 
 @require(app='logzen.web:App',
-         sessions='logzen.db:Sessions')
+         session='logzen.db:Session')
 def main(app,
-         sessions):
-    session = sessions()
-
+         session):
     if session \
             .query(User) \
             .count() < 1:
-        admin = User(username='admin',
-                     password='admin')
-        session.add(admin)
+        user = User(username='admin',
+                    password='admin',
+                    filter={ 'match_all' : {}})
+        session.add(user)
 
-    if session \
-        .query(Stream) \
-        .count() < 1:
-        stream = Stream(name = 'everything')
-
-        mask = Mask(title = 'Everything',
-                    query = { 'match_all' : {}})
-        stream.masks.append(mask)
-
-        session.add(mask, stream)
+        stream = Stream(name='everything',
+                        user=user,
+                        filter={ 'match_all' : {}})
+        session.add(stream)
 
     session.commit()
 

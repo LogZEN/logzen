@@ -17,42 +17,34 @@ You should have received a copy of the GNU General Public License
 along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from require import *
-
 import bottle
 
-from logzen.streams import Streams
-from logzen.web.api import resource, restricted
+from require import *
+from logzen.web.api import resource
+from logzen.web.api.auth import restricted
 
 
-@resource('/streams', 'GET',
-          arg_session='db')
+@resource('/streams', 'GET')
 @restricted()
-def list(db):
-    streams = Streams(db)
+@require(user='logzen.web.api.auth:User')
+def list(user):
+    return {key: {'name': stream.name,
+                  'description': stream.description}
+            for key, stream
+            in user.streams.items()}
 
-    return [{'name': stream.name,
-             'description': stream.description}
-            for stream
-            in streams]
 
-
-@resource('/streams/<name>', 'GET',
-          arg_session='db')
+@resource('/streams/<name>', 'GET')
 @restricted()
+@require(user='logzen.web.api.auth:User')
 def get(name,
-        db):
-    streams = Streams(db)
-
+        user):
     try:
-        stream = streams(name)
+        stream = user.streams[name]
 
         return {'name': stream.name,
                 'description': stream.description,
-                'masks': [{'title': mask.title,
-                           'query': mask.query}
-                          for mask
-                          in stream.masks]}
+                'filter': stream.filter}
 
     except KeyError:
         raise bottle.HTTPError(404, 'Stream not found: %s' % name)
@@ -60,33 +52,15 @@ def get(name,
     return stream.query(bottle.request.body)
 
 
-@resource('/streams/<name>', 'POST',
-          arg_session='db')
-@require(es='logzen.es:Connection')
-# @restricted()
+@resource('/streams/<name>/query', 'POST')
+@restricted()
+@require(user='logzen.web.api.auth:User',
+         request='logzen.web.api:Request')
 def query(name,
-          db,
-          es):
-    streams = Streams(db)
-
+          user,
+          request):
     try:
-        stream = streams.getStream(name)
+        return user.streams[name].query(request.json)
 
     except KeyError:
         raise bottle.HTTPError(404, 'Stream not found: %s' % name)
-
-    query = {
-        'filter': {
-            'and': [
-                bottle.request.json,
-                {
-                    'or': [mask.query
-                           for mask
-                           in stream.masks
-                           if mask.active]
-                }
-            ]
-        }
-    }
-
-    return es.query(query)

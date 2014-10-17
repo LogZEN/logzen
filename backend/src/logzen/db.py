@@ -23,10 +23,28 @@ import sqlalchemy
 import sqlalchemy.orm
 import sqlalchemy.ext.declarative
 
-import functools
+import json
+
+import contextlib
 
 
 Entity = sqlalchemy.ext.declarative.declarative_base()
+
+
+
+class JSONDict(sqlalchemy.types.TypeDecorator):
+    impl = sqlalchemy.Text
+
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            return json.dumps(value)
+
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            return json.loads(value)
+
 
 
 @export()
@@ -43,39 +61,62 @@ def Engine():
 
 @export(engine='logzen.db:Engine')
 def Sessions(engine):
-    session = sqlalchemy.orm.sessionmaker()
-    session.configure(bind=engine)
+    sessions = sqlalchemy.orm.sessionmaker()
+    sessions.configure(bind=engine)
 
-    return session
+    return sessions
 
 
-def session(arg=None):
-    @require(sessions='logzen.db:Sessions')
-    def wrapper(func,
-                sessions):
-        @functools.wraps(func)
-        def wrapped(*args, **kwargs):
-            # Create a new session
-            session = sessions()
 
-            # Pass the session to the wrapped function as an keyword argument
-            if arg is not None:
-                kwargs[arg] = session
+@export(oneshot,
+        sessions='logzen.db:Sessions')
+def Session(sessions):
+    return sessions()
 
-            # Call the wrapped function
-            try:
-                return func(*args,
-                            **kwargs)
 
-            except:
-                session.rollback()
-                raise
 
-            else:
-                session.commit()
+@contextlib.contextmanager
+@require(session='logzen.db:Session')
+def session(session):
+    try:
+        yield session
 
-            finally:
-                session.close()
+    except:
+        session.rollback()
+        raise
 
-        return wrapped
-    return wrapper
+    else:
+        session.commit()
+
+    finally:
+        session.close()
+
+
+# def session(arg=None):
+#     @require(session='logzen.db:Session')
+#     def wrapper(func,
+#                 session):
+#         @functools.wraps(func)
+#         def wrapped(*args, **kwargs):
+#
+#             # Pass the session to the wrapped function as an keyword argument
+#             if arg is not None:
+#                 kwargs[arg] = session
+#
+#             # Call the wrapped function
+#             try:
+#                 return func(*args,
+#                             **kwargs)
+#
+#             except:
+#                 session.rollback()
+#                 raise
+#
+#             else:
+#                 session.commit()
+#
+#             finally:
+#                 session.close()
+#
+#         return wrapped
+#     return wrapper

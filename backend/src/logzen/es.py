@@ -48,12 +48,12 @@ class Connection:
                                           connection_class=Urllib3HttpConnection,
                                           http_auth=auth)
 
-    def query(self,
-              query):
-        self.logger.debug('Execute query: %s',
-                          JSONSerializer().dumps(query))
+    def search(self,
+               body):
+        self.logger.debug('Execute search: %s',
+                          JSONSerializer().dumps(body))
 
-        return self.__connection.search(body=query,
+        return self.__connection.search(body=body,
                                         index='syslog') #config.system.es.index)
 
 

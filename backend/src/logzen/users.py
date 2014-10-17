@@ -19,7 +19,7 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 
 from require import *
 
-from logzen.db import Entity
+from logzen.db import Entity, JSONDict
 
 import sqlalchemy
 import sqlalchemy.types
@@ -58,16 +58,23 @@ class User(Entity):
     password = sqlalchemy.Column(Password,
                                  nullable=False)
 
+    filter = sqlalchemy.Column(JSONDict,
+                               nullable=False)
+
+    streams = sqlalchemy.orm.relationship('Stream',
+                                          collection_class=sqlalchemy.orm.collections.attribute_mapped_collection('name'),
+                                          cascade='all, delete-orphan')
 
 
+
+@export()
 class Users(object):
-    def __init__(self, session):
-        self.__session = session
+    session = require('logzen.db:Session')
 
 
     def getUser(self, username):
         try:
-            return self.__session \
+            return self.session \
                     .query(User) \
                     .filter(User.username == username) \
                     .one()
@@ -78,7 +85,7 @@ class Users(object):
 
     def getVerifiedUser(self, username, password):
         try:
-            return self.__session \
+            return self.session \
                     .query(User) \
                     .filter(User.username == username, \
                             User.password == password) \

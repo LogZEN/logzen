@@ -6,14 +6,14 @@ GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
 ###
 
 require.config
-#  urlArgs: 'v=' + new Date()
+  urlArgs: 'v=' + new Date()
   baseUrl: '/'
   paths:
     'jquery':'libs/jquery/dist/jquery'
     'knockout':'libs/knockoutjs/dist/knockout.debug'
     'pager':'libs/pagerjs/pager'
     'bootstrap':'libs/bootstrap/dist/js/bootstrap'
-    'require.text': 'libs/requirejs-text/text'
+    'text': 'libs/requirejs-text/text'
     'jquery.gridster': 'libs/gridster/dist/jquery.gridster'
     'jquery.humanize': 'libs/jquery.humanize'
   shim:
@@ -33,7 +33,7 @@ require.config
 
 @requireHTML = (module) ->
   (page, callback) ->
-    require ["require.text!/pages/#{module}.html"], (html) ->
+    require ["text!/pages/#{module}.html"], (html) ->
       $(page.element).html html
       callback()
 
@@ -50,7 +50,7 @@ define ['jquery', 'knockout', 'pager', 'api', 'utils', 'bootstrap'], \
 
 
     login: (username, password) ->
-      document.cookie = 'logzen.auth=;'
+      #document.cookie = 'logzen.auth=;'
 
       api('token').post
         username: username

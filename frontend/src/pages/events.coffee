@@ -27,8 +27,7 @@ define ['jquery', 'knockout', 'model'], \
         message: ko.observable ''
 
       # The query as required by the base model
-      @query =
-        'match_all' : {}
+      @query = {}
 #      ko.computed () =>
 #        filter:
 #          bool:

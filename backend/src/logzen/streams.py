@@ -17,54 +17,13 @@ You should have received a copy of the GNU General Public License
 along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from require import *
-
 import sqlalchemy
 import sqlalchemy.orm
 import sqlalchemy.types
 import sqlalchemy.schema
 
-import json
-
-from logzen.db import Entity
-
-
-
-class JSONDict(sqlalchemy.types.TypeDecorator):
-    impl = sqlalchemy.Text
-
-
-    def process_bind_param(self, value, dialect):
-        if value is not None:
-            return json.dumps(value)
-
-
-    def process_result_value(self, value, dialect):
-        if value is not None:
-            return json.loads(value)
-
-
-
-class Mask(Entity):
-    __tablename__ = 'masks'
-
-    id = sqlalchemy.Column(sqlalchemy.Integer,
-                           primary_key=True,
-                           nullable=False,
-                           autoincrement=True)
-
-    stream_id = sqlalchemy.Column(sqlalchemy.BigInteger,
-                                  sqlalchemy.ForeignKey('streams.id'))
-
-    title = sqlalchemy.Column(sqlalchemy.String,
-                              nullable=False)
-
-    query = sqlalchemy.Column(JSONDict,
-                              nullable=False)
-
-    active = sqlalchemy.Column(sqlalchemy.Boolean,
-                               nullable=False,
-                               default=True)
+from require import *
+from logzen.db import Entity, JSONDict
 
 
 
@@ -76,6 +35,11 @@ class Stream(Entity):
                            nullable=False,
                            autoincrement=True)
 
+    user_id = sqlalchemy.Column(sqlalchemy.Integer,
+                                sqlalchemy.ForeignKey('users.id'))
+
+    user = sqlalchemy.orm.relationship('User')
+
     name = sqlalchemy.Column(sqlalchemy.String,
                              nullable=False)
 
@@ -83,8 +47,32 @@ class Stream(Entity):
                                     nullable=False,
                                     default='')
 
-    masks = sqlalchemy.orm.relationship('Mask',
-                                        backref='stream')
+    filter = sqlalchemy.Column(JSONDict,
+                               nullable=False)
+
+
+    @require(es='logzen.es:Connection')
+    def query(self, query, es):
+        body = {}
+
+        # Add the user filter and the stream filter to the search
+        body.update({
+            'filter': {
+                'and': [
+                    self.filter,
+                    self.user.filter
+                ]
+            }
+        })
+
+        # Add the passed query - if any
+        if query:
+            body.update({
+                'query': query
+            })
+
+        # Execute the search
+        return es.search(body)
 
 
 
@@ -96,9 +84,9 @@ class Streams(object):
     def getStream(self, name):
         try:
             return self.__session \
-                    .query(Stream) \
-                    .filter(Stream.name == name) \
-                    .one()
+                .query(Stream) \
+                .filter(Stream.name == name) \
+                .one()
 
         except sqlalchemy.orm.exc.NoResultFound:
             raise KeyError(name)

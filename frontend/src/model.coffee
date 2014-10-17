@@ -93,7 +93,7 @@ define ['knockout', 'api', 'utils'], \
     constructor: () ->
       @request = ko.computed () =>
         (api) =>
-          api 'streams/everything'
+          api 'streams/everything/query'
           .post @query
 
       super()

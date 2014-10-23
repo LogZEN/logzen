@@ -35,27 +35,38 @@ class SessionPlugin(object):
 
     def apply(self, callback, route):
         def wrapper(*args, **kwargs):
-            setattr(bottle.local, 'session', self.sessionFactory())
+            session = self.sessionFactory()
+            setattr(bottle.local, 'session', session)
 
-            return callback(*args, **kwargs)
+            try:
+                return callback(*args, **kwargs)
+
+            finally:
+                session.close()
 
         return wrapper
 
 
 
 @extend('logzen.web.api:Api',
-        session='logzen.web.api.db:SessionPlugin')
+        session='logzen.web.api.db:SessionPlugin',
+        logger='logzen.util:Logger')
 def install(api,
-            session):
+            session,
+            logger):
     """ Installs the session plugin to the API.
     """
 
     api.install(session)
 
+    logger.debug('Plugin "session" installed')
 
 
-@extend('logzen.db:SessionProvider')
-def RequestSessionProvider(base):
+
+@extend('logzen.db:SessionProvider',
+        logger='logzen.util:Logger')
+def RequestSessionProvider(base,
+                           logger):
     """ Extension providing the request session if it exists.
 
         The extension provides the request specific session created by the
@@ -64,6 +75,8 @@ def RequestSessionProvider(base):
     """
 
     if hasattr(bottle.local, 'session'):
+        logger.debug('Providing request session')
+
         return lambda: getattr(bottle.local, 'session')
 
     else:

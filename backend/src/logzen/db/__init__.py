@@ -89,8 +89,10 @@ def SessionFactory(engine):
 
 
 @export(oneshot,
-        factory='logzen.db:SessionFactory')
-def SessionProvider(factory):
+        factory='logzen.db:SessionFactory',
+        logger='logzen.util:Logger')
+def SessionProvider(factory,
+                    logger):
     """ Provider to access a session..
 
         The default implementation returns a new session each time.
@@ -99,17 +101,25 @@ def SessionProvider(factory):
         implement session scoping.
     """
 
+    logger.debug('Providing onehsot session')
+
     return factory
 
 
 
 @export(oneshot,
-        provider='logzen.db:SessionProvider')
-def Session(provider):
+        provider='logzen.db:SessionProvider',
+        logger='logzen.util:Logger')
+def Session(provider,
+            logger):
     """ The current session.
     """
 
-    return provider()
+    session = provider()
+
+    logger.debug('Using session:%s from provider: %s', session, provider)
+
+    return session
 
 
 
@@ -122,8 +132,6 @@ def session(session):
         closing in an appropriate way.
     """
 
-    session.begin()
-
     try:
         yield session
 
@@ -133,9 +141,6 @@ def session(session):
 
     else:
         session.commit()
-
-    finally:
-        session.close()
 
 
 class DAO(object):

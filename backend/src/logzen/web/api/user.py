@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import bottle
 
 from require import *
 from logzen.web.api import resource
@@ -29,3 +28,4 @@ from logzen.web.api.auth import restricted
 @require(user='logzen.web.api.auth:User')
 def get(user):
     return {'username': user.username}
+

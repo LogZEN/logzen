@@ -24,9 +24,9 @@ from logzen.db import Entity, JSONDict, DAO
 import sqlalchemy
 import sqlalchemy.types
 import sqlalchemy.orm.exc
+from sqlalchemy.orm import validates
 
 import hashlib
-
 
 
 class Password(sqlalchemy.types.TypeDecorator):
@@ -53,7 +53,6 @@ class Password(sqlalchemy.types.TypeDecorator):
             return hashlib.sha512(value.encode('utf8')).hexdigest()
 
 
-
 class User(Entity):
     """ Entity representing a user.
     """
@@ -66,10 +65,14 @@ class User(Entity):
                            autoincrement=True)
 
     username = sqlalchemy.Column(sqlalchemy.String,
-                                 nullable=False)
+                                 nullable=False,
+                                 unique=True)
 
     password = sqlalchemy.Column(Password,
                                  nullable=False)
+
+    admin = sqlalchemy.Column(sqlalchemy.Boolean,
+                              default=False)
 
     filter = sqlalchemy.Column(JSONDict,
                                nullable=False)
@@ -78,6 +81,17 @@ class User(Entity):
                                           collection_class=sqlalchemy.orm.collections.attribute_mapped_collection('name'),
                                           cascade='all, delete-orphan')
 
+    @validates('username')
+    def validate_username(self, key, username):
+        assert username
+
+        return username
+
+    @validates('password')
+    def validate_password(self, key, password):
+        assert len(password) >= 4
+
+        return password
 
 
 @export()
@@ -99,7 +113,7 @@ class Users(DAO):
                     .one()
 
         except sqlalchemy.orm.exc.NoResultFound:
-            return None
+            raise KeyError(username)
 
 
     def getVerifiedUser(self, username, password):
@@ -117,3 +131,31 @@ class Users(DAO):
 
         except sqlalchemy.orm.exc.NoResultFound:
             return None
+
+
+    def getUsers(self):
+        return iter(self.session.query(User))
+
+
+    def deleteUser(self, username):
+        try:
+            user = self.session \
+                    .query(User) \
+                    .filter(User.username == username) \
+                    .one()
+
+            self.session.delete(user)
+
+        except sqlalchemy.orm.exc.ObjectDeletedError:
+            raise KeyError(username)
+
+
+    def createUser(self, **kwargs):
+        try:
+            user = User(**kwargs)
+            self.session.add(user)
+
+            return user
+
+        except:
+            raise

@@ -30,7 +30,7 @@ class Logs(object):
     es = require('logzen.es:Connection')
 
     users = require('logzen.db.users:Users')
-    streams = require('logzen.db.users:Streams')
+    streams = require('logzen.db.streams:Streams')
 
 
     def query(self,

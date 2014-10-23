@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from require import *
+
 import sqlalchemy
 import sqlalchemy.orm
 import sqlalchemy.types
@@ -57,6 +59,7 @@ class Stream(Entity):
 
 
 
+@export()
 class Streams(DAO):
     """ DAO for accessing stream entities.
     """

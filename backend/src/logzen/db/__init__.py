@@ -33,6 +33,13 @@ Entity = sqlalchemy.ext.declarative.declarative_base()
 
 
 class JSONDict(sqlalchemy.types.TypeDecorator):
+    """ A sqlalchemy type wrapper storing a python dict using JSON.
+
+        This handler stores any kind of (nested) python dict in a single field
+        by (de-)serializing the dict to a JSON object and stores it in a TEXT
+        field.
+    """
+
     impl = sqlalchemy.Text
 
 
@@ -49,6 +56,13 @@ class JSONDict(sqlalchemy.types.TypeDecorator):
 
 @export()
 def Engine():
+    """ The sqlalchemy engine.
+
+        The configured database is populated with the whole schema during
+        initialisation.
+    """
+
+    # Create the engine instance
     engine = sqlalchemy.create_engine('sqlite:///',
                                       pool_size=20,
                                       echo=True)
@@ -60,7 +74,13 @@ def Engine():
 
 
 @export(engine='logzen.db:Engine')
-def Sessions(engine):
+def SessionFactory(engine):
+    """ The sqlalchemy session factory.
+
+        This factory can be used to create new sessions by calling it. The
+        returned session is bound to the engine and ready to use.
+    """
+
     sessions = sqlalchemy.orm.sessionmaker()
     sessions.configure(bind=engine)
 
@@ -69,15 +89,41 @@ def Sessions(engine):
 
 
 @export(oneshot,
-        sessions='logzen.db:Sessions')
-def Session(sessions):
-    return sessions()
+        factory='logzen.db:SessionFactory')
+def SessionProvider(factory):
+    """ Provider to access a session..
+
+        The default implementation returns a new session each time.
+
+        This export exists to be extended by session providers allowing to
+        implement session scoping.
+    """
+
+    return factory
+
+
+
+@export(oneshot,
+        provider='logzen.db:SessionProvider')
+def Session(provider):
+    """ The current session.
+    """
+
+    return provider()
 
 
 
 @contextlib.contextmanager
 @require(session='logzen.db:Session')
 def session(session):
+    """ A context manager for session handling.
+
+        The context manager handles session creation, commit / rollback and
+        closing in an appropriate way.
+    """
+
+    session.begin()
+
     try:
         yield session
 
@@ -92,31 +138,10 @@ def session(session):
         session.close()
 
 
-# def session(arg=None):
-#     @require(session='logzen.db:Session')
-#     def wrapper(func,
-#                 session):
-#         @functools.wraps(func)
-#         def wrapped(*args, **kwargs):
-#
-#             # Pass the session to the wrapped function as an keyword argument
-#             if arg is not None:
-#                 kwargs[arg] = session
-#
-#             # Call the wrapped function
-#             try:
-#                 return func(*args,
-#                             **kwargs)
-#
-#             except:
-#                 session.rollback()
-#                 raise
-#
-#             else:
-#                 session.commit()
-#
-#             finally:
-#                 session.close()
-#
-#         return wrapped
-#     return wrapper
+class DAO(object):
+    """ Base class for all DAOs.
+
+        The base class provides the current session.
+    """
+
+    session = require('logzen.db:Session')

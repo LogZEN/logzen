@@ -19,7 +19,7 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 
 from require import *
 
-from logzen.db import Entity, JSONDict
+from logzen.db import Entity, JSONDict, DAO
 
 import sqlalchemy
 import sqlalchemy.types
@@ -30,8 +30,18 @@ import hashlib
 
 
 class Password(sqlalchemy.types.TypeDecorator):
-    impl = sqlalchemy.String
+    """ A sqlalchemy type wrapper storing an password in a secured.
 
+        The password is hashed while setting the value. A 'decryption' is not
+        possible.
+
+        In addition to stored values, literals are hashed in the same way
+        allowing comparison of passwords.
+    """
+
+    # TODO: Use passlib to store a salt
+
+    impl = sqlalchemy.String
 
     def process_bind_param(self, value, dialect):
         if value is not None:
@@ -45,6 +55,9 @@ class Password(sqlalchemy.types.TypeDecorator):
 
 
 class User(Entity):
+    """ Entity representing a user.
+    """
+
     __tablename__ = 'users'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
@@ -68,11 +81,17 @@ class User(Entity):
 
 
 @export()
-class Users(object):
-    session = require('logzen.db:Session')
-
+class Users(DAO):
+    """ Accessor for user entities.
+    """
 
     def getUser(self, username):
+        """ Get a user entity with the given username.
+
+            If a user with such username exists, the user entity is returned.
+            If no such user exists, None is returned.
+        """
+
         try:
             return self.session \
                     .query(User) \
@@ -84,6 +103,11 @@ class Users(object):
 
 
     def getVerifiedUser(self, username, password):
+        """ Get a user entity with the given username and a matching password.
+
+            If a user with such username exists and the users password matches
+            the given one the user entity is returned - None otherwise.
+        """
         try:
             return self.session \
                     .query(User) \

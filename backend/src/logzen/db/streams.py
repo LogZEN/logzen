@@ -22,12 +22,17 @@ import sqlalchemy.orm
 import sqlalchemy.types
 import sqlalchemy.schema
 
-from require import *
-from logzen.db import Entity, JSONDict
+from logzen.db import Entity, JSONDict, DAO
 
 
 
 class Stream(Entity):
+    """ The database entity for streams.
+
+        The filter defining the stream is stored as serialized JSON data in the
+        entity.
+    """
+
     __tablename__ = 'streams'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
@@ -51,39 +56,14 @@ class Stream(Entity):
                                nullable=False)
 
 
-    @require(es='logzen.es:Connection')
-    def query(self, query, es):
-        body = {}
 
-        # Add the user filter and the stream filter to the search
-        body.update({
-            'filter': {
-                'and': [
-                    self.filter,
-                    self.user.filter
-                ]
-            }
-        })
-
-        # Add the passed query - if any
-        if query:
-            body.update({
-                'query': query
-            })
-
-        # Execute the search
-        return es.search(body)
-
-
-
-class Streams(object):
-    def __init__(self, session):
-        self.__session = session
-
+class Streams(DAO):
+    """ DAO for accessing stream entities.
+    """
 
     def getStream(self, name):
         try:
-            return self.__session \
+            return self.session \
                 .query(Stream) \
                 .filter(Stream.name == name) \
                 .one()
@@ -93,8 +73,21 @@ class Streams(object):
 
 
     def getStreams(self):
-        return iter(self.__session.query(Stream))
+        """ Returns an iterator over all existing stream entities.
+        """
+
+        return iter(self.session.query(Stream))
 
 
     def createStream(self, name):
-        self.__session.add(Stream(name=name))
+        """ Create a new stream entity.
+
+            All parameters are passed as-is to the entity to create. The
+            created entity is attached to the session and returned.
+        """
+
+        stream = Stream(name=name)
+
+        self.session.add(stream)
+
+        return stream

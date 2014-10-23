@@ -18,10 +18,7 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 """
 
 
-from require import require, singleton
-
-import logzen.users
-import logzen.streams
+from require import require
 
 import logzen.web.frontend
 import logzen.web.api
@@ -29,10 +26,11 @@ import logzen.web.api.db
 import logzen.web.api.auth
 import logzen.web.api.dashboard
 import logzen.web.api.streams
+import logzen.web.api.logs
 import logzen.web.api.user
 
-from logzen.users import User
-from logzen.streams import Stream
+from logzen.db.users import User
+from logzen.db.streams import Stream
 
 
 @require(app='logzen.web:App',

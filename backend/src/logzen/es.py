@@ -29,6 +29,10 @@ from elasticsearch.serializer import JSONSerializer
 
 @export()
 class Connection:
+    """ Connection to ElasticSearch.
+
+        Creates a (pooled) low-level connection to the ElasticSearch cluster.
+    """
     logger = require('logzen.util:Logger')
 
 
@@ -50,6 +54,12 @@ class Connection:
 
     def search(self,
                body):
+        """ Execute a search query.
+
+            The passed query must be a valid ElasticSearch query. This query is
+            passed to the connection with the according index and the result is
+            returned.
+        """
         self.logger.debug('Execute search: %s',
                           JSONSerializer().dumps(body))
 
@@ -59,5 +69,10 @@ class Connection:
 
     def get(self,
             id):
+        """ Fetches an document.
+
+            The document with the passed id is fetched from the according index
+            and is returned.
+        """
         return self.__connection.get(id=id,
                                      index='syslog') #config.system.es.index)

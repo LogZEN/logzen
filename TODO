@@ -1,0 +1,12 @@
+== Backend ==
+* Reintroduce config file.
+* Make database configurable.
+* Make ElasticSearch connection configurable.
+* Make Auth-Token signature configurable.
+* Make logging configurable.
+* Let Auth-Token expire.
+* Introduce session provider to avoid useless session creation.
+* Is there anything in the API which is not restricted? Evaluate and make default.
+* Separate layers: Move all DB modules in db package and extract business functions.
+* Find better way for default database content.
+* Make database schema update-save.

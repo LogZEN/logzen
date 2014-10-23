@@ -15,6 +15,7 @@ define ['jquery', 'knockout'], \
       $.ajax @path,
         type: 'GET'
         accepts: 'json'
+      .then api.done, api.fail
 
     post: (data) ->
       $.ajax @path,
@@ -22,15 +23,22 @@ define ['jquery', 'knockout'], \
         contentType: 'application/json'
         accepts: 'application/json'
         data: ko.toJSON data
+      .then api.done, api.fail
 
     delete: () ->
       $.ajax @path,
         type: 'DELETE'
         accepts: 'application/json'
+      .then api.done, api.fail
 
 
-  return (path) ->
+  api = (path) ->
     return new Resource path
+
+  api.done = []
+  api.fail = []
+
+  return api
 
 
 

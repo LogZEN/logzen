@@ -48,11 +48,12 @@ define ['jquery', 'knockout', 'pager', 'api', 'utils', 'bootstrap'], \
       @authenticated = ko.computed () =>
         @user() != null
 
+
+      api.fail.push (err) =>
+        console.log err
+
       # Try to fetch user information or redirect to login page
       api('user').get()
-      .error (err) =>
-        pager.navigate 'system/login'
-
       .done (res) =>
         # Update the user information
         @user res
@@ -66,11 +67,11 @@ define ['jquery', 'knockout', 'pager', 'api', 'utils', 'bootstrap'], \
         username: username
         password: password
 
-      .error (err) =>
+      .fail (err) =>
         console.error 'Login failed', err
 
       .done (res) =>
-        console.log 'User logged in', res
+        console.log 'User logged in'
 
         # Fetch the user information
         api('user').get()

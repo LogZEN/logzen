@@ -25,11 +25,17 @@ import bottle
 
 @export()
 class SessionPlugin(object):
-    sessions = require('logzen.db:Sessions')
+    """ A bottle plugin creating a session for each request.
+
+        For each incoming request, a sqlalchemy session is created and attached
+        to the requests.
+    """
+
+    sessionFactory = require('logzen.db:SessionFactory')
 
     def apply(self, callback, route):
         def wrapper(*args, **kwargs):
-            setattr(bottle.local, 'session', self.sessions())
+            setattr(bottle.local, 'session', self.sessionFactory())
 
             return callback(*args, **kwargs)
 
@@ -41,14 +47,24 @@ class SessionPlugin(object):
         session='logzen.web.api.db:SessionPlugin')
 def install(api,
             session):
+    """ Installs the session plugin to the API.
+    """
+
     api.install(session)
 
 
 
-@extend('logzen.db:Session')
-def RequestSession(globalSession):
+@extend('logzen.db:SessionProvider')
+def RequestSessionProvider(base):
+    """ Extension providing the request session if it exists.
+
+        The extension provides the request specific session created by the
+        bottle plugin above. If no such session exists (i.e. not called in a
+        bottle request context), the base provider is returned.
+    """
+
     if hasattr(bottle.local, 'session'):
-        return getattr(bottle.local, 'session')
+        return lambda: getattr(bottle.local, 'session')
 
     else:
-        return globalSession
+        return base

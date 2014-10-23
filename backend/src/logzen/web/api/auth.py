@@ -38,7 +38,7 @@ TOKEN_DURATION = 300
 class AuthPlugin():
     logger = require('logzen.util:Logger')
 
-    users = require('logzen.users:Users')
+    users = require('logzen.db.users:Users')
 
 
     def __init__(self):
@@ -125,7 +125,7 @@ def install(api,
 
 @resource('/token', 'POST')
 @require(request='logzen.web.api:Request',
-         users='logzen.users:Users')
+         users='logzen.db.users:Users')
 def login(request,
           users):
     user = users.getVerifiedUser(username=request.json['username'],

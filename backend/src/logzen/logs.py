@@ -20,23 +20,63 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 from require import *
 
 
-@export(elasticsearch='logzen.elasticsearch:Connection')
-class Manager(object):
+@export()
+class Logs(object):
+    """ Service for accessing logs.
+    """
+
     MATCH_ALL = {'match_all': {}}
 
-    def __init__(self,
-                 elasticsearch):
-        self.__elasticsearch = elasticsearch
+    es = require('logzen.es:Connection')
+
+    users = require('logzen.db.users:Users')
+    streams = require('logzen.db.users:Streams')
 
 
     def query(self,
               stream,
-              query=MATCH_ALL):
-        return self.__elasticsearch.query({
-            'query': {
-                'filtered': {
-                    'query': query,
-                    'filter': stream.filter
+              query=None):
+        """ Search for logs using the passed stream and query.
+
+            The returned log list is filtered by the filter assigned to the
+            user owning the stream and by an optional filter assigned to a stream.
+
+            The returned value is the unmodified result of the executed
+            ElasticSearch query.
+        """
+
+        request = {
+        }
+
+        # Add the filters to the request
+        if stream.user.filter and stream.filter:
+            # Create a combined filter using the user filter and stream filter
+            request.update({
+                'filter': {
+                    'and': [
+                        stream.user.filter,
+                        stream.filter
+                    ]
                 }
-            }
-        })
+            })
+
+        elif stream.user.filter:
+            # Use only the user filter
+            request.update({
+                'filter': stream.user.filter
+            })
+
+        elif stream.filter is not None:
+            # Use only the stream filter
+            request.update({
+                'filter': stream.filter
+            })
+
+        # Add the query to the request - if any
+        if query:
+            request.update({
+                'query': query,
+            })
+
+        # Execute the search
+        return self.es.search(request)

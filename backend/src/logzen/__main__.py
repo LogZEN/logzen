@@ -18,7 +18,7 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 """
 
 
-from require import require, singleton
+from require import require
 
 import logzen.web.frontend
 import logzen.web.api

@@ -31,6 +31,9 @@ import logzen.web.api.dashboard
 import logzen.web.api.streams
 import logzen.web.api.user
 
+import logzen.web.api.admin
+import logzen.web.api.admin.user
+
 from logzen.users import User
 from logzen.streams import Stream
 
@@ -42,10 +45,17 @@ def main(app,
     if session \
             .query(User) \
             .count() < 1:
-        user = User(username='admin',
-                    password='admin',
+        admin = User(username='admin',
+                     password='admin',
+                     admin=True,
+                     filter={ 'match_all' : {}})
+        session.add(admin)
+
+        user = User(username='user',
+                    password='user',
                     filter={ 'match_all' : {}})
         session.add(user)
+
 
         stream = Stream(name='everything',
                         user=user,

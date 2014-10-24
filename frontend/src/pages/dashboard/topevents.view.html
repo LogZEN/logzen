@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<!-- widget.topevents -->
+
+<div class="row-fluid dashwidget" id="widget_topevents">
+    <div class="clearfix dashpadded">
+    	<h2 class="inline">Top events</h2>
+    	
+    	<div class="pull-right" style="padding-top: 8px;">
+        <div class="btn-group inline pull-right">
+          <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+              <span>except</span>
+              <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+             <!-- ko foreach: excludeMessages -->
+            <li><a href="javascript:void(0);" data-bind="text: $data, click: $parent.include" class="q_tip" title="Include into list"></a></li>
+            <!-- /ko -->
+          </ul>
+        </div>
+        
+        <div class="btn-group inline pull-right" style="padding-right: 5px;">
+          <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+              <span data-bind="text: rangeSelectedLabel">last 24 hours</span>
+              <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="javascript:void(0);" data-bind="click: updateRange.bind($data, 1)">show last day</a></li>
+            <li><a href="javascript:void(0);" data-bind="click: updateRange.bind($data, 7)">show last week</a></li>
+            <li><a href="javascript:void(0);" data-bind="click: updateRange.bind($data, 30)">show last month</a></li>
+            <li><a href="javascript:void(0);" data-bind="click: updateRange.bind($data, 365)">show last year</a></li>
+          </ul>
+        </div>
+        
+        <div class="btn-group inline pull-right">
+          <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+            <span id="new_events_selector" data-bind="text: severitySelectedLabel"></span>
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="javascript:void(0);" data-bind="click: updateSeverity.bind($data, 1)">Alert and above</a></li>
+            <li><a href="javascript:void(0);" data-bind="click: updateSeverity.bind($data, 2)">Critical and above</a></li>
+            <li><a href="javascript:void(0);" data-bind="click: updateSeverity.bind($data, 3)">Error and above</a></li>
+            <li><a href="javascript:void(0);" data-bind="click: updateSeverity.bind($data, 4)">Warning and above</a></li>
+            <li><a href="javascript:void(0);" data-bind="click: updateSeverity.bind($data, 5)">Notice and above</a></li>
+            <li><a href="javascript:void(0);" data-bind="click: updateSeverity.bind($data, 6)">Info and above</a></li>
+            <li class="divider"></li>
+            <li><a href="javascript:void(0);" data-bind="click: updateSeverity.bind($data, 7)">All severities</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <table class="events widget_table" style="font-size: 8pt; table-layout: fixed;">
+      <thead>
+    		<tr id="first">
+          <th width="50">Count</th>
+          <th>Message</th>
+          <th width="30">&nbsp;</th>
+    		</tr>
+    	</thead>
+    	<tbody id="tbody_content">
+        <!-- ko foreach: events -->
+          <tr>
+            <td class="event text-right" data-bind="text: count"></td>
+            <td class="event" data-bind="text: message, attr: { title: message }" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></td>
+            <td><a href="javascript:void(0);" data-bind="click: $parent.exclude.bind($data, message)" class="q_tip" title="Remove from list"><i class="icon-remove"></i></a></td>
+          </tr>
+        <!-- /ko -->
+        
+        <!--  ko ifnot: events().length -->
+          <tr><td colspan="3" id="noresults" class="text-center">No Events found</td></tr>
+        <!-- /ko -->
+    	</tbody>
+    </table>
+</div>
+

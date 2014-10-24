@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<div class="row">
+    <div class="col-md-4 pull-center">
+        <form class="well form-horizontal">
+            <fieldset>
+                <legend>Please Login</legend>
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-fw fa-user"></i>
+                        </span>
+                        <input class="form-control"
+                               type="text"
+                               placeholder="Username"
+                               name="input_user"
+                               required="required"
+                               data-bind="{ value: username,
+                                            valueUpdate: 'afterkeydown' }">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-fw fa-lock"></i>
+                        </span>
+                        <input class="form-control"
+                               type="password"
+                               placeholder="Password"
+                               name="input_pass"
+                               required="required"
+                               data-bind="{ value: password,
+                                            valueUpdate: 'afterkeydown' }">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <a href="#"
+                       class="btn btn-success btn-primary"
+                       data-bind="{ enable: submitable,
+                          click: login }">
+                        Login
+                    </a>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>

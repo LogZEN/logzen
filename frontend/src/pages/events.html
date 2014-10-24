@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<!-- Tabs menu -->
+<ul class="nav nav-tabs">
+    <!-- ko foreach: $page.children -->
+        <li data-bind="css: { active: isVisible }">
+            <!-- ko ifnot: isVisible -->
+                <a data-bind="text: $data.val('title'),
+                              page-href: $data">
+                </a>
+            <!-- /ko -->
+            <!-- ko if: isVisible -->
+                <span>
+                    <span data-bind="text: $data.val('title')"></span>
+                    <a title="Close Tab"
+                       data-bind="click: $parent.remove.bind(undefined, $data.ctx)">
+                        <i class="fa fa-fw fa-times q_tip"></i>
+                    </a>
+                </span>
+            <!-- /ko -->
+        </li>
+    <!-- /ko -->
+    <li>
+        <a data-bind="click: add"
+           class="btn btn-xs btn-link"
+           style="padding-top: 9px;
+                  padding-bottom: 8px;">
+            <i class="fa fa-fw fa-plus q_tip" title="New Tab"></i>
+        </a>
+    </li>
+</ul>
+
+<!-- Tabs content -->
+<div class="tab-content"
+     data-bind="foreach: tabs">
+    <div class="eventlist"
+         data-bind="page: { id: id,
+                            title: title }">
+
+      <!-- Loading handling -->
+      <div style="display: none;"
+           data-bind="visible: loading"></div>
+
+      <!-- Error handling -->
+      <div class="row"
+           style="display: none;"
+           data-bind="visible: error">
+        <div class="col-md-12">
+          <div class="alert alert-block alert-danger">
+            <strong>Error:</strong>
+            <span data-bind="text: error"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="row">
+        <div class="evlist_nav col-md-12">
+          <span class="eventcount">
+            <!-- ko if: hits() > 0 -->
+              Showing events:
+              <span data-bind="text: page.current"></span>
+              (
+              <span data-bind="text: page.current() * page.size() + 1"></span>
+              -
+              <span data-bind="text: Math.min((page.current() + 1) * page.size(), hits())"></span>
+              )
+            <!-- /ko -->
+          </span>
+          <span class="btn-group">
+            <a class="btn btn-default btn-sm q_tip"
+               title="Newest events"
+               data-bind="click: page.first">
+                First
+            </a>
+            <a class="btn btn-default btn-sm q_tip"
+               title="Newer events"
+               data-bind="click: page.prev">
+                Prev
+            </a>
+            <a class="btn btn-default btn-sm q_tip"
+               title="Older events"
+               data-bind="click: page.next">
+                Next
+            </a>
+            <a class="btn btn-default btn-sm q_tip"
+               title="Oldest events"
+               data-bind="click: page.last">
+                Last
+            </a>
+          </span>
+          <span class="btn-group">
+            <button type="button"
+                    class="btn btn-default btn-sm q_tip"
+                    data-bind="click: execute">
+                Refresh
+            </button>
+            <!-- TODO: Add interval dropdown -->
+            <!-- button type="button"
+                    class="btn btn-sm dropdown-toggle"
+                    data-toggle="dropdown">
+                    data-bind="btn-default"
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu"
+                role="menu">
+              <li>
+                <input type="radio"
+                       name="interval"
+                       value="1000">
+                <label>1 Second</label>
+              </li>
+              <li>
+                <input type="radio"
+                       name="interval"
+                       value="5000">
+                <label>5 Seconds</label>
+              </li>
+              <li>
+                <input type="radio"
+                       name="interval"
+                       value="10000">
+                <label>10 Seconds</label>
+              </li>
+              <li>
+                <input type="radio"
+                       name="interval"
+                       value="30000">
+                <label>30 Seconds</label>
+              </li>
+              <li>
+                <input type="radio"
+                       name="interval"
+                       value="60000">
+                <label>1 Minute</label>
+              </li>
+              <li>
+                <input type="radio"
+                       name="interval"
+                       value="300000">
+                <label>5 Minutes</label>
+              </li>
+              <li class="divider"></li>
+              <li>
+                <input type="radio"
+                       name="interval"
+                       value="0">
+                <label>Disabled</label>
+              </li>
+            </ul -->
+          </span>
+        </div>
+      </div>
+
+      <!-- Graph -->
+      <!--
+      <div class="row-fluid">
+          <div class="span12">
+              <div id="timeSeries"
+                   style="width: 100%">
+                  <svg></svg>
+              </div>
+          </div>
+      </div>
+      -->
+
+      <!-- Content -->
+      <div class="tab-pane active">
+        <div class="row">
+          <div class="col-md-12">
+            <table class="events table-condensed">
+              <thead>
+                <tr>
+                  <th class="column_menu">&nbsp;</th>
+                  <th>Time</th>
+                  <th>Severity</th>
+                  <th>Facility</th>
+                  <th>Host</th>
+                  <th>Program</th>
+                  <th>Message</th>
+                </tr>
+                <tr>
+                  <th class="column_menu">
+                  </th>
+
+                  <th class="input-col">
+                    <input type="text"
+                           name="timereported"
+                           class="form-control input-sm"
+                           placeholder=""
+                           readonly="readonly"/>
+                  </th>
+
+                  <th class="input-col">
+                    <div class="input-group">
+                      <input type="text"
+                             name="severity"
+                             class="form-control input-sm filter"
+                             placeholder="filter"
+                             data-bind="value: filters.severity,
+                                        valueUpdate: 'afterkeydown'"
+                             data-provide="typeahead"
+                             data-items="4"
+                             data-source="['emerge','alert','critical','error','warning','notice','info','debug']" />
+                      <span class="input-group-addon">
+                          <i class="fa fa-fw fa-undo q_tip"
+                             title="Clear this filter"
+                             data-bind="click: clearFilter('severity')"></i>
+                      </span>
+                    </div>
+                  </th>
+
+                  <th class="input-col">
+                    <div class="input-group">
+                      <input type="text"
+                             name="facility"
+                             class="form-control input-sm filter"
+                             placeholder="filter"
+                             data-bind="value: filters.facility,
+                                        valueUpdate: 'afterkeydown'" />
+                      <span class="input-group-addon">
+                          <i class="fa fa-fw fa-undo q_tip"
+                             title="Clear this filter"
+                             data-bind="click: clearFilter('facility')"></i>
+                      </span>
+                    </div>
+                  </th>
+
+                  <th class="input-col">
+                    <div class="input-group">
+                      <input type="text"
+                             name="fromhost"
+                             class="form-control input-sm filter"
+                             placeholder="filter"
+                             data-bind="value: filters.host,
+                                        valueUpdate: 'afterkeydown'" />
+                      <span class="input-group-addon">
+                          <i class="fa fa-fw fa-undo q_tip"
+                             title="Clear this filter"
+                             data-bind="click: clearFilter('host')"></i>
+                      </span>
+                    </div>
+                  </th>
+
+                  <th class="input-col">
+                    <div class="input-group">
+                      <input type="text"
+                             name="program"
+                             class="form-control input-sm filter"
+                             placeholder="filter"
+                             data-bind="value: filters.program,
+                                        valueUpdate: 'afterkeydown'" />
+                      <span class="input-group-addon">
+                          <i class="fa fa-fw fa-undo q_tip"
+                             title="Clear this filter"
+                             data-bind="click: clearFilter('program')"></i>
+                      </span>
+                    </div>
+                  </th>
+
+                  <th class="input-col">
+                    <div class="input-group">
+                      <input type="text"
+                             name="message"
+                             class="form-control input-sm filter"
+                             placeholder="filter"
+                             data-bind="value: filters.message,
+                                        valueUpdate: 'afterkeydown'" />
+                      <span class="input-group-addon">
+                          <i class="fa fa-fw fa-undo q_tip"
+                             title="Clear this filter"
+                             data-bind="click: clearFilter('message')"></i>
+                      </span>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+              <!-- ko foreach: events -->
+                <tr>
+                  <td class="column_menu">
+                    <ul class="nav hover-nav" style="display:inline-block">
+                      <li class="dropdown">
+                      <a class="dropdown-toggle plain" href="#"><i class="fa fa-fw fa-chevron-down"></i></a>
+                        <ul class="dropdown-menu">
+                          <li><a><i class="fa fa-fw fa-info-circle"></i> Display details</a></li>
+                          <li><a href="{{searchengine}}' + encodeURIComponent() + '"><i class="icon-globe"></i> Search with {{searchengine_name}}</a></li>
+                        </ul>
+                      </li>
+                    </ul>
+                    <i class="icon-eye-open event_tooltip" title="<%_id%>"></i>
+                  </td>
+
+                  <td data-bind="text: time"></td>
+                  <td><a data-bind="text: severity_text,
+                                    click: $parent.setFilter('severity'),
+                                    css: { color_emerge: severity == '0',
+                                           color_alert: severity == '1',
+                                           color_critical: severity == '2',
+                                           color_error: severity == '3',
+                                           color_warning: severity == '4',
+                                           color_notice: severity == '5',
+                                           color_info: severity == '6',
+                                           color_debug: severity == '7' }"
+                         class="badge"></a></td>
+                  <td><a data-bind="text: facility_text,
+                                    click: $parent.setFilter('facility')"></a></td>
+                  <td><a data-bind="text: host,
+                                    click: $parent.setFilter('host')"></a></td>
+                  <td><a data-bind="text: program,
+                                    click: $parent.setFilter('program')"></a></td>
+                  <td><a data-bind="html: message_hl,
+                                    click: $parent.setFilter('message')"></a></td>
+                </tr>
+              <!-- /ko -->
+
+              <!--  ko ifnot: events().length -->
+                  <tr>
+                      <td colspan="13"
+                          class="noresults">
+                          No Events
+                      </td>
+                  </tr>
+              <!-- /ko -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>

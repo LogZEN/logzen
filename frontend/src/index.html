@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <title>LogZen</title>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="pragma" content="no-cache">
+  
+  <script type="text/javascript"
+          src="libs/requirejs/require.js"
+          data-main="index.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="libs/normalize-css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="libs/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="libs/bootstrap/dist/css/bootstrap-theme.css">
+  <link rel="stylesheet" type="text/css" href="libs/font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" type="text/css" href="libs/pagerjs/dist/pager.css">
+  <link rel="stylesheet" type="text/css" href="libs/gridster/dist/jquery.gridster.css">
+
+  <link rel="stylesheet" type="text/css" href="index.css">
+</head>
+
+<body>
+  <noscript>
+    <div class="modal" style="display: block;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Javascript required</h4>
+          </div>
+          <div class="modal-body">
+            <p>
+              This Website does not work without Javascript.<br>
+              Please activate Javascript in your browser or move along.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <a target="_blank" href="http://www.enable-javascript.com" class="btn btn-primary">Need Help? - Klick here</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </noscript>
+  
+  <!-- Menu bar -->
+  <header class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button"
+                class="navbar-toggle"
+                data-toggle="collapse"
+                data-target="#mainmenu">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand"
+           href="/">
+          LogZen
+        </a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="mainmenu"><ul class="nav navbar-nav pull-right">
+          <!-- ko if: authenticated -->
+          <li><a data-bind="page-href: 'dashboard'">Dashboard</a></li>
+          <li><a data-bind="page-href: 'events'">Events</a></li>
+
+            <li class="divider-vertical"></li>
+
+            <li class="dropdown">
+              <a href="#"
+                 class="dropdown-toggle"
+                 data-toggle="dropdown">
+                More
+                <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a data-bind="page-href: 'system/help'">Help</a></li>
+                <li><a data-bind="page-href: 'system/about'">About</a></li>
+                <li class="divider"></li>
+                <li><a data-bind="page-href: 'system/adduser'">Add User</a></li>
+                <li class="divider"></li>
+                <li><a data-bind="click: logout">Logout</a></li>
+              </ul>
+            </li>
+            <li class="divider-vertical"></li>
+            <li class="navbar-text"
+              data-bind="text: '00:00'">
+            </li>
+          <!-- /ko -->
+
+          <!-- ko ifnot: authenticated -->
+            <li><a data-bind="page-href: 'system/login'">Login</a></li>
+            <li class="divider-vertical navbar-text"></li>
+            <li><a data-bind="page-href: 'system/help'">Help</a></li>
+            <li><a data-bind="page-href: 'system/about'">About</a></li>
+          <!-- /ko -->
+        </ul>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- page content -->
+  <div id="main">
+      <div data-bind="page: { id: 'dashboard',
+                              title: 'Dashboard',
+                              sourceOnShow: requireHTML('dashboard'),
+                              withOnShow: requireVM('dashboard'),
+                              role: 'start',
+                              guard: guard }"
+           style="overflow: hidden;"></div>
+      
+      <div data-bind="page: { id: 'events',
+                              title: 'Events',
+                              sourceOnShow: requireHTML('events'),
+                              withOnShow: requireVM('events'),
+                              guard: guard }"></div>
+
+      <!-- Other pages -->
+      <div data-bind="page: { id: 'system' }">
+        <div data-bind="page: { id: 'help',
+                                title: 'Help',
+                                sourceOnShow: requireHTML('help') }"></div>
+        <div data-bind="page: { id: 'about',
+                                title: 'About',
+                                sourceOnShow: requireHTML('about') }"></div>
+        <div data-bind="page: { id: 'adduser',
+                                title: 'Add User',
+                                sourceOnShow: requireHTML('adduser'),
+                                guard: guard }"></div>
+        <div data-bind="page: { id: 'login',
+                                title: 'Login',
+                                sourceOnShow: requireHTML('login'),
+                                withOnShow: requireVM('login') }"></div>
+      </div>
+
+      <!-- Catch all page for incorrect URLs -->
+      <div data-bind="page: { id: '?',
+                              title: 'Page not found',
+                              sourceOnShow: '404.html' }"></div>
+  </div>
+  
+</body>
+</html>

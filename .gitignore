@@ -1,3 +1,14 @@
 .project
 .pydevproject
-*.pyc
+
+.idea
+*.iml
+
+/backend/src/**/*.pyc
+/backend/src/**/__pycache__
+
+/frontend/build
+/frontend/bower_components
+/frontend/node_modules
+/frontend/src/**/*.js
+

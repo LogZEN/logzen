@@ -24,27 +24,24 @@ from logzen.db.streams import Stream
 
 
 @require(app='logzen.web:App',
-         session='logzen.db:Session')
+         session='logzen.db:Session',
+         users='logzen.db.users:Users')
 def main(app,
-         session):
+         session,
+         users):
     if session \
             .query(User) \
             .count() < 1:
-        admin = User(username='admin',
-                     password='admin',
-                     admin=True,
-                     filter={ 'match_all' : {}})
-        session.add(admin)
+        admin = users.createUser(username='admin',
+                                 password='admin',
+                                 admin=True)
+        admin.streams.set(Stream(name='everything',
+                                 filter={'match_all': {}}))
 
-        user = User(username='user',
-                    password='user',
-                    filter={ 'match_all' : {}})
-        session.add(user)
-
-        stream = Stream(name='everything',
-                        user=user,
-                        filter={ 'match_all' : {}})
-        session.add(stream)
+        user = users.createUser(username='user',
+                                password='user')
+        user.streams.set(Stream(name='everything',
+                                filter={'match_all': {}}))
 
     session.commit()
 

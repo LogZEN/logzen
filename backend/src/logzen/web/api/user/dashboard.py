@@ -22,7 +22,7 @@ from require import *
 import uuid
 import bottle
 
-from logzen.web.api import resource
+from logzen.web.api.user import resource
 
 
 dashboard = {

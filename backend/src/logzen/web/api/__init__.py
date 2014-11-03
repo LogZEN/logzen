@@ -64,3 +64,10 @@ def Request():
 def Response():
     return bottle.response
 
+
+
+import logzen.web.api.db
+import logzen.web.api.schema
+import logzen.web.api.auth
+import logzen.web.api.user
+import logzen.web.api.admin

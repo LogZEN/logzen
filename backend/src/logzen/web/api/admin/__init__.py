@@ -63,3 +63,6 @@ def resource(path,
         return adminapi.route(path, methods, wrapped)
     return extender
 
+
+
+import logzen.web.api.admin.users

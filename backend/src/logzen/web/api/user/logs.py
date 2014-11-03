@@ -20,8 +20,7 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 import bottle
 
 from require import *
-from logzen.web.api import resource
-from logzen.web.api.auth import restricted
+from logzen.web.api.user import resource
 
 
 

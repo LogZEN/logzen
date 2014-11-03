@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
 from require import *
 from logzen.web.api import resource
 from logzen.web.api.auth import restricted
@@ -29,3 +28,8 @@ from logzen.web.api.auth import restricted
 def get(user):
     return {'username': user.username}
 
+
+import logzen.web.api.user.account
+import logzen.web.api.user.dashboard
+import logzen.web.api.user.streams
+import logzen.web.api.user.logs

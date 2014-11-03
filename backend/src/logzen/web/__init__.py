@@ -22,6 +22,7 @@ from require import *
 import bottle
 
 
+
 @export()
 def App():
     # Create a new bottle application
@@ -40,3 +41,8 @@ def route(path,
         return app.route(path, methods, func)
 
     return extender
+
+
+
+import logzen.web.frontend
+import logzen.web.api

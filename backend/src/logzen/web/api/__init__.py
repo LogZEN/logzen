@@ -29,7 +29,17 @@ def Api(app):
     api = bottle.Bottle()
 
     # Avoid fancy error pages for the API
-    api.default_error_handler = lambda res: str(res.body)
+    @require(logger='logzen.util:Logger')
+    def error_handler(response,
+                      logger):
+        logger.error('Error occurred: %s - %s',
+                     response.status_line,
+                     response.exception)
+
+        # Return the error message as response
+        return str(response.body)
+
+    api.default_error_handler = error_handler
 
     # Mount the API application to the root application
     app.mount('/api/v1',
@@ -40,16 +50,17 @@ def Api(app):
 
 
 def resource(path,
-             methods='GET'):
+             method='GET',
+             **config):
     @require(api='logzen.web.api:Api',
              logger='logzen.util:Logger')
     def extender(func,
                  api,
                  logger):
         logger.debug('Register API resource: %s %s -> %s',
-                     path, methods, func)
+                     path, method, func)
 
-        return api.route(path, methods, func)
+        return api.route(path, method, func, **config)
     return extender
 
 
@@ -64,3 +75,10 @@ def Request():
 def Response():
     return bottle.response
 
+
+
+import logzen.web.api.db
+import logzen.web.api.schema
+import logzen.web.api.auth
+import logzen.web.api.user
+import logzen.web.api.admin

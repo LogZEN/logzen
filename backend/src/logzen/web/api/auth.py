@@ -17,25 +17,23 @@ You should have received a copy of the GNU General Public License
 along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from require import *
-
-from logzen.web.api import resource
-
-import bottle
-
-import itsdangerous
-
 import functools
 
+import bottle
+import itsdangerous
+
+from require import *
+from logzen.web.api import resource
 
 
 TOKEN_COOKIE = 'logzen.auth'
 TOKEN_DURATION = 300
 
 
-
 @export()
 class AuthPlugin():
+    api = 2
+
     logger = require('logzen.util:Logger')
 
     users = require('logzen.db.users:Users')
@@ -81,6 +79,7 @@ class AuthPlugin():
 
                 self.logger.debug('User entry found: %s', user)
 
+                # Assign the user to the request
                 setattr(bottle.local, 'user', user)
 
             # Call the original route
@@ -106,13 +105,14 @@ class AuthPlugin():
                 # Pass the token to the client
                 bottle.response.set_cookie(name=TOKEN_COOKIE,
                                            value=token,
-                                           path='/api/v1',
-                                           max_age=TOKEN_DURATION)
+                                           path='/api/v1')
+
+            # Avoid inter-request interference
+            delattr(bottle.local, 'user')
 
             return body
 
         return wrapper
-
 
 
 @extend('logzen.web.api:Api',
@@ -122,20 +122,23 @@ def install(api,
     api.install(auth)
 
 
-
-@resource('/token', 'POST')
+@resource('/token', 'POST',
+          schema={'type': 'object',
+                  'properties': {'username': {'type': 'string'},
+                                 'password': {'type': 'string'}},
+                  'required': ['username',
+                               'password']})
 @require(request='logzen.web.api:Request',
          users='logzen.db.users:Users')
 def login(request,
           users):
-    user = users.getVerifiedUser(username=request.json['username'],
-                                 password=request.json['password'])
+    user = users.getVerifiedUser(**request.data)
+
     if user is None:
         raise bottle.HTTPError(401, 'Wrong username or password')
 
     # Set the user to the request - letting the after-request hook do the signing
     setattr(bottle.local, 'user', user)
-
 
 
 @resource('/token', 'DELETE')
@@ -144,24 +147,26 @@ def logout():
     delattr(bottle.local, 'user')
 
 
-
 @export(oneshot)
 def User():
     return getattr(bottle.local, 'user', None)
 
 
+def restricted(func, verify):
+    ''' Restricts access to a function.
 
-def restricted():
-    def wrapper(func):
-        @functools.wraps(func)
-        def wrapped(*args, **kwargs):
-            # Raise error, if the request is not authorized
-            if getattr(bottle.local, 'user', None) is None:
-                raise bottle.HTTPError(401, 'Authentication required')
+        The function can be accessed iff the current user passes verification.
+    '''
 
-            # Call the decorated function
-            return func(*args,
-                        **kwargs)
+    @functools.wraps(func)
+    @require(user='logzen.web.api.auth:User')
+    def wrapped(user, *args, **kwargs):
+        # Raise error, if the request is not authorized
+        if not verify(user):
+            raise bottle.HTTPError(401, 'Authentication required')
 
-        return wrapped
-    return wrapper
+        # Call the decorated function
+        return func(*args,
+                    **kwargs)
+
+    return wrapped

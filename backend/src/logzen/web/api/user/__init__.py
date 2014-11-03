@@ -17,15 +17,44 @@ You should have received a copy of the GNU General Public License
 along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
 from require import *
-from logzen.web.api import resource
+
 from logzen.web.api.auth import restricted
 
 
-@resource('/user', 'GET')
-@restricted()
+def resource(path,
+             methods='GET',
+             **config):
+    path = '/user' + path
+
+    @require(api='logzen.web.api:Api',
+             logger='logzen.util:Logger')
+    def extender(func,
+                 api,
+                 logger):
+        logger.debug('Register User API resource: %s %s -> %s',
+                     path, methods, func)
+
+        # Restrict access to users
+        func = restricted(func,
+                          lambda user: user is not None)
+
+        # Define the route
+        return api.route(path,
+                         methods,
+                         func,
+                         **config)
+
+    return extender
+
+
+@resource('', 'GET')
 @require(user='logzen.web.api.auth:User')
 def get(user):
     return {'username': user.username}
 
+
+import logzen.web.api.user.account
+import logzen.web.api.user.dashboard
+import logzen.web.api.user.streams
+import logzen.web.api.user.logs

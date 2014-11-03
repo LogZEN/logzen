@@ -191,12 +191,12 @@ class AdminApiTestCase(ApiTestCase):
         assert_that(resp.data, is_(b'Authentication required'))
 
 
-class UsersAdminApiTestCase(ApiTestCase):
+class AdminUsersApiTestCase(ApiTestCase):
     users = require('logzen.db.users:Users')
 
 
     def setUp(self):
-        super(UsersAdminApiTestCase, self).setUp()
+        super(AdminUsersApiTestCase, self).setUp()
 
         with session():
             self.admin = self.users.createUser(username='admin',

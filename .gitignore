@@ -7,6 +7,9 @@
 /backend/src/**/*.pyc
 /backend/src/**/__pycache__
 
+/backend/tests/**/*.pyc
+/backend/tests/**/__pycache__
+
 /frontend/build
 /frontend/bower_components
 /frontend/node_modules

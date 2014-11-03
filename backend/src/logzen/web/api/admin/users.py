@@ -27,44 +27,60 @@ from logzen.db import session
 @resource('/users', 'GET')
 @require(users='logzen.db.users:Users')
 def list(users):
-    return {user.id: {'username': user.username}
+    return {user.username: {'username': user.username,
+                            'admin': user.admin}
             for user
             in users.getUsers()}
 
 
 @resource('/users/<name>', 'GET')
-@require(users='logzen.db.users:Users',
-         request='logzen.web.api:Request')
+@require(users='logzen.db.users:Users')
 def get(name,
-        users,
-        request):
+        users):
     try:
         user = users.getUser(name)
 
-        return {'id': user.id,
-                'username': user.username,
+        return {'username': user.username,
                 'admin': user.admin}
 
     except KeyError:
         raise bottle.HTTPError(404, 'User not found: %s' % name)
 
-    return stream.query(request.body)
 
-
-@resource('/users/<name>', 'PUT')
+@resource('/users', 'POST',
+          schema={'type': 'object',
+                  'properties': {'username': {'type': 'string'},
+                                 'password': {'type': 'string'},
+                                 'admin': {'type': 'boolean'}},
+                  'required': ['username',
+                               'password']})
 @require(users='logzen.db.users:Users',
          request='logzen.web.api:Request')
-def delete(name,
+def create(users,
+           request):
+    with session():
+        users.createUser(**request.data)
+
+
+@resource('/users/<name>', 'PUT',
+          schema={'type': 'object',
+                  'properties': {'username': {'type': 'string'},
+                                 'password': {'type': 'string'},
+                                 'admin': {'type': 'boolean'}},
+                  'required': ['username',
+                               'password']})
+@require(users='logzen.db.users:Users',
+         request='logzen.web.api:Request')
+def update(name,
            users,
            request):
-    try:
-        user = users.getUser(name)
-
-    except KeyError:
-        raise bottle.HTTPError(404, 'User not found: %s' % name)
-
     with session():
-        user.__init__(**request.json)
+        try:
+            user = users.getUser(name)
+            user.__init__(**request.data)
+
+        except KeyError:
+            raise bottle.HTTPError(404, 'User not found: %s' % name)
 
 
 @resource('/users/<name>', 'DELETE')
@@ -72,14 +88,10 @@ def delete(name,
 def delete(name,
            users):
     with session():
-        users.deleteUser(name)
+        try:
+            user = users.getUser(name)
+            users.deleteUser(user)
 
-
-@resource('/users', 'POST')
-@require(users='logzen.db.users:Users',
-         request='logzen.web.api:Request')
-def create(users,
-           request):
-    with session():
-        users.createUser(**request.json)
+        except KeyError:
+            raise bottle.HTTPError(404, 'User not found: %s' % name)
 

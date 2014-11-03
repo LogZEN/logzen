@@ -25,7 +25,6 @@ from logzen.web.api.user import resource
 
 
 @resource('/logs/<stream>', ['GET', 'POST'])
-@restricted()
 @require(user='logzen.web.api.auth:User',
          request='logzen.web.api:Request',
          logs='logzen.logs:Logs')

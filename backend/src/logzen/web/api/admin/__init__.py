@@ -19,48 +19,31 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 
 from require import *
 
+from logzen.web.api.auth import restricted
+
 import bottle
-import functools
-
-
-
-@export(api='logzen.web.api:Api')
-def AdminApi(api):
-    # Generate a new bottle application containing the API
-    adminapi = bottle.Bottle()
-
-    # Avoid fancy error pages for the API
-    adminapi.default_error_handler = lambda res: str(res.body)
-
-    # Mount the API application to the root application
-    api.mount('/admin',
-              adminapi)
-
-    return adminapi
 
 
 def resource(path,
-             methods='GET'):
-    @require(adminapi='logzen.web.api.admin:AdminApi',
+             method='GET',
+             **config):
+    @require(api='logzen.web.api:Api',
              logger='logzen.util:Logger')
     def extender(func,
-                 adminapi,
+                 api,
                  logger):
         logger.debug('Register Admin API resource: %s %s -> %s',
-                     path, methods, func)
+                     path, method, func)
 
-        @functools.wraps(func)
-        def wrapped(*args, **kwargs):
-            # Raise error, if the request is not authorized
-            user = getattr(bottle.local, 'user', None)
-            if user is None or not user.admin:
-                raise bottle.HTTPError(401, 'Authentication required')
+        # Restrict access to admin users only
+        func = restricted(func,
+                          lambda user: user is not None and user.admin)
 
-            # Call the decorated function
-            return func(*args,
-                        **kwargs)
-
-        return adminapi.route(path, methods, wrapped)
+        # Define the route
+        return api.route('/admin' + path,
+                         method,
+                         func,
+                         **config)
     return extender
 
 

@@ -50,16 +50,17 @@ def Api(app):
 
 
 def resource(path,
-             methods='GET'):
+             method='GET',
+             **config):
     @require(api='logzen.web.api:Api',
              logger='logzen.util:Logger')
     def extender(func,
                  api,
                  logger):
         logger.debug('Register API resource: %s %s -> %s',
-                     path, methods, func)
+                     path, method, func)
 
-        return api.route(path, methods, func)
+        return api.route(path, method, func, **config)
     return extender
 
 

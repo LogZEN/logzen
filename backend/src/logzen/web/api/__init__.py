@@ -29,7 +29,17 @@ def Api(app):
     api = bottle.Bottle()
 
     # Avoid fancy error pages for the API
-    api.default_error_handler = lambda res: str(res.body)
+    @require(logger='logzen.util:Logger')
+    def error_handler(response,
+                      logger):
+        logger.error('Error occurred: %s - %s',
+                     response.status_line,
+                     response.exception)
+
+        # Return the error message as response
+        return str(response.body)
+
+    api.default_error_handler = error_handler
 
     # Mount the API application to the root application
     app.mount('/api/v1',

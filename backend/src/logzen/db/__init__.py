@@ -64,8 +64,7 @@ def Engine():
 
     # Create the engine instance
     engine = sqlalchemy.create_engine('sqlite:///',
-                                      pool_size=20,
-                                      echo=True)
+                                      pool_size=20)
 
     # Create / update the schema
     Entity.metadata.create_all(engine)

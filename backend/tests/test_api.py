@@ -13,6 +13,24 @@ from logzen.db import session
 
 
 
+@extend('logzen.config:ConfigFile')
+def TestConfigFile(file):
+    from configparser import ConfigParser
+
+    config_file = ConfigParser()
+    config_file.add_section('db')
+    config_file.add_section('es')
+    config_file.add_section('auth')
+    config_file.add_section('log')
+
+    config_file.set('db', 'url', 'sqlite:///')
+    config_file.set('es', 'hosts', '')
+    config_file.set('log', 'level', 'DEBUG')
+
+    return config_file
+
+
+
 @export(engine='logzen.db:Engine')
 def TestConnection(engine):
     return engine.connect()
@@ -75,6 +93,7 @@ class AuthenticationApiTestCase(ApiTestCase):
                                                  'password': 'admin'}))
 
         assert_that(resp.status_code, is_(200))
+
         assert_that(resp.data, is_(empty()))
 
 

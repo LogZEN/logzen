@@ -28,8 +28,17 @@ import json
 import contextlib
 
 
-Entity = sqlalchemy.ext.declarative.declarative_base()
+@extend('logzen.config:ConfigDecl')
+def DatabaseConfigDecl(config_decl):
+    with config_decl('db') as section_decl:
+        section_decl('url')
 
+        section_decl('pool_size',
+                     conv=int,
+                     default=10)
+
+
+Entity = sqlalchemy.ext.declarative.declarative_base()
 
 
 class JSONDict(sqlalchemy.types.TypeDecorator):
@@ -54,8 +63,8 @@ class JSONDict(sqlalchemy.types.TypeDecorator):
 
 
 
-@export()
-def Engine():
+@export(config='logzen.config:Config')
+def Engine(config):
     """ The sqlalchemy engine.
 
         The configured database is populated with the whole schema during
@@ -63,8 +72,8 @@ def Engine():
     """
 
     # Create the engine instance
-    engine = sqlalchemy.create_engine('sqlite:///',
-                                      pool_size=20)
+    engine = sqlalchemy.create_engine(config.db.url,
+                                      pool_size=config.db.pool_size)
 
     # Create / update the schema
     Entity.metadata.create_all(engine)

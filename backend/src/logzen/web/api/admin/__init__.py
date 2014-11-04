@@ -17,35 +17,20 @@ You should have received a copy of the GNU General Public License
 along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from require import *
-
+from logzen.web.api import resource as api_resource
 from logzen.web.api.auth import restricted
-
-import bottle
 
 
 def resource(path,
              method='GET',
              **config):
-    @require(api='logzen.web.api:Api',
-             logger='logzen.util:Logger')
-    def extender(func,
-                 api,
-                 logger):
-        logger.debug('Register Admin API resource: %s %s -> %s',
-                     path, method, func)
+    def wrapper(func):
+        return api_resource('/admin' + path,
+                            method,
+                            **config)(restricted(func,
+                                                 lambda user: user is not None and user.admin))
 
-        # Restrict access to admin users only
-        func = restricted(func,
-                          lambda user: user is not None and user.admin)
-
-        # Define the route
-        return api.route('/admin' + path,
-                         method,
-                         func,
-                         **config)
-    return extender
-
+    return wrapper
 
 
 import logzen.web.api.admin.users

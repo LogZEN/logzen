@@ -23,8 +23,8 @@ import bottle
 
 
 
-@export(app='logzen.web:App')
-def Api(app):
+@export()
+def Api():
     # Generate a new bottle application containing the API
     api = bottle.Bottle()
 
@@ -41,26 +41,34 @@ def Api(app):
 
     api.default_error_handler = error_handler
 
+    return api
+
+
+
+@extend('logzen.web:App',
+        api='logzen.web.api:Api')
+def install(app,
+            api):
     # Mount the API application to the root application
     app.mount('/api/v1',
               api)
-
-    return api
 
 
 
 def resource(path,
              method='GET',
              **config):
-    @require(api='logzen.web.api:Api',
-             logger='logzen.util:Logger')
-    def extender(func,
-                 api,
-                 logger):
-        logger.debug('Register API resource: %s %s -> %s',
-                     path, method, func)
+    def extender(func):
+        @extend('logzen.web.api:Api',
+                logger='logzen.util:Logger')
+        def extension(api,
+                      logger):
+            logger.debug('Register API resource: %s %s -> %s',
+                         path, method, func)
 
-        return api.route(path, method, func, **config)
+            api.route(path, method, func, **config)
+
+        return func
     return extender
 
 

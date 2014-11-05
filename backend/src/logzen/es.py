@@ -23,7 +23,24 @@ from elasticsearch import Elasticsearch
 from elasticsearch.connection import Urllib3HttpConnection
 from elasticsearch.serializer import JSONSerializer
 
-# from logzen.xconfig import config
+
+
+@extend('logzen.config:ConfigDecl')
+def ElasticsearchConfigDecl(config_decl):
+    with config_decl('es') as section_decl:
+        # The hosts running elasticsearch
+        section_decl('hosts')
+
+        # The username / password used to authenticate on the elasticsearch
+        # cluster
+        section_decl('username',
+                     default=None)
+        section_decl('password',
+                     default=None)
+
+        # The index containing the syslog messages
+        section_decl('index',
+                     default='syslog')
 
 
 
@@ -33,22 +50,21 @@ class Connection:
 
         Creates a (pooled) low-level connection to the ElasticSearch cluster.
     """
+
     logger = require('logzen.util:Logger')
+
+    config = require('logzen.config:Config')
 
 
     def __init__(self):
-        servers = ['localhost'] #[value for key, value in config.system.es if key.startswith('server_')]
-
-        username = None #config.system.es['username']
-        password = None #config.system.es['password']
-
-        if username and password:
-            auth = (username, password)
+        if self.config.es.username and self.config.es.password:
+            auth = (self.config.es.username,
+                    self.config.es.password)
 
         else:
             auth = None
 
-        self.__connection = Elasticsearch(servers,
+        self.__connection = Elasticsearch(self.config.es.host,
                                           connection_class=Urllib3HttpConnection,
                                           http_auth=auth)
 
@@ -64,15 +80,4 @@ class Connection:
                           JSONSerializer().dumps(body))
 
         return self.__connection.search(body=body,
-                                        index='syslog') #config.system.es.index)
-
-
-    def get(self,
-            id):
-        """ Fetches an document.
-
-            The document with the passed id is fetched from the according index
-            and is returned.
-        """
-        return self.__connection.get(id=id,
-                                     index='syslog') #config.system.es.index)
+                                        index=self.config.es.index)

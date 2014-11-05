@@ -22,6 +22,7 @@ from require import *
 import bottle
 
 
+
 @export()
 def App():
     # Create a new bottle application
@@ -29,14 +30,22 @@ def App():
 
 
 def route(path,
-          methods='GET'):
-    @require(app='logzen.web:App',
-             logger='logzen.util:Logger')
-    def extender(func,
-                 app, logger):
-        logger.debug('Register route: %s %s -> %s',
-                     path, methods, func)
+          method='GET',
+          **config):
+    def extender(func):
+        @extend('logzen.web:App',
+                logger='logzen.util:Logger')
+        def extension(app,
+                      logger):
+            logger.debug('Register route: %s %s -> %s',
+                         path, method, func)
 
-        return app.route(path, methods, func)
+            app.route(path, method, func, **config)
 
+        return func
     return extender
+
+
+
+import logzen.web.frontend
+import logzen.web.api

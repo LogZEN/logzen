@@ -1,0 +1,12 @@
+[db]
+url=sqlite:///
+
+[es]
+hosts='localhost'
+
+[log]
+level=DEBUG
+
+[auth]
+key=h4ckm3
+expire=6000

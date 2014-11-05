@@ -17,20 +17,28 @@ You should have received a copy of the GNU General Public License
 along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from logzen.web.api import resource as api_resource
-from logzen.web.api.auth import restricted
+import bottle
+
+from require import *
+from logzen.web.api.user import resource
 
 
-def resource(path,
-             method='GET',
-             **config):
-    def wrapper(func):
-        return api_resource('/admin' + path,
-                            method,
-                            **config)(restricted(func,
-                                                 lambda user: user is not None and user.admin))
 
-    return wrapper
+@resource('/logs/<stream>', ['GET', 'POST'])
+@require(user='logzen.web.api.auth:User',
+         request='logzen.web.api:Request',
+         logs='logzen.logs:Logs')
+def query(name,
+          user,
+          request,
+          logs):
+    # Resolve the stream entity
+    try:
+        stream = user.streams[name]
 
+    except KeyError:
+        raise bottle.HTTPError(404, 'Stream not found: %s' % name)
 
-import logzen.web.api.admin.users
+    # Execute the query and return the result
+    return logs.query(stream=stream,
+                      query=request.json)

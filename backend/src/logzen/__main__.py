@@ -17,46 +17,31 @@ You should have received a copy of the GNU General Public License
 along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 from require import require
-
-import logzen.web.frontend
-import logzen.web.api
-import logzen.web.api.db
-import logzen.web.api.auth
-import logzen.web.api.dashboard
-import logzen.web.api.streams
-import logzen.web.api.logs
-import logzen.web.api.user
-import logzen.web.api.admin
-import logzen.web.api.admin.user
 
 from logzen.db.users import User
 from logzen.db.streams import Stream
 
 
 @require(app='logzen.web:App',
-         session='logzen.db:Session')
+         session='logzen.db:Session',
+         users='logzen.db.users:Users')
 def main(app,
-         session):
+         session,
+         users):
     if session \
             .query(User) \
             .count() < 1:
-        admin = User(username='admin',
-                     password='admin',
-                     admin=True,
-                     filter={ 'match_all' : {}})
-        session.add(admin)
+        admin = users.createUser(username='admin',
+                                 password='admin',
+                                 admin=True)
+        admin.streams.set(Stream(name='everything',
+                                 filter={'match_all': {}}))
 
-        user = User(username='user',
-                    password='user',
-                    filter={ 'match_all' : {}})
-        session.add(user)
-
-        stream = Stream(name='everything',
-                        user=user,
-                        filter={ 'match_all' : {}})
-        session.add(stream)
+        user = users.createUser(username='user',
+                                password='user')
+        user.streams.set(Stream(name='everything',
+                                filter={'match_all': {}}))
 
     session.commit()
 

@@ -75,7 +75,8 @@ class User(Entity):
                               default=False)
 
     filter = sqlalchemy.Column(JSONDict,
-                               nullable=False)
+                               nullable=True,
+                               default=None)
 
     streams = sqlalchemy.orm.relationship('Stream',
                                           collection_class=sqlalchemy.orm.collections.attribute_mapped_collection('name'),
@@ -137,25 +138,13 @@ class Users(DAO):
         return iter(self.session.query(User))
 
 
-    def deleteUser(self, username):
-        try:
-            user = self.session \
-                    .query(User) \
-                    .filter(User.username == username) \
-                    .one()
-
-            self.session.delete(user)
-
-        except sqlalchemy.orm.exc.ObjectDeletedError:
-            raise KeyError(username)
-
-
     def createUser(self, **kwargs):
-        try:
-            user = User(**kwargs)
-            self.session.add(user)
+        user = User(**kwargs)
 
-            return user
+        self.session.add(user)
 
-        except:
-            raise
+        return user
+
+
+    def deleteUser(self, user):
+        self.session.delete(user)

@@ -20,27 +20,28 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 import bottle
 
 from require import *
-from logzen.web.api import resource
-from logzen.web.api.auth import restricted
+from logzen.web.api.user import resource
 
 
+@resource('/streams', 'GET')
+@require(user='logzen.web.api.auth:User')
+def list(user):
+    return {key: {'name': stream.name,
+                  'description': stream.description}
+            for key, stream
+            in user.streams.items()}
 
-@resource('/logs/<stream>', ['GET', 'POST'])
-@restricted()
-@require(user='logzen.web.api.auth:User',
-         request='logzen.web.api:Request',
-         logs='logzen.logs:Logs')
-def query(name,
-          user,
-          request,
-          logs):
-    # Resolve the stream entity
+
+@resource('/streams/<name>', 'GET')
+@require(user='logzen.web.api.auth:User')
+def get(name,
+        user):
     try:
         stream = user.streams[name]
 
     except KeyError:
         raise bottle.HTTPError(404, 'Stream not found: %s' % name)
 
-    # Execute the query and return the result
-    return logs.query(stream=stream,
-                      query=request.json)
+    return {'name': stream.name,
+            'description': stream.description,
+            'filter': stream.filter}

@@ -28,8 +28,17 @@ import json
 import contextlib
 
 
-Entity = sqlalchemy.ext.declarative.declarative_base()
+@extend('logzen.config:ConfigDecl')
+def DatabaseConfigDecl(config_decl):
+    with config_decl('db') as section_decl:
+        section_decl('url')
 
+        section_decl('pool_size',
+                     conv=int,
+                     default=10)
+
+
+Entity = sqlalchemy.ext.declarative.declarative_base()
 
 
 class JSONDict(sqlalchemy.types.TypeDecorator):
@@ -54,8 +63,8 @@ class JSONDict(sqlalchemy.types.TypeDecorator):
 
 
 
-@export()
-def Engine():
+@export(config='logzen.config:Config')
+def Engine(config):
     """ The sqlalchemy engine.
 
         The configured database is populated with the whole schema during
@@ -63,9 +72,8 @@ def Engine():
     """
 
     # Create the engine instance
-    engine = sqlalchemy.create_engine('sqlite:///',
-                                      pool_size=20,
-                                      echo=True)
+    engine = sqlalchemy.create_engine(config.db.url,
+                                      pool_size=config.db.pool_size)
 
     # Create / update the schema
     Entity.metadata.create_all(engine)
@@ -73,53 +81,27 @@ def Engine():
     return engine
 
 
+
 @export(engine='logzen.db:Engine')
 def SessionFactory(engine):
-    """ The sqlalchemy session factory.
+    """ Returns the factory used to create new sessions.
 
-        This factory can be used to create new sessions by calling it. The
-        returned session is bound to the engine and ready to use.
+        By default, a new session is created on each request.
     """
 
-    sessions = sqlalchemy.orm.sessionmaker()
-    sessions.configure(bind=engine)
-
-    return sessions
+    return sqlalchemy.orm.sessionmaker(bind=engine)
 
 
 
-@export(oneshot,
-        factory='logzen.db:SessionFactory',
-        logger='logzen.util:Logger')
-def SessionProvider(factory,
-                    logger):
-    """ Provider to access a session..
+@export(scope=oneshot,
+        sessionFactory='logzen.db:SessionFactory')
+def Session(sessionFactory):
+    """ Returns a session.
 
-        The default implementation returns a new session each time.
-
-        This export exists to be extended by session providers allowing to
-        implement session scoping.
+        A session is acquired using the session factory on each request.
     """
 
-    logger.debug('Providing onehsot session')
-
-    return factory
-
-
-
-@export(oneshot,
-        provider='logzen.db:SessionProvider',
-        logger='logzen.util:Logger')
-def Session(provider,
-            logger):
-    """ The current session.
-    """
-
-    session = provider()
-
-    logger.debug('Using session:%s from provider: %s', session, provider)
-
-    return session
+    return sessionFactory()
 
 
 

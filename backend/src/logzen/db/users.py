@@ -24,33 +24,11 @@ from logzen.db import Entity, JSONDict, DAO
 import sqlalchemy
 import sqlalchemy.types
 import sqlalchemy.orm.exc
+
 from sqlalchemy.orm import validates
 
-import hashlib
+from sqlalchemy_utils.types.password import PasswordType, Password
 
-
-class Password(sqlalchemy.types.TypeDecorator):
-    """ A sqlalchemy type wrapper storing an password in a secured.
-
-        The password is hashed while setting the value. A 'decryption' is not
-        possible.
-
-        In addition to stored values, literals are hashed in the same way
-        allowing comparison of passwords.
-    """
-
-    # TODO: Use passlib to store a salt
-
-    impl = sqlalchemy.String
-
-    def process_bind_param(self, value, dialect):
-        if value is not None:
-            return hashlib.sha512(value.encode('utf8')).hexdigest()
-
-
-    def process_literal_param(self, value, dialect):
-        if value is not None:
-            return hashlib.sha512(value.encode('utf8')).hexdigest()
 
 
 class User(Entity):
@@ -68,7 +46,7 @@ class User(Entity):
                                  nullable=False,
                                  unique=True)
 
-    password = sqlalchemy.Column(Password,
+    password = sqlalchemy.Column(PasswordType(schemes=['pbkdf2_sha512']),
                                  nullable=False)
 
     admin = sqlalchemy.Column(sqlalchemy.Boolean,
@@ -123,15 +101,17 @@ class Users(DAO):
             If a user with such username exists and the users password matches
             the given one the user entity is returned - None otherwise.
         """
+
         try:
-            return self.session \
-                    .query(User) \
-                    .filter(User.username == username, \
-                            User.password == password) \
-                    .one()
+            user = self.getUser(username)
 
         except sqlalchemy.orm.exc.NoResultFound:
             return None
+
+        if user.password != password:
+            return None
+
+        return user
 
 
     def getUsers(self):

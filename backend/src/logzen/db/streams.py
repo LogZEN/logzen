@@ -27,7 +27,6 @@ import sqlalchemy.schema
 from logzen.db import Entity, JSONDict, DAO
 
 
-
 class Stream(Entity):
     """ The database entity for streams.
 
@@ -57,16 +56,16 @@ class Stream(Entity):
                                nullable=False)
 
 
-
 @export()
 class Streams(DAO):
     """ DAO for accessing stream entities.
     """
 
-    def getStream(self, name):
+    def getStreamByName(self, user, name):
         try:
             return self.session \
                 .query(Stream) \
+                .filter(Stream.user == user) \
                 .filter(Stream.name == name) \
                 .one()
 
@@ -74,22 +73,30 @@ class Streams(DAO):
             raise KeyError(name)
 
 
-    def getStreams(self):
-        """ Returns an iterator over all existing stream entities.
+    def getStreamsByUser(self, user):
+        """ Returns all existing stream entities for the passed user.
         """
 
-        return iter(self.session.query(Stream))
+        return self.session \
+            .query(Stream) \
+            .filter(Stream.user == user) \
+            .all()
 
 
-    def createStream(self, name):
+    def createStream(self, user, **kwargs):
         """ Create a new stream entity.
 
             All parameters are passed as-is to the entity to create. The
             created entity is attached to the session and returned.
         """
 
-        stream = Stream(name=name)
+        stream = Stream(user=user,
+                        **kwargs)
 
         self.session.add(stream)
 
         return stream
+
+
+    def deleteStream(self, stream):
+        self.session.delete(stream)

@@ -90,7 +90,7 @@ class AuthPlugin():
                 self.logger.debug('Token validated with username: %s', username)
 
                 # Get the user object for the username
-                user = self.users.getUser(username=username)
+                user = self.users.getUserByName(username=username)
                 if user is None:
                     raise bottle.HTTPError(401, 'User does not exist: ' + username)
 
@@ -150,7 +150,7 @@ def install(api,
          users='logzen.db.users:Users')
 def login(request,
           users):
-    user = users.getVerifiedUser(**request.data)
+    user = users.getVerifiedUserByName(**request.data)
 
     if user is None:
         raise bottle.HTTPError(401, 'Wrong username or password')

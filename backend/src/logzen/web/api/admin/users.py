@@ -38,7 +38,7 @@ def list(users):
 def get(name,
         users):
     try:
-        user = users.getUser(name)
+        user = users.getUserByName(name)
 
         return {'username': user.username,
                 'admin': user.admin}
@@ -76,11 +76,12 @@ def update(name,
            request):
     with session():
         try:
-            user = users.getUser(name)
-            user.__init__(**request.data)
+            user = users.getUserByName(name)
 
         except KeyError:
             raise bottle.HTTPError(404, 'User not found: %s' % name)
+
+        user.__init__(**request.data)
 
 
 @resource('/users/<name>', 'DELETE')
@@ -89,9 +90,10 @@ def delete(name,
            users):
     with session():
         try:
-            user = users.getUser(name)
-            users.deleteUser(user)
+            user = users.getUserByName(name)
 
         except KeyError:
             raise bottle.HTTPError(404, 'User not found: %s' % name)
+
+        users.deleteUser(user)
 

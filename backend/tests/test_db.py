@@ -50,19 +50,19 @@ class UserDatabaseTestCase(DatabaseTestCase):
 
 
     def testPasswordIsHashedAfterFetching(self):
-        user = self.users.getUser('test')
+        user = self.users.getUserByName('test')
 
         assert_that(user.password, is_(instance_of(Password)))
 
 
     def testPasswordVerificytionSucceeds(self):
-        user = self.users.getUser('test')
+        user = self.users.getUserByName('test')
 
         assert_that(user.password == 'plain', is_(True))
 
 
     def testPasswordVerificytionWithWrongPasswordFails(self):
-        user = self.users.getUser('test')
+        user = self.users.getUserByName('test')
 
         assert_that(user.password == 'WRONG!', is_(False))
 

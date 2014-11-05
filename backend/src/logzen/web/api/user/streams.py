@@ -20,24 +20,29 @@ along with LogZen. If not, see <http://www.gnu.org/licenses/>.
 import bottle
 
 from require import *
+from logzen.db import session
 from logzen.web.api.user import resource
 
 
 @resource('/streams', 'GET')
-@require(user='logzen.web.api.auth:User')
-def list(user):
-    return {key: {'name': stream.name,
-                  'description': stream.description}
-            for key, stream
-            in user.streams.items()}
+@require(user='logzen.web.api.auth:User',
+         streams='logzen.db.streams:Streams')
+def list(user,
+         streams):
+    return {stream.name: {'description': stream.description,
+                          'filter': stream.filter}
+            for stream
+            in streams.getStreamsByUser(user)}
 
 
 @resource('/streams/<name>', 'GET')
-@require(user='logzen.web.api.auth:User')
+@require(user='logzen.web.api.auth:User',
+         streams='logzen.db.streams:Streams')
 def get(name,
-        user):
+        user,
+        streams):
     try:
-        stream = user.streams[name]
+        stream = streams.getStreamByName(user, name)
 
     except KeyError:
         raise bottle.HTTPError(404, 'Stream not found: %s' % name)
@@ -45,3 +50,61 @@ def get(name,
     return {'name': stream.name,
             'description': stream.description,
             'filter': stream.filter}
+
+
+@resource('/streams', 'POST',
+          schema={'type': 'object',
+                  'properties': {'name': {'type': 'string'},
+                                 'description': {'type': 'string'},
+                                 'filter': {'type': 'object'}},
+                  'required': ['name',
+                               'filter']})
+@require(user='logzen.web.api.auth:User',
+         streams='logzen.db.streams:Streams',
+         request='logzen.web.api:Request')
+def create(user,
+           streams,
+           request):
+    with session():
+        streams.createStream(user, **request.data)
+
+
+@resource('/streams/<name>', 'PUT',
+          schema={'type': 'object',
+                  'properties': {'name': {'type': 'string'},
+                                 'description': {'type': 'string'},
+                                 'filter': {'type': 'object'}},
+                  'required': ['name',
+                               'filter']})
+@require(user='logzen.web.api.auth:User',
+         streams='logzen.db.streams:Streams',
+         request='logzen.web.api:Request')
+def update(name,
+           user,
+           streams,
+           request):
+    with session():
+        try:
+            stream = streams.getStreamByName(user, name)
+
+        except KeyError:
+            raise bottle.HTTPError(404, 'Stream not found: %s' % name)
+
+        stream.__init__(**request.data)
+
+
+@resource('/streams/<name>', 'DELETE')
+@require(user='logzen.web.api.auth:User',
+         streams='logzen.db.streams:Streams')
+def delete(name,
+           user,
+           streams):
+    with session():
+        try:
+            stream = streams.getStreamByName(user, name)
+
+        except KeyError:
+            raise bottle.HTTPError(404, 'Stream not found: %s' % name)
+
+        streams.deleteStream(stream)
+

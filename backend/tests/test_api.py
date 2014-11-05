@@ -1,16 +1,12 @@
 import unittest
+import json
 
 from hamcrest import *
-
 import werkzeug.test
 import werkzeug.wrappers
 
-import json
-
 from require import *
-
 from logzen.db import session
-
 
 
 class ApiTestCase(unittest.TestCase):
@@ -40,7 +36,6 @@ class ApiTestCase(unittest.TestCase):
 
         # Rollback all changes
         self.transaction.rollback()
-
 
 
 class AuthenticationApiTestCase(ApiTestCase):
@@ -134,6 +129,114 @@ class UserAccountApiTestCase(ApiTestCase):
         assert_that(json.loads(resp.data.decode('utf8')), is_({'username': 'user'}))
 
 
+class UserStreamsApiTestCase(ApiTestCase):
+    users = require('logzen.db.users:Users')
+    streams = require('logzen.db.streams:Streams')
+
+
+    def setUp(self):
+        super(UserStreamsApiTestCase, self).setUp()
+
+        with session():
+            self.user = self.users.createUser(username='user',
+                                              password='user')
+
+        self.client.post('/api/v1/token',
+                         data=json.dumps({'username': 'user',
+                                          'password': 'user'}))
+
+
+    def testCreatingStreamSucceeds(self):
+        resp = self.client.post('/api/v1/user/streams',
+                                data=json.dumps({'name': 'test',
+                                                 'description': 'For testing purposes only',
+                                                 'filter': {'foo': 42,
+                                                            'bar': 23}}))
+
+        assert_that(resp.status_code, is_(200))
+
+        with session():
+            user = self.users.getUserByName('user')
+
+            assert_that(user.streams, has_length(1))
+            assert_that(user.streams, has_items('test'))
+
+
+    def testDeletingStreamSucceeds(self):
+        with session():
+            self.streams.createStream(user=self.user,
+                                      name='test',
+                                      filter={})
+
+        resp = self.client.delete('/api/v1/user/streams/test')
+
+        assert_that(resp.status_code, is_(200))
+
+        with session():
+            user = self.users.getUserByName('user')
+
+            assert_that(user.streams, is_(empty()))
+
+
+    def testListingStreamsSucceeds(self):
+        with session():
+            self.streams.createStream(user=self.user,
+                                      name='test1',
+                                      filter={})
+            self.streams.createStream(user=self.user,
+                                      name='test2',
+                                      filter={})
+            self.streams.createStream(user=self.user,
+                                      name='test3',
+                                      filter={})
+
+        resp = self.client.get('/api/v1/user/streams')
+
+        assert_that(resp.status_code, is_(200))
+        assert_that(json.loads(resp.data.decode('utf8')), is_({'test1': {'description': '',
+                                                                         'filter': {}},
+                                                               'test2': {'description': '',
+                                                                         'filter': {}},
+                                                               'test3': {'description': '',
+                                                                         'filter': {}}}))
+
+
+    def testFetchingStreamSucceeds(self):
+        with session():
+            self.streams.createStream(user=self.user,
+                                      name='test',
+                                      filter={})
+
+        resp = self.client.get('/api/v1/user/streams/test')
+
+        assert_that(resp.status_code, is_(200))
+        assert_that(json.loads(resp.data.decode('utf8')), is_({'name': 'test',
+                                                               'description': '',
+                                                               'filter': {}}))
+
+
+    def testUpdatingStreamSucceeds(self):
+        with session():
+            self.streams.createStream(user=self.user,
+                                      name='test',
+                                      filter={})
+
+        resp = self.client.put('/api/v1/user/streams/test',
+                               data=json.dumps({'name': 'toast',
+                                                'description': 'x',
+                                                'filter': {'foo': 'bar'}}))
+
+        assert_that(resp.status_code, is_(200))
+
+        with session():
+            user = self.users.getUserByName('user')
+            stream = user.streams['toast']
+
+            assert_that(stream.name, is_('toast'))
+            assert_that(stream.description, is_('x'))
+            assert_that(stream.filter, is_({'foo': 'bar'}))
+
+
 class AdminApiTestCase(ApiTestCase):
     users = require('logzen.db.users:Users')
 
@@ -225,7 +328,7 @@ class AdminUsersApiTestCase(ApiTestCase):
         assert_that(resp.status_code, is_(200))
         assert_that(resp.data, is_(b''))
 
-        user = self.users.getUser('marvin')
+        user = self.users.getUserByName('marvin')
 
         assert_that(user, is_(not_none()))
         assert_that(user, has_properties(username='marvin',

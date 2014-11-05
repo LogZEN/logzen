@@ -78,7 +78,7 @@ class Users(DAO):
     """ Accessor for user entities.
     """
 
-    def getUser(self, username):
+    def getUserByName(self, username):
         """ Get a user entity with the given username.
 
             If a user with such username exists, the user entity is returned.
@@ -95,7 +95,7 @@ class Users(DAO):
             raise KeyError(username)
 
 
-    def getVerifiedUser(self, username, password):
+    def getVerifiedUserByName(self, username, password):
         """ Get a user entity with the given username and a matching password.
 
             If a user with such username exists and the users password matches
@@ -103,7 +103,7 @@ class Users(DAO):
         """
 
         try:
-            user = self.getUser(username)
+            user = self.getUserByName(username)
 
         except sqlalchemy.orm.exc.NoResultFound:
             return None

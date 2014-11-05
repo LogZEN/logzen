@@ -42,7 +42,7 @@ class User(Entity):
                            nullable=False,
                            autoincrement=True)
 
-    username = sqlalchemy.Column(sqlalchemy.String,
+    username = sqlalchemy.Column(sqlalchemy.Unicode,
                                  nullable=False,
                                  unique=True)
 

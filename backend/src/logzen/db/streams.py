@@ -42,15 +42,14 @@ class Stream(Entity):
                            nullable=False,
                            autoincrement=True)
 
-    user_id = sqlalchemy.Column(sqlalchemy.Integer,
-                                sqlalchemy.ForeignKey('users.id'))
+    user_id = sqlalchemy.Column(sqlalchemy.ForeignKey('users.id'))
 
     user = sqlalchemy.orm.relationship('User')
 
-    name = sqlalchemy.Column(sqlalchemy.String,
+    name = sqlalchemy.Column(sqlalchemy.Unicode,
                              nullable=False)
 
-    description = sqlalchemy.Column(sqlalchemy.Text,
+    description = sqlalchemy.Column(sqlalchemy.UnicodeText,
                                     nullable=False,
                                     default='')
 

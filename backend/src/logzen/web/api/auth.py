@@ -24,7 +24,7 @@ import functools
 import bottle
 import itsdangerous
 
-import random
+import os
 
 from logzen.web.api import resource
 
@@ -34,7 +34,7 @@ def AuthConfigDecl(config_decl):
     with config_decl('auth') as section_decl:
         # The secret key used to sign the authentication token
         section_decl('key',
-                     default=lambda: random.getrandbits(4096).to_bytes(512, 'little'))
+                     default=lambda: os.urandom(512))
 
         # The duration a authentication token is valid after creation (in
         # seconds)

@@ -53,7 +53,8 @@ class Stream(Entity):
                                     default='')
 
     filter = sqlalchemy.Column(JSONDict,
-                               nullable=False)
+                               nullable=True,
+                               default=None)
 
 
 @export()

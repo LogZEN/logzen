@@ -2,10 +2,10 @@ import unittest
 
 from hamcrest import *
 
-from require import *
-
 from logzen.db import session
 from logzen.db.users import User, Password
+
+from util import *
 
 
 
@@ -16,6 +16,8 @@ class DatabaseTestCase(unittest.TestCase):
 
 
     def setUp(self):
+        mockConfigFile.start()
+
         # Begin a manual transaction
         self.transaction = self.testConnection.begin()
 
@@ -28,6 +30,8 @@ class DatabaseTestCase(unittest.TestCase):
         # Rollback all changes
         self.transaction.rollback()
 
+        mockConfigFile.stop()
+
 
 
 class UserDatabaseTestCase(DatabaseTestCase):
@@ -36,7 +40,7 @@ class UserDatabaseTestCase(DatabaseTestCase):
 
 
     def setUp(self):
-        super(UserDatabaseTestCase, self).setUp()
+        super().setUp()
 
         with session():
             self.users.createUser(username='test',

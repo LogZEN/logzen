@@ -42,6 +42,10 @@ def ElasticsearchConfigDecl(config_decl):
         section_decl('index',
                      default='syslog')
 
+        # The doc_type of the the syslog messages
+        section_decl('type',
+                     default='event')
+
 
 
 @export()
@@ -64,9 +68,17 @@ class Connection:
         else:
             auth = None
 
-        self.__connection = Elasticsearch(self.config.es.host,
+        self.__connection = Elasticsearch(self.config.es.hosts,
                                           connection_class=Urllib3HttpConnection,
                                           http_auth=auth)
+
+        if not self.__connection.indices.exists(self.config.es.index):
+            self.logger.warn('Specified index does not exist: %s', self.config.es.index)
+
+        elif not self.__connection.indices.exists_type(self.config.es.index,
+                                                     self.config.es.type):
+            self.logger.warn('Specified mapping does not exist: %s/%s', self.config.es.index, self.config.es.type)
+
 
     def search(self,
                body):
@@ -79,5 +91,6 @@ class Connection:
         self.logger.debug('Execute search: %s',
                           JSONSerializer().dumps(body))
 
-        return self.__connection.search(body=body,
-                                        index=self.config.es.index)
+        return self.__connection.search(self.config.es.index,
+                                        self.config.es.type,
+                                        body)

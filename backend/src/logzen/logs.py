@@ -29,54 +29,83 @@ class Logs(object):
 
     es = require('logzen.es:Connection')
 
-    users = require('logzen.db.users:Users')
-    streams = require('logzen.db.streams:Streams')
 
-
-    def query(self,
-              stream,
-              query=None):
-        """ Search for logs using the passed stream and query.
-
-            The returned log list is filtered by the filter assigned to the
-            user owning the stream and by an optional filter assigned to a stream.
-
-            The returned value is the unmodified result of the executed
-            ElasticSearch query.
+    def queryWithFilter(self,
+                        filter,
+                        query=None):
+        """ Search for logs using the passed filter and an optional query.
         """
 
-        request = {
-        }
+        request = {}
 
-        # Add the filters to the request
-        if stream.user.filter and stream.filter:
-            # Create a combined filter using the user filter and stream filter
-            request.update({
-                'filter': {
-                    'and': [
-                        stream.user.filter,
-                        stream.filter
-                    ]
-                }
-            })
-
-        elif stream.user.filter:
-            # Use only the user filter
-            request.update({
-                'filter': stream.user.filter
-            })
-
-        elif stream.filter is not None:
-            # Use only the stream filter
-            request.update({
-                'filter': stream.filter
-            })
+        # Add the filter to the request - if any
+        if filter:
+            request['filter'] = filter
 
         # Add the query to the request - if any
         if query:
-            request.update({
-                'query': query,
-            })
+            request['query'] = query
 
-        # Execute the search
-        return self.es.search(request)
+        else:
+            request['query'] = self.MATCH_ALL
+
+        # Execute the request
+        result = self.es.search(request)
+
+        return result
+
+
+    def queryWithFilters(self,
+                         filters,
+                         query=None):
+        """ Search for logs using the passed filters and an optional query.
+
+            If the filters does contain more than one filter, the filters are concatinated using the 'and' operation.
+        """
+
+        # Add the filters to the request
+        if not filters:
+            # Do not use a filter
+            filter = None
+
+        elif len(filters) == 1:
+            # Use the single filter as-is
+            filter = filters[0]
+
+        else:
+            # Concatenate all filters using 'and' operation
+            filter = {'and': filters}
+
+        # Execute the query
+        return self.queryWithFilter(filter,
+                                    query)
+
+
+    def queryWithUser(self,
+                      user,
+                      query=None):
+        """ Search for logs using the passed users filter and an optional query.
+        """
+
+        return self.queryWithFilter(user.filter,
+                                    query)
+
+
+    def queryWithStream(self,
+                        stream,
+                        query=None):
+        """ Search for logs using the passed streams filter and an optional query.
+        """
+
+        filters = []
+
+        # Add the user filter to the list of filters - if any
+        if stream.user.filter:
+            filters.append(stream.user.filter)
+
+        # Add the stream filter to the list of filters - if any
+        if stream.filter:
+            filters.append(stream.filter)
+
+        return self.queryWithFilters(filters,
+                                     query)

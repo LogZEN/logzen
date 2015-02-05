@@ -24,21 +24,31 @@ from logzen.web.api.user import resource
 
 
 
+@resource('/logs/*', ['GET', 'POST'])
+@require(user='logzen.web.api.auth:User',
+         request='logzen.web.api:Request',
+         logs='logzen.logs:Logs')
+def query(user,
+          request,
+          logs):
+    return logs.queryWithUser(user=user,
+                              query=request.json)
+
+
+
 @resource('/logs/<stream>', ['GET', 'POST'])
 @require(user='logzen.web.api.auth:User',
          request='logzen.web.api:Request',
          logs='logzen.logs:Logs')
-def query(name,
+def query(stream,
           user,
           request,
           logs):
-    # Resolve the stream entity
     try:
-        stream = user.streams[name]
+        stream = user.streams[stream]
 
     except KeyError:
-        raise bottle.HTTPError(404, 'Stream not found: %s' % name)
+        raise bottle.HTTPError(404, 'Stream not found: %s' % stream)
 
-    # Execute the query and return the result
-    return logs.query(stream=stream,
-                      query=request.json)
+    return logs.queryWithStream(stream=stream,
+                                query=request.json)

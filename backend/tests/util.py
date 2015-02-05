@@ -1,11 +1,10 @@
-
-
-
 from require import *
+from require.mock import *
 
 
-@extend('logzen.config:ConfigFile')
-def TestConfigFile(file):
+
+@mock('logzen.config:ConfigFile')
+def mockConfigFile(file):
     from configparser import ConfigParser
 
     config_file = ConfigParser()
@@ -18,7 +17,13 @@ def TestConfigFile(file):
     config_file.set('es', 'hosts', '')
     config_file.set('log', 'level', 'DEBUG')
 
-    return config_file
+    file.return_value = config_file
+
+
+
+@mock('logzen.es:Connection')
+def mockElasticsearch(connection):
+    connection.return_value.search.side_effect = lambda request: request
 
 
 
